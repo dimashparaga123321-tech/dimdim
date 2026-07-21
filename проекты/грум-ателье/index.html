@@ -321,8 +321,9 @@
       border-radius: 50%; background: var(--secondary); border: 3px solid var(--bg);
     }
     .chat-panel {
-      position: fixed; right: 12px; bottom: 84px; width: min(340px, calc(100vw - 24px));
-      height: min(500px, calc(100dvh - 104px)); max-height: calc(100dvh - 104px);
+      position: fixed; left: 50%; right: auto; bottom: 84px; transform: translateX(-50%);
+      width: min(360px, calc(100dvw - 28px));
+      height: min(460px, calc(100dvh - 120px)); max-height: calc(100dvh - 120px);
       background: var(--card-bg);
       border: 1px solid var(--card-border); border-radius: 22px; overflow: hidden;
       box-shadow: 0 22px 60px rgba(0,0,0,.28);
@@ -348,7 +349,7 @@
       background: linear-gradient(180deg, var(--card-bg), var(--bg));
     }
     .chat-message {
-      max-width: 90%; padding: 10px 12px; border-radius: 15px; font-size: 13px; line-height: 1.42;
+      max-width: 100%; padding: 10px 12px; border-radius: 15px; font-size: 13px; line-height: 1.42;
       white-space: pre-wrap; overflow-wrap: anywhere;
     }
     .chat-message.bot {
@@ -366,7 +367,11 @@
     .chat-foot {
       border-top: 1px solid var(--card-border); padding: 10px; background: var(--card-bg);
     }
-    .chat-quick { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
+    .chat-quick {
+      display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding-bottom: 10px;
+    }
+    .chat-quick .chat-chip { width: 100%; }
     .chat-form { display: grid; grid-template-columns: 1fr 44px; gap: 8px; }
     .chat-input {
       min-width: 0; border: 2px solid var(--card-border); border-radius: 999px;
@@ -392,8 +397,8 @@
       .modal-actions { grid-template-columns: 1fr; }
       .chatbot { right: 12px; bottom: 12px; }
       .chat-panel {
-        right: 10px; left: 10px; bottom: 76px; width: auto;
-        height: min(470px, calc(100dvh - 92px)); max-height: calc(100dvh - 92px);
+        left: 10px; right: 10px; bottom: 76px; transform: none; width: auto;
+        height: min(430px, calc(100dvh - 92px)); max-height: calc(100dvh - 92px);
       }
     }
     footer { text-align: center; padding: 34px; color: var(--muted); font-size: 14px; }
