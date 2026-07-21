@@ -6,33 +6,33 @@
   <title>Лохматый Стиль — груминг-ателье для собак</title>
   <style>
     /* ===== ЦВЕТОВЫЕ ТЕМЫ (гаммы) ===== */
-    :root, body[data-theme="light-orange"] {
-      --bg: #fff8f0; --text: #3a2e2a; --muted: #8a7970;
-      --accent: #ff7a3d; --accent-text: #fff;
-      --card-bg: #ffffff; --card-border: #ffe3c7; --glow: #ffe3c7;
-      --secondary: #2ec4b6; --panel: #fff3e6; --ghost-border: #ffca9e;
-      --hero-ink: #24130c; --hero-soft: #fff2e4;
+    :root, body[data-theme="golden-light"] {
+      --bg: #fff8ec; --text: #34261c; --muted: #8c7662;
+      --accent: #d88a32; --accent-text: #fffdf8;
+      --card-bg: #ffffff; --card-border: #f3d7ae; --glow: #f7d99d;
+      --secondary: #2d9f95; --panel: #fff0d8; --ghost-border: #eabf83;
+      --hero-ink: #2f1f15; --hero-soft: #ffe7bd;
     }
-    body[data-theme="dark-purple"] {
-      --bg: #12101f; --text: #ececf5; --muted: #a9a3c2;
-      --accent: #a06bff; --accent-text: #fff;
-      --card-bg: #1c1830; --card-border: #2c2748; --glow: #3a2f7a;
-      --secondary: #2ec4b6; --panel: #1a1730; --ghost-border: #4a3f80;
-      --hero-ink: #ffffff; --hero-soft: #211b3b;
+    body[data-theme="maltese-light"] {
+      --bg: #fbf8f1; --text: #2f2a24; --muted: #82766a;
+      --accent: #b9855a; --accent-text: #fffaf3;
+      --card-bg: #ffffff; --card-border: #eadfce; --glow: #f0e5d2;
+      --secondary: #6daaa2; --panel: #f4eee3; --ghost-border: #d8c6ad;
+      --hero-ink: #28231e; --hero-soft: #f2e8d8;
     }
-    body[data-theme="dark-orange"] {
-      --bg: #1a1310; --text: #f5ece6; --muted: #b7a498;
-      --accent: #ff8c42; --accent-text: #201009;
-      --card-bg: #241a14; --card-border: #3a2a1e; --glow: #4a2f1a;
-      --secondary: #35c9ba; --panel: #241a14; --ghost-border: #6b4a30;
-      --hero-ink: #fff7ef; --hero-soft: #2b1c14;
+    body[data-theme="doberman-dark"] {
+      --bg: #17110d; --text: #f8efe6; --muted: #c4aa91;
+      --accent: #c97837; --accent-text: #1a0f08;
+      --card-bg: #231813; --card-border: #3a281f; --glow: #5a341f;
+      --secondary: #3fb6aa; --panel: #2a1b14; --ghost-border: #6a4229;
+      --hero-ink: #fff5eb; --hero-soft: #2e1b12;
     }
-    body[data-theme="mint-light"] {
-      --bg: #f0fbf9; --text: #22403c; --muted: #6f8a84;
-      --accent: #17b7a6; --accent-text: #fff;
-      --card-bg: #ffffff; --card-border: #cdeee9; --glow: #cdeee9;
-      --secondary: #ff7a3d; --panel: #e6f7f4; --ghost-border: #9fe0d7;
-      --hero-ink: #15332f; --hero-soft: #ddf6f1;
+    body[data-theme="husky-dark"] {
+      --bg: #101820; --text: #eef6fb; --muted: #a9b8c5;
+      --accent: #8fc7df; --accent-text: #071018;
+      --card-bg: #172431; --card-border: #263849; --glow: #24495e;
+      --secondary: #d99a55; --panel: #14212c; --ghost-border: #3d5b70;
+      --hero-ink: #f8fcff; --hero-soft: #193347;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -75,8 +75,8 @@
         radial-gradient(700px 360px at 84% 0%, rgba(46,196,182,.22) 0%, transparent 62%),
         var(--bg);
     }
-    body[data-theme="dark-purple"] .hero,
-    body[data-theme="dark-orange"] .hero {
+    body[data-theme="doberman-dark"] .hero,
+    body[data-theme="husky-dark"] .hero {
       background:
         radial-gradient(850px 420px at 18% 12%, var(--hero-soft) 0%, transparent 58%),
         radial-gradient(700px 360px at 84% 0%, rgba(46,196,182,.2) 0%, transparent 62%),
@@ -295,17 +295,17 @@
     footer { text-align: center; padding: 34px; color: var(--muted); font-size: 14px; }
   </style>
 </head>
-<body data-theme="light-orange">
+<body data-theme="golden-light">
 
   <!-- КНОПКА НАСТРОЕК -->
   <div class="settings">
     <button class="gear" id="gearBtn" aria-label="Настройки">⚙️</button>
     <div class="settings-panel" id="settingsPanel" hidden>
       <p class="settings-title">🎨 Тема оформления</p>
-      <button data-theme="light-orange">🟠 Светлая</button>
-      <button data-theme="dark-purple">🟣 Тёмно-фиолетовая</button>
-      <button data-theme="dark-orange">🟤 Тёмно-оранжевая</button>
-      <button data-theme="mint-light">🟢 Мятная</button>
+      <button data-theme="golden-light">🦮 Ретривер светлая</button>
+      <button data-theme="maltese-light">🤍 Мальтезе светлая</button>
+      <button data-theme="doberman-dark">🟤 Доберман тёмная</button>
+      <button data-theme="husky-dark">❄️ Хаски тёмная</button>
     </div>
   </div>
 
@@ -501,7 +501,7 @@
 
       <!-- Готово -->
       <div id="step-done" hidden>
-        <h3>✅ Заявка отправлена!</h3>
+        <h3 id="doneTitle">✅ Заявка отправлена!</h3>
         <p class="sub" id="doneText">Спасибо! 🐾</p>
       </div>
     </div>
@@ -511,8 +511,14 @@
     const body = document.body;
 
     /* ===== ТЕМЫ ===== */
+    const availableThemes = ["golden-light", "maltese-light", "doberman-dark", "husky-dark"];
     const saved = localStorage.getItem("theme");
-    if (saved) body.setAttribute("data-theme", saved);
+    if (availableThemes.includes(saved)) {
+      body.setAttribute("data-theme", saved);
+    } else {
+      body.setAttribute("data-theme", "golden-light");
+      localStorage.setItem("theme", "golden-light");
+    }
 
     const gear = document.getElementById("gearBtn");
     const panel = document.getElementById("settingsPanel");
@@ -554,7 +560,7 @@
 
     // 🔒 Адрес нашего сервера (Cloudflare Worker), который прячет токен бота.
     // Вставим сюда ссылку после настройки сервера (см. уроки/урок-04/СЕРВЕР.md).
-    const WORKER_URL = "ВСТАВЬ_АДРЕС_СЕРВЕРА";
+    const WORKER_URL = "";
 
     const stylesBySize = {
       small: [
@@ -739,7 +745,17 @@
     }
 
     // Отправить заявку в Telegram-бот
-    document.getElementById("sendBooking").addEventListener("click", () => {
+    function showDone(title, text) {
+      document.getElementById("doneTitle").textContent = title;
+      document.getElementById("doneText").textContent = text;
+      showStep("step-done");
+    }
+
+    function telegramServerReady() {
+      return WORKER_URL.startsWith("https://");
+    }
+
+    document.getElementById("sendBooking").addEventListener("click", async () => {
       const phoneEl = document.getElementById("clientPhone");
       const phoneError = document.getElementById("phoneError");
       const phone = phoneEl.value.trim();
@@ -764,16 +780,36 @@
         "☎️ Телефон клиента: " + phone + "\n" +
         "⏱ Займёт примерно: " + duration + "\n" +
         "💰 Цена: " + price + " ₽";
-      // отправляем заявку на наш сервер — он уже сам шлёт её в Telegram
-      fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: text })
-      }).catch(() => {}); // пока сервер не настроен — просто не падаем
-      document.getElementById("doneText").textContent =
-        "Готово! Заявка отправлена. ✂️ Стрижка займёт примерно " + duration +
-        " · Цена " + price + " ₽. Мы свяжемся по номеру " + phone + ".";
-      showStep("step-done");
+
+      if (!telegramServerReady()) {
+        showDone(
+          "⚠️ Telegram-сервер не подключён",
+          "Заявка собрана, но не отправлена в бот: в сайте ещё нет адреса Cloudflare Worker. Пришли адрес сервера, и я подключу отправку."
+        );
+        return;
+      }
+
+      try {
+        const response = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: text })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.ok === false) {
+          throw new Error(data.error || "Telegram не принял сообщение");
+        }
+        showDone(
+          "✅ Заявка отправлена!",
+          "Готово! Стрижка займёт примерно " + duration +
+          " · Цена " + price + " ₽. Мы свяжемся по номеру " + phone + "."
+        );
+      } catch (error) {
+        showDone(
+          "⚠️ Не удалось отправить в Telegram",
+          "Заявка собрана, но бот не получил сообщение. Проверь адрес Worker, BOT_TOKEN и CHAT_ID в Cloudflare."
+        );
+      }
     });
 
     /* ===== управление модалкой ===== */
