@@ -334,6 +334,10 @@
     }
     .chat-panel.is-open { animation: chat-pop .22s ease-out; }
     .chat-panel.is-positioned.is-open { animation-name: chat-pop-positioned; }
+    .chat-panel.is-closing {
+      pointer-events: none; animation: chat-hide .2s ease-in forwards;
+    }
+    .chat-panel.is-positioned.is-closing { animation-name: chat-hide-positioned; }
     .chat-panel.is-dragging, .chat-panel.is-resizing {
       transition: none; user-select: none;
     }
@@ -344,6 +348,14 @@
     @keyframes chat-pop-positioned {
       from { opacity: 0; transform: translateY(18px) scale(.96); }
       to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes chat-hide {
+      from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+      to { opacity: 0; transform: translateX(-50%) translateY(18px) scale(.94); }
+    }
+    @keyframes chat-hide-positioned {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(18px) scale(.96); }
     }
     .chat-head {
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -376,6 +388,7 @@
     .chat-message.user {
       align-self: flex-end; background: var(--accent); color: var(--accent-text);
     }
+    .chat-message.thinking { color: var(--muted); font-style: italic; }
     .chat-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
     .chat-chip {
       border: 1px solid var(--ghost-border); background: var(--card-bg); color: var(--accent);
@@ -399,6 +412,7 @@
       width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
       background: var(--accent); color: var(--accent-text); font-size: 18px; font-weight: 900;
     }
+    .chat-send:disabled, .chat-input:disabled { cursor: wait; opacity: .65; }
     .chat-payment {
       margin-top: 8px; padding: 12px; border-radius: 14px; background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -409,14 +423,8 @@
       padding: 8px 10px; border-radius: 10px; background: var(--bg); color: var(--text);
     }
     .chat-resize {
-      position: absolute; right: 4px; bottom: 4px; width: 36px; height: 36px;
+      position: absolute; right: 0; bottom: 0; width: 12px; height: 12px;
       cursor: nwse-resize; touch-action: none; z-index: 3;
-      border-radius: 12px;
-    }
-    .chat-resize::after {
-      content: ""; position: absolute; right: 9px; bottom: 9px; width: 12px; height: 12px;
-      border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
-      opacity: .7;
     }
     @media (max-width: 520px) {
       .contact .phone { font-size: 28px; }
@@ -429,9 +437,14 @@
         height: min(430px, calc(100dvh - 92px)); max-height: calc(100dvh - 92px);
       }
       .chat-panel.is-open { animation-name: chat-pop-mobile; }
+      .chat-panel.is-closing { animation-name: chat-hide-mobile; }
       @keyframes chat-pop-mobile {
         from { opacity: 0; transform: translateY(18px) scale(.96); }
         to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      @keyframes chat-hide-mobile {
+        from { opacity: 1; transform: translateY(0) scale(1); }
+        to { opacity: 0; transform: translateY(18px) scale(.96); }
       }
     }
     footer { text-align: center; padding: 34px; color: var(--muted); font-size: 14px; }
@@ -598,8 +611,8 @@
         <div class="chat-title">
           <div class="chat-avatar">🐶</div>
           <div>
-            <strong>Лохматый бот</strong>
-            <span>запись, цены, оплата и вопросы</span>
+            <strong>Лохматый AI</strong>
+            <span>консультант на DeepSeek</span>
           </div>
         </div>
         <button class="chat-close" id="chatClose" aria-label="Закрыть чат">×</button>
@@ -1180,11 +1193,15 @@
     const chatQuick = document.getElementById("chatQuick");
     const chatForm = document.getElementById("chatForm");
     const chatInput = document.getElementById("chatInput");
+    const chatSend = chatForm.querySelector(".chat-send");
     const chatHead = chatPanel.querySelector(".chat-head");
     const chatResize = document.getElementById("chatResize");
     let chatStarted = false;
     let chatDrag = null;
     let chatSizing = null;
+    let chatCloseTimer = null;
+    let chatBusy = false;
+    let chatHistory = [];
 
     const quickReplies = [
       { label:"Записаться", value:"записаться" },
@@ -1235,16 +1252,17 @@
     }
 
     function openChat() {
+      window.clearTimeout(chatCloseTimer);
       chatPanel.hidden = false;
       chatToggle.setAttribute("aria-expanded", "true");
       chatToggle.querySelector(".chat-badge").hidden = true;
       if (chatPanel.classList.contains("is-positioned")) keepChatInsideScreen();
-      chatPanel.classList.remove("is-open");
+      chatPanel.classList.remove("is-open", "is-closing");
       void chatPanel.offsetWidth;
       chatPanel.classList.add("is-open");
       if (!chatStarted) {
         chatStarted = true;
-        botSay("Привет! Я помогу выбрать стрижку, объясню цены, создам демо-счёт на оплату и передам вопрос администратору.");
+        botSay("Привет! Я AI-консультант на DeepSeek. Спроси меня о стрижках, ценах, грумерах, спецуслугах или записи.");
         renderChatActions([
           { label:"Записаться на стрижку", action: () => { botSay("Открываю запись. Выбери породу, мастера, стрижку и удобное время."); openModal(); } },
           { label:"Посчитать оплату", action: () => showPaymentDemo(1900) },
@@ -1255,9 +1273,19 @@
     }
 
     function closeChat() {
-      chatPanel.hidden = true;
+      if (chatPanel.hidden || chatPanel.classList.contains("is-closing")) return;
       chatToggle.setAttribute("aria-expanded", "false");
       chatPanel.classList.remove("is-open");
+      chatPanel.classList.add("is-closing");
+
+      const finishClosing = () => {
+        if (!chatPanel.classList.contains("is-closing")) return;
+        chatPanel.hidden = true;
+        chatPanel.classList.remove("is-closing");
+      };
+
+      chatPanel.addEventListener("animationend", finishClosing, { once: true });
+      chatCloseTimer = window.setTimeout(finishClosing, 260);
     }
 
     function toggleChat() {
@@ -1366,57 +1394,53 @@
       }
     }
 
-    function botAnswer(message) {
-      const msg = message.toLowerCase();
-      if (msg.includes("запис") || msg.includes("стриж")) {
-        botSay("Могу провести запись прямо сейчас: порода → грумер → стрижка → спецуслуги → время → телефон.");
-        renderChatActions([{ label:"Открыть запись", action: openModal }]);
-        return;
-      }
-      if (msg.includes("цен") || msg.includes("стоим") || msg.includes("сколько")) {
-        botSay("Цена считается так: порода + стрижка + спецуслуги. Маленькие породы от 500 ₽, крупные от 1600 ₽. В форме итог посчитается автоматически.");
-        renderChatActions([
-          { label:"Открыть запись", action: openModal },
-          { label:"Демо-счёт 1900 ₽", action: () => showPaymentDemo(1900) },
-        ]);
-        return;
-      }
-      if (msg.includes("оплат") || msg.includes("сбп") || msg.includes("карт")) {
-        botSay("Сейчас работает демо-оплата: можно показать клиенту счёт и способ оплаты. Реальные списания подключим после выбора платёжного провайдера.");
-        renderChatActions([
-          { label:"Счёт 1200 ₽", action: () => showPaymentDemo(1200) },
-          { label:"Счёт 1900 ₽", action: () => showPaymentDemo(1900) },
-          { label:"Счёт 2500 ₽", action: () => showPaymentDemo(2500) },
-        ]);
-        return;
-      }
-      if (msg.includes("спец") || msg.includes("когт") || msg.includes("уш") || msg.includes("spa") || msg.includes("колтун")) {
-        botSay("Спецуслуги можно добавить после выбора стрижки: SPA, гигиена, вычёсывание, когти и лапки, уши и глаза, антиколтун. Они увеличивают время и цену по размеру собаки.");
-        renderChatActions([{ label:"Записаться со спецуслугой", action: openModal }]);
-        return;
-      }
-      if (msg.includes("грумер") || msg.includes("мастер") || msg.includes("рейтинг")) {
-        botSay("У нас есть Аня, Максим, Лера, Карина, Тимур и София. После выбора породы сайт покажет подходящих мастеров и рейтинги.");
-        renderChatActions([{ label:"Выбрать мастера", action: openModal }]);
-        return;
-      }
-      if (msg.includes("админ") || msg.includes("оператор") || msg.includes("человек") || msg.includes("связ")) {
-        botSay("Напиши вопрос одним сообщением. Я передам его администратору в Telegram.");
-        return;
-      }
-      if (msg.includes("скид") || msg.includes("акци")) {
-        botSay("Идея для демо: скидка 10% на первую стрижку и бесплатные когти при комплексном уходе. В реальном запуске можно включить промокоды.");
-        return;
-      }
-      botSay("Я понял вопрос и передал его администратору. Ещё могу помочь с записью, ценами, спецуслугами и демо-оплатой.");
-      sendChatToTelegram("💬 Вопрос из чат-бота груминг-ателье:\n" + message);
+    function setChatBusy(value) {
+      chatBusy = value;
+      chatInput.disabled = value;
+      chatSend.disabled = value;
     }
 
-    function handleChatMessage(message) {
+    async function askDeepSeek(message) {
+      chatHistory.push({ role: "user", content: message });
+      chatHistory = chatHistory.slice(-10);
+      const thinking = appendChatMessage("Печатает...", "bot thinking");
+      setChatBusy(true);
+
+      try {
+        const response = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "chat", messages: chatHistory }),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.ok === false || !data.reply) {
+          const error = new Error(data.error || "DeepSeek не ответил");
+          error.code = data.code || "";
+          throw error;
+        }
+        thinking.remove();
+        chatHistory.push({ role: "assistant", content: data.reply });
+        chatHistory = chatHistory.slice(-10);
+        botSay(data.reply);
+      } catch (error) {
+        thinking.remove();
+        chatHistory = chatHistory.slice(0, -1);
+        if (error.code === "AI_NOT_CONFIGURED") {
+          botSay("DeepSeek уже подготовлен, но ключ API ещё не добавлен в Cloudflare. После добавления ключа я начну отвечать сам.");
+        } else {
+          botSay("Сейчас не получилось связаться с DeepSeek. Попробуй ещё раз чуть позже или открой форму записи.");
+        }
+      } finally {
+        setChatBusy(false);
+        chatInput.focus();
+      }
+    }
+
+    async function handleChatMessage(message) {
       const text = message.trim();
-      if (!text) return;
+      if (!text || chatBusy) return;
       userSay(text);
-      botAnswer(text);
+      await askDeepSeek(text);
     }
 
     chatToggle.addEventListener("click", toggleChat);
@@ -1473,11 +1497,12 @@
       chatPanel.classList.remove("is-dragging", "is-resizing");
     });
     window.addEventListener("resize", keepChatInsideScreen);
-    chatForm.addEventListener("submit", (e) => {
+    chatForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const text = chatInput.value.trim();
+      if (!text || chatBusy) return;
       chatInput.value = "";
-      handleChatMessage(text);
+      await handleChatMessage(text);
     });
     renderQuickReplies();
 
