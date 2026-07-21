@@ -184,7 +184,7 @@
     }
     .modal {
       background: var(--card-bg); color: var(--text); border-radius: 24px;
-      padding: 32px 28px; max-width: 420px; width: 100%; text-align: center; position: relative;
+      padding: 32px 28px; max-width: 520px; width: 100%; text-align: center; position: relative;
       box-shadow: 0 20px 60px rgba(0,0,0,.35); max-height: 90vh; overflow-y: auto;
     }
     .modal-backdrop.is-opening { animation: booking-backdrop-in .22s ease-out both; }
@@ -219,10 +219,60 @@
     }
     .modal h3 { font-size: 24px; margin-bottom: 8px; }
     .modal .sub { margin-bottom: 20px; }
-    .modal select {
-      font-size: 17px; padding: 14px 18px; border-radius: 14px; width: 100%;
-      border: 2px solid var(--ghost-border); background: var(--bg); color: var(--text); cursor: pointer;
+    .breed-native {
+      position: absolute; width: 1px; height: 1px; overflow: hidden;
+      clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
     }
+    .breed-picker { position: relative; text-align: left; }
+    .breed-trigger {
+      width: 100%; min-height: 72px; padding: 12px 14px; cursor: pointer;
+      display: grid; grid-template-columns: 44px minmax(0, 1fr) 28px; gap: 12px; align-items: center;
+      color: var(--text); background: var(--bg); border: 2px solid var(--ghost-border);
+      border-radius: 18px; text-align: left; transition: border-color .18s, box-shadow .18s, transform .18s;
+    }
+    .breed-trigger:hover, .breed-trigger[aria-expanded="true"] {
+      border-color: var(--accent); box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 16%, transparent);
+    }
+    .breed-trigger-icon {
+      width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px;
+      background: var(--panel); color: var(--accent); font-size: 23px; border: 1px solid var(--card-border);
+    }
+    .breed-trigger-copy { min-width: 0; }
+    .breed-trigger-copy small { display: block; color: var(--muted); font-size: 12px; font-weight: 800; }
+    .breed-trigger-copy strong {
+      display: block; margin-top: 1px; font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .breed-trigger-arrow { color: var(--accent); font-size: 22px; text-align: center; transition: transform .18s; }
+    .breed-trigger[aria-expanded="true"] .breed-trigger-arrow { transform: rotate(180deg); }
+    .breed-menu {
+      margin-top: 10px; padding: 12px; border: 1px solid var(--card-border); border-radius: 18px;
+      background: var(--card-bg); box-shadow: 0 18px 42px rgba(0,0,0,.16);
+    }
+    .breed-search {
+      width: 100%; padding: 11px 13px; border: 2px solid var(--card-border); border-radius: 13px;
+      background: var(--bg); color: var(--text); font: inherit; outline: none;
+    }
+    .breed-search:focus { border-color: var(--accent); }
+    .breed-group + .breed-group { margin-top: 14px; }
+    .breed-group-title {
+      margin: 0 2px 7px; color: var(--muted); font-size: 12px; font-weight: 900; text-transform: uppercase;
+    }
+    .breed-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+    .breed-option {
+      min-width: 0; padding: 10px; cursor: pointer; display: grid;
+      grid-template-columns: 34px minmax(0, 1fr); gap: 9px; align-items: center;
+      border: 1px solid var(--card-border); border-radius: 13px;
+      background: var(--card-bg); color: var(--text); text-align: left;
+      transition: border-color .15s, background .15s, transform .15s;
+    }
+    .breed-option:hover { border-color: var(--accent); background: var(--panel); transform: translateY(-1px); }
+    .breed-option.selected { border-color: var(--accent); background: var(--panel); }
+    .breed-option-icon {
+      width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center;
+      color: var(--accent); background: var(--bg); font-size: 17px; font-weight: 900;
+    }
+    .breed-option-name { min-width: 0; font-size: 13px; font-weight: 800; line-height: 1.2; }
+    .breed-empty { padding: 16px 8px; color: var(--muted); text-align: center; font-size: 14px; }
     .match-result {
       margin-top: 22px; background: var(--bg); border: 2px solid var(--accent);
       border-radius: 18px; padding: 22px;
@@ -252,6 +302,9 @@
     .choice-list.style-options button { text-align: left; padding: 14px 16px; }
     .groomer-options { margin-top: 16px; }
     .groomer-options button { text-align: left; }
+    .groomer-availability {
+      display: block; margin-top: 5px; color: var(--secondary); font-size: 13px; font-weight: 800;
+    }
     .style-title { display: block; font-weight: 900; }
     .style-meta { display: block; color: var(--muted); font-size: 14px; margin-top: 2px; }
     .modal-actions {
@@ -324,11 +377,15 @@
     .send-btn svg { width: 24px; height: 24px; }
 
     /* КОНТАКТЫ */
-    .contact { text-align: center; background: var(--panel); border-radius: 28px; margin: 40px 24px; padding: 56px 24px; }
+    .contact {
+      width: calc(100% - 48px); max-width: 1000px; text-align: center;
+      background: var(--panel); border-radius: 28px; margin: 40px auto; padding: 56px 24px;
+      overflow: hidden;
+    }
     .contact .phone {
-      font-size: clamp(26px, 6vw, 40px); font-weight: 800; color: var(--accent);
-      display: inline-block; max-width: 100%; margin: 10px auto 0;
-      white-space: nowrap; overflow-wrap: normal; line-height: 1.15;
+      width: fit-content; max-width: 100%; font-size: clamp(22px, 5vw, 40px);
+      font-weight: 800; color: var(--accent); display: block; margin: 10px auto 0;
+      white-space: nowrap; line-height: 1.15; text-align: center;
     }
 
     /* ===== ЧАТ-БОТ ===== */
@@ -457,6 +514,8 @@
       .sbp-box { grid-template-columns: 1fr; text-align: center; }
       .qr-placeholder { margin: 0 auto; }
       .modal-actions { grid-template-columns: 1fr; }
+      .breed-grid { grid-template-columns: 1fr; }
+      .breed-menu { padding: 10px; }
       .chatbot { right: 12px; bottom: 12px; }
       .chat-panel {
         left: 10px; right: 10px; bottom: 76px; transform: none; width: auto;
@@ -674,9 +733,23 @@
       <div id="step-breed">
         <h3>🐾 Запись на стрижку</h3>
         <p class="sub">Шаг 1. Выбери породу собаки</p>
-        <select id="breedSelect">
-          <option value="">— выбери породу —</option>
-        </select>
+        <div class="breed-picker" id="breedPicker">
+          <button class="breed-trigger" id="breedTrigger" type="button" aria-expanded="false" aria-controls="breedMenu">
+            <span class="breed-trigger-icon">🐕</span>
+            <span class="breed-trigger-copy">
+              <small>Порода собаки</small>
+              <strong id="breedPickerValue">Выберите породу</strong>
+            </span>
+            <span class="breed-trigger-arrow" aria-hidden="true">⌄</span>
+          </button>
+          <div class="breed-menu" id="breedMenu" hidden>
+            <input class="breed-search" id="breedSearch" type="search" autocomplete="off" placeholder="Найти породу..." aria-label="Найти породу">
+            <div id="breedOptions"></div>
+          </div>
+          <select class="breed-native" id="breedSelect" tabindex="-1" aria-hidden="true">
+            <option value="">Выберите породу</option>
+          </select>
+        </div>
         <div class="match-result" id="matchResult" hidden>
           <div class="emoji">👥</div>
           <h4 id="mName">Выбери грумера</h4>
@@ -773,13 +846,20 @@
 
     /* ===== ДАННЫЕ ===== */
     const groomers = {
-      // busyUntil — до какого времени грумер занят (задано вручную для примера; позже возьмём из базы)
-      anya:   { name: "Аня",    emoji: "👩‍🎨", spec: "кудрявых и выставочных пород", rating: "4.9", reviews: 128, stars: "★★★★★", busyUntil: "14:30" },
-      maxim:  { name: "Максим", emoji: "🧑‍🔧", spec: "крупных и активных пород", rating: "4.7", reviews: 96, stars: "★★★★☆", busyUntil: "12:00" },
-      lera:   { name: "Лера",   emoji: "👩‍🦰", spec: "мелких пород и мягких форм", rating: "4.8", reviews: 112, stars: "★★★★★", busyUntil: null },
-      karina: { name: "Карина", emoji: "👩‍💼", spec: "спаниелей, терьеров и аккуратных лапок", rating: "4.6", reviews: 74, stars: "★★★★☆", busyUntil: "13:00" },
-      timur:  { name: "Тимур",  emoji: "🧑‍🎨", spec: "плотной шерсти, линьки и летнего ухода", rating: "4.5", reviews: 58, stars: "★★★★☆", busyUntil: "15:00" },
-      sofia:  { name: "София",  emoji: "👩‍⚕️", spec: "щенков и деликатного первого ухода", rating: "5.0", reviews: 41, stars: "★★★★★", busyUntil: null },
+      anya:   { name: "Аня",    emoji: "👩‍🎨", spec: "кудрявых и выставочных пород", rating: "4.9", reviews: 128, stars: "★★★★★" },
+      maxim:  { name: "Максим", emoji: "🧑‍🔧", spec: "крупных и активных пород", rating: "4.7", reviews: 96, stars: "★★★★☆" },
+      lera:   { name: "Лера",   emoji: "👩‍🦰", spec: "мелких пород и мягких форм", rating: "4.8", reviews: 112, stars: "★★★★★" },
+      karina: { name: "Карина", emoji: "👩‍💼", spec: "спаниелей, терьеров и аккуратных лапок", rating: "4.6", reviews: 74, stars: "★★★★☆" },
+      timur:  { name: "Тимур",  emoji: "🧑‍🎨", spec: "плотной шерсти, линьки и летнего ухода", rating: "4.5", reviews: 58, stars: "★★★★☆" },
+      sofia:  { name: "София",  emoji: "👩‍⚕️", spec: "щенков и деликатного первого ухода", rating: "5.0", reviews: 41, stars: "★★★★★" },
+    };
+    const demoBookings = {
+      anya: [{ startMin:600, endMin:870 }],
+      maxim: [{ startMin:600, endMin:720 }],
+      lera: [],
+      karina: [{ startMin:600, endMin:780 }],
+      timur: [{ startMin:600, endMin:900 }],
+      sofia: [],
     };
     const breedSize = {
       "Немецкая овчарка": "large", "Лабрадор": "large", "Хаски": "large",
@@ -853,18 +933,82 @@
     const payMethods = ["💳 Банковская карта", "📱 СБП по номеру +7 900 555 35 35"];
 
     const booking = {
-      breed:"", size:"", groomer:"", style:"", stylePrice:0, styleDurationMin:0,
+      breed:"", size:"", groomer:"", groomerId:"", style:"", stylePrice:0, styleDurationMin:0,
       specialServices:[], time:"", pay:"", phone:"", price:0
     };
     let currentGroomer = null;
+    let availabilityCache = null;
 
     /* заполнить список пород */
     const select = document.getElementById("breedSelect");
+    const breedPicker = document.getElementById("breedPicker");
+    const breedTrigger = document.getElementById("breedTrigger");
+    const breedMenu = document.getElementById("breedMenu");
+    const breedSearch = document.getElementById("breedSearch");
+    const breedOptions = document.getElementById("breedOptions");
+    const breedPickerValue = document.getElementById("breedPickerValue");
     Object.keys(breedSize).sort().forEach(breed => {
       const opt = document.createElement("option");
       opt.value = breed; opt.textContent = breed;
       select.appendChild(opt);
     });
+
+    function setBreedMenu(open) {
+      breedMenu.hidden = !open;
+      breedTrigger.setAttribute("aria-expanded", String(open));
+      if (open) {
+        breedSearch.value = "";
+        renderBreedOptions();
+        window.setTimeout(() => breedSearch.focus(), 0);
+      }
+    }
+
+    function renderBreedOptions(query = "") {
+      breedOptions.innerHTML = "";
+      const normalized = query.trim().toLocaleLowerCase("ru");
+      let visibleCount = 0;
+      [
+        { size:"small", title:"Маленькие породы", icon:"🐕" },
+        { size:"large", title:"Средние и крупные", icon:"🐕‍🦺" },
+      ].forEach(group => {
+        const breeds = Object.keys(breedSize)
+          .filter(breed => breedSize[breed] === group.size && breed.toLocaleLowerCase("ru").includes(normalized))
+          .sort();
+        if (!breeds.length) return;
+        visibleCount += breeds.length;
+        const section = document.createElement("div");
+        section.className = "breed-group";
+        section.innerHTML = "<div class='breed-group-title'>" + group.title + "</div>";
+        const grid = document.createElement("div");
+        grid.className = "breed-grid";
+        breeds.forEach(breed => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "breed-option" + (booking.breed === breed ? " selected" : "");
+          button.innerHTML =
+            "<span class='breed-option-icon'>" + group.icon + "</span>" +
+            "<span class='breed-option-name'>" + breed + "</span>";
+          button.addEventListener("click", () => {
+            select.value = breed;
+            breedPickerValue.textContent = breed;
+            setBreedMenu(false);
+            handleBreedSelection(breed);
+          });
+          grid.appendChild(button);
+        });
+        section.appendChild(grid);
+        breedOptions.appendChild(section);
+      });
+      if (!visibleCount) {
+        breedOptions.innerHTML = "<div class='breed-empty'>Такой породы пока нет в списке</div>";
+      }
+    }
+
+    breedTrigger.addEventListener("click", () => setBreedMenu(breedMenu.hidden));
+    breedSearch.addEventListener("input", () => renderBreedOptions(breedSearch.value));
+    breedPicker.addEventListener("click", event => event.stopPropagation());
+    document.addEventListener("click", () => setBreedMenu(false));
+    renderBreedOptions();
 
     // показать один шаг, спрятать остальные
     const steps = ["step-breed","step-style","step-special","step-time","step-pay","step-confirm","step-done"];
@@ -901,6 +1045,56 @@
       return size === "small" ? "маленькая собака" : "крупная собака";
     }
 
+    function todayKey() {
+      const now = new Date();
+      return [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, "0"),
+        String(now.getDate()).padStart(2, "0"),
+      ].join("-");
+    }
+
+    async function loadAvailability(force = false) {
+      if (availabilityCache && !force) return availabilityCache;
+      try {
+        const response = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action:"availability", date:todayKey() }),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.ok === false) throw new Error(data.error || "Расписание недоступно");
+        availabilityCache = Array.isArray(data.bookings) ? data.bookings : [];
+      } catch (error) {
+        availabilityCache = [];
+      }
+      return availabilityCache;
+    }
+
+    function busyRanges(groomerId) {
+      const remote = (availabilityCache || [])
+        .filter(item => item.groomerId === groomerId)
+        .map(item => ({ startMin:Number(item.startMin), endMin:Number(item.endMin) }));
+      const ranges = [...(demoBookings[groomerId] || []), ...remote]
+        .filter(item => Number.isFinite(item.startMin) && Number.isFinite(item.endMin))
+        .sort((a, b) => a.startMin - b.startMin);
+      return ranges.reduce((merged, range) => {
+        const last = merged[merged.length - 1];
+        if (last && range.startMin <= last.endMin) {
+          last.endMin = Math.max(last.endMin, range.endMin);
+        } else {
+          merged.push({ ...range });
+        }
+        return merged;
+      }, []);
+    }
+
+    function availabilityLabel(groomerId) {
+      const ranges = busyRanges(groomerId);
+      if (!ranges.length) return "Сегодня свободен весь день";
+      return "Занят: " + ranges.map(range => toTime(range.startMin) + "–" + toTime(range.endMin)).join(", ");
+    }
+
     function formatDuration(minutes) {
       if (!minutes) return "около 1 часа";
       const hours = Math.floor(minutes / 60);
@@ -932,22 +1126,25 @@
     }
 
     // Шаг 1: выбрали породу -> показать несколько грумеров
-    select.addEventListener("change", () => {
-      const breed = select.value;
+    function handleBreedSelection(breed) {
       if (!breed) { result.hidden = true; return; }
       booking.breed = breed;
       booking.size = breedSize[breed] || "small";
       currentGroomer = null;
       booking.groomer = "";
+      booking.groomerId = "";
       document.getElementById("mName").textContent = "Выбери грумера";
       document.getElementById("mWhy").textContent =
         "Порода «" + breed + "» относится к категории «" + sizeLabel(booking.size) +
         "». Ниже только мастера, которые подходят для этой категории.";
       buildGroomerChoices();
       result.hidden = false;
-    });
+    }
+    select.addEventListener("change", () => handleBreedSelection(select.value));
 
-    function buildGroomerChoices(){
+    async function buildGroomerChoices(){
+      groomerChoices.innerHTML = "<div class='note'>Проверяем расписание мастеров...</div>";
+      await loadAvailability();
       groomerChoices.innerHTML = "";
       (groomersBySize[booking.size] || []).forEach(id => {
         const groomer = groomers[id];
@@ -955,10 +1152,12 @@
         b.innerHTML =
           "<span class='style-title'>" + groomer.emoji + " " + groomer.name +
           " · " + groomer.rating + " · " + groomer.reviews + " отзывов</span>" +
-          "<span class='style-meta'>" + groomer.stars + " · " + groomer.spec + "</span>";
+          "<span class='style-meta'>" + groomer.stars + " · " + groomer.spec + "</span>" +
+          "<span class='groomer-availability'>" + availabilityLabel(id) + "</span>";
         b.addEventListener("click", () => {
           currentGroomer = groomer;
           booking.groomer = groomer.name;
+          booking.groomerId = id;
           buildStyleList();
           showStep("step-style");
         });
@@ -1011,8 +1210,8 @@
     document.getElementById("continueAfterStyle").addEventListener("click", () => {
       if (!booking.style) return;
       booking.specialServices = [];
-      buildTimeList();
       showStep("step-time");
+      buildTimeList();
     });
 
     document.getElementById("addSpecialService").addEventListener("click", () => {
@@ -1063,8 +1262,8 @@
     }
 
     document.getElementById("continueAfterSpecial").addEventListener("click", () => {
-      buildTimeList();
       showStep("step-time");
+      buildTimeList();
     });
 
     // Шаг 3: свободное время с учётом занятости грумера
@@ -1073,38 +1272,42 @@
     function toTime(min){ return String(Math.floor(min/60)).padStart(2,"0") + ":" + String(min%60).padStart(2,"0"); }
     const timeList = document.getElementById("timeList");
     const timeNote = document.getElementById("timeNote");
-    function buildTimeList(){
+    async function buildTimeList(){
+      timeList.innerHTML = "<div class='note'>Обновляем свободное время...</div>";
+      await loadAvailability(true);
       timeList.innerHTML = "";
-      let start = WORK_START*60;
       const totalDuration = currentDurationMin();
-      const busy = currentGroomer.busyUntil;
-      if (busy) {
-        start = Math.max(start, Math.ceil(toMin(busy)/60)*60);
-        timeNote.textContent = currentGroomer.name + " освободится в " + busy +
-          ", поэтому запись доступна с " + toTime(start) +
-          ". Общая длительность: " + formatDuration(totalDuration) + ".";
+      const occupied = busyRanges(booking.groomerId);
+      if (occupied.length) {
+        timeNote.textContent = currentGroomer.name + " сегодня занят: " +
+          occupied.map(range => toTime(range.startMin) + "–" + toTime(range.endMin)).join(", ") +
+          ". Выбранные услуги займут " + formatDuration(totalDuration) + ".";
       } else {
-        timeNote.textContent = currentGroomer.name + " сейчас свободна — выбирай любое время. " +
-          "Общая длительность: " + formatDuration(totalDuration) + ".";
+        timeNote.textContent = "У " + currentGroomer.name + " сегодня пока нет записей. " +
+          "Выбранные услуги займут " + formatDuration(totalDuration) + ".";
       }
       const lastStart = WORK_END*60 - totalDuration;
-      if (start > lastStart) {
-        const p = document.createElement("p");
-        p.className = "note";
-        p.textContent = "Сегодня уже не хватает времени на такой набор услуг. Попробуй убрать спецуслугу или выбрать другого грумера.";
-        timeList.appendChild(p);
-        return;
-      }
-      for (let t = start; t <= lastStart; t += 60) {
+      let availableCount = 0;
+      for (let t = WORK_START*60; t <= lastStart; t += 60) {
+        const end = t + totalDuration;
+        const hasConflict = occupied.some(range => t < range.endMin && end > range.startMin);
+        if (hasConflict) continue;
+        availableCount += 1;
         const time = toTime(t);
         const b = document.createElement("button");
-        b.textContent = "🕐 " + time;
+        b.textContent = "🕐 " + time + "–" + toTime(end);
         b.addEventListener("click", () => {
           booking.time = time;
           buildPayList();
           showStep("step-pay");
         });
         timeList.appendChild(b);
+      }
+      if (!availableCount) {
+        const p = document.createElement("p");
+        p.className = "note";
+        p.textContent = "Сегодня у мастера не осталось подходящего окна. Выбери другого грумера или сократи набор услуг.";
+        timeList.appendChild(p);
       }
     }
 
@@ -1134,6 +1337,7 @@
       const price = currentPrice();
       booking.price = price;
       const duration = formatDuration(currentDurationMin());
+      const endTime = toTime(toMin(booking.time) + currentDurationMin());
       const specials = selectedSpecials().map(service => service.name).join(", ") || "не выбраны";
       document.getElementById("summary").innerHTML =
         "<div>🐶 Порода: <b>"+booking.breed+"</b></div>" +
@@ -1141,7 +1345,7 @@
         "<div>💇 Грумер: <b>"+booking.groomer+"</b></div>" +
         "<div>✂️ Стрижка: <b>"+booking.style+"</b></div>" +
         "<div>🧴 Спецуслуги: <b>"+specials+"</b></div>" +
-        "<div>🕐 Время: <b>"+booking.time+"</b></div>" +
+        "<div>🕐 Время: <b>"+booking.time+"–"+endTime+"</b></div>" +
         "<div>💳 Оплата: <b>"+booking.pay+"</b></div>" +
         "<div>⏱ Займёт: <b>"+duration+"</b></div>" +
         "<div>💰 Цена: <b>"+price+" ₽</b></div>";
@@ -1172,6 +1376,7 @@
       phoneError.hidden = true;
       booking.phone = phone;
       const duration = formatDuration(currentDurationMin());
+      const endTime = toTime(toMin(booking.time) + currentDurationMin());
       const price = currentPrice();
       const specials = selectedSpecials().map(service => service.name).join(", ") || "не выбраны";
       const text =
@@ -1181,7 +1386,7 @@
         "Грумер: " + booking.groomer + "\n" +
         "Стрижка: " + booking.style + "\n" +
         "Спецуслуги: " + specials + "\n" +
-        "Время записи: " + booking.time + "\n" +
+        "Время записи: " + booking.time + "–" + endTime + "\n" +
         "Оплата: " + booking.pay + "\n" +
         "☎️ Телефон клиента: " + phone + "\n" +
         "⏱ Займёт примерно: " + duration + "\n" +
@@ -1199,18 +1404,37 @@
         const response = await fetch(WORKER_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: text })
+          body: JSON.stringify({
+            action: "booking",
+            text: text,
+            booking: {
+              groomerId: booking.groomerId,
+              date: todayKey(),
+              startMin: toMin(booking.time),
+              durationMin: currentDurationMin(),
+            },
+          })
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok || data.ok === false) {
-          throw new Error(data.error || "Telegram не принял сообщение");
+          const requestError = new Error(data.error || "Telegram не принял сообщение");
+          requestError.code = data.code || "";
+          throw requestError;
         }
+        availabilityCache = null;
         showDone(
           "✅ Заявка отправлена!",
           "Готово! Стрижка займёт примерно " + duration +
           " · Цена " + price + " ₽. Мы свяжемся по номеру " + phone + "."
         );
       } catch (error) {
+        if (error.code === "TIME_UNAVAILABLE") {
+          availabilityCache = null;
+          showStep("step-time");
+          await buildTimeList();
+          timeNote.textContent = "Это время только что занял другой клиент. Расписание обновлено — выбери новое свободное окно.";
+          return;
+        }
         showDone(
           "⚠️ Не удалось отправить в Telegram",
           "Заявка собрана, но бот не получил сообщение. Проверь адрес Worker, BOT_TOKEN и CHAT_ID в Cloudflare."
@@ -1224,9 +1448,12 @@
     function openModal() {
       window.clearTimeout(modalCloseTimer);
       select.value = "";
+      breedPickerValue.textContent = "Выберите породу";
+      setBreedMenu(false);
       result.hidden = true;
       currentGroomer = null;
       booking.breed = booking.size = booking.groomer = booking.style = booking.time = booking.pay = booking.phone = "";
+      booking.groomerId = "";
       booking.stylePrice = booking.price = 0;
       booking.styleDurationMin = 0;
       booking.specialServices = [];
@@ -1265,7 +1492,11 @@
     document.querySelectorAll(".open-match").forEach(b => b.addEventListener("click", openModal));
     document.getElementById("modalClose").addEventListener("click", closeModal);
     modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      if (!breedMenu.hidden) setBreedMenu(false);
+      else closeModal();
+    });
 
     /* ===== ЧАТ-БОТ ===== */
     const chatPanel = document.getElementById("chatPanel");

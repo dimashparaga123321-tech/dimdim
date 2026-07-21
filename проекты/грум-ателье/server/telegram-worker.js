@@ -41,6 +41,77 @@ function sanitizeMessages(messages) {
     .filter(message => message.content);
 }
 
+const GROOMER_IDS = new Set(["anya", "maxim", "lera", "karina", "timur", "sofia"]);
+
+function validBookingDate(value) {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+async function getAvailability(data, env) {
+  if (!env.DB) {
+    return json({ ok: false, code: "SCHEDULE_NOT_CONFIGURED", error: "Расписание пока не подключено" }, 503);
+  }
+  if (!validBookingDate(data.date)) {
+    return json({ ok: false, error: "Некорректная дата расписания" }, 400);
+  }
+
+  const result = await env.DB.prepare(`
+    SELECT groomer_id AS groomerId, start_min AS startMin, end_min AS endMin
+    FROM bookings
+    WHERE booking_date = ?
+    ORDER BY groomer_id, start_min
+  `).bind(data.date).all();
+
+  return json({ ok: true, bookings: result.results || [] });
+}
+
+async function reserveAndSendBooking(data, env) {
+  if (!env.DB) {
+    return json({ ok: false, code: "SCHEDULE_NOT_CONFIGURED", error: "Расписание пока не подключено" }, 503);
+  }
+
+  const details = data.booking || {};
+  const groomerId = String(details.groomerId || "");
+  const startMin = Number(details.startMin);
+  const durationMin = Number(details.durationMin);
+  const endMin = startMin + durationMin;
+  if (
+    !GROOMER_IDS.has(groomerId) || !validBookingDate(details.date) ||
+    !Number.isInteger(startMin) || !Number.isInteger(durationMin) ||
+    startMin < 600 || endMin > 1080 || durationMin < 15 || durationMin > 480
+  ) {
+    return json({ ok: false, error: "Некорректные параметры записи" }, 400);
+  }
+
+  const bookingId = crypto.randomUUID();
+  const insert = await env.DB.prepare(`
+    INSERT INTO bookings (id, groomer_id, booking_date, start_min, end_min)
+    SELECT ?, ?, ?, ?, ?
+    WHERE NOT EXISTS (
+      SELECT 1 FROM bookings
+      WHERE groomer_id = ? AND booking_date = ?
+        AND start_min < ? AND end_min > ?
+    )
+  `).bind(
+    bookingId, groomerId, details.date, startMin, endMin,
+    groomerId, details.date, endMin, startMin,
+  ).run();
+
+  if (!insert.meta?.changes) {
+    return json({
+      ok: false,
+      code: "TIME_UNAVAILABLE",
+      error: "Это время уже занято. Выберите другое окно.",
+    }, 409);
+  }
+
+  const telegramResult = await sendToTelegram(data, env);
+  if (!telegramResult.ok) {
+    await env.DB.prepare("DELETE FROM bookings WHERE id = ?").bind(bookingId).run();
+  }
+  return telegramResult;
+}
+
 async function answerWithWorkersAI(data, env) {
   if (!env.AI) {
     return json({
@@ -109,6 +180,8 @@ export default {
 
     try {
       if (data.action === "chat") return await answerWithWorkersAI(data, env);
+      if (data.action === "availability") return await getAvailability(data, env);
+      if (data.action === "booking") return await reserveAndSendBooking(data, env);
       return await sendToTelegram(data, env);
     } catch (error) {
       return json({ ok: false, error: "Сервис временно недоступен" }, 502);
