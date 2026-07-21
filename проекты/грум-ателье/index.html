@@ -144,6 +144,124 @@
     .service-card { text-align: left; }
     .service-card .emoji { font-size: 34px; margin-bottom: 8px; }
 
+    /* ===== ПРОФИЛИ И РАСПИСАНИЕ ГРУМЕРОВ ===== */
+    .groomer-card {
+      width: 100%; font: inherit; color: var(--text); cursor: pointer;
+      transition: transform .18s, border-color .18s, box-shadow .18s;
+    }
+    .groomer-card:hover, .groomer-card:focus-visible {
+      transform: translateY(-3px); border-color: var(--accent);
+      box-shadow: 0 14px 32px color-mix(in srgb, var(--accent) 14%, transparent);
+      outline: none;
+    }
+    .groomer-card-link {
+      display: inline-block; margin-top: 10px; color: var(--accent); font-size: 14px; font-weight: 900;
+    }
+    .schedule-heading {
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 22px;
+    }
+    .schedule-heading h2, .schedule-heading .sub { text-align: left; }
+    .schedule-heading .sub { margin: 4px 0 0; }
+    .schedule-toggle {
+      flex: 0 0 auto; padding: 12px 18px; border: 2px solid var(--ghost-border); border-radius: 999px;
+      background: var(--card-bg); color: var(--accent); font: inherit; font-weight: 900; cursor: pointer;
+    }
+    .schedule-toggle:hover { border-color: var(--accent); }
+    .schedule-panel {
+      border-top: 1px solid var(--card-border); padding-top: 18px;
+      animation: booking-step-in .22s ease-out both;
+    }
+    .schedule-legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 12px; color: var(--muted); font-size: 13px; }
+    .schedule-key { display: inline-flex; align-items: center; gap: 7px; }
+    .schedule-key::before { content: ""; width: 13px; height: 13px; border-radius: 4px; background: var(--secondary); }
+    .schedule-key.busy::before { background: color-mix(in srgb, var(--accent) 72%, var(--text)); }
+    .schedule-viewport {
+      width: 100%; overflow-x: auto; border: 1px solid var(--card-border); border-radius: 8px;
+      background: var(--card-bg); cursor: grab; scrollbar-color: var(--accent) var(--panel);
+    }
+    .schedule-viewport.is-dragging { cursor: grabbing; user-select: none; }
+    .schedule-grid {
+      min-width: 940px; display: grid; grid-template-columns: 190px repeat(8, 94px);
+    }
+    .schedule-cell {
+      min-height: 74px; padding: 10px 8px; display: grid; place-items: center; text-align: center;
+      border-right: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border);
+      font-size: 13px; color: var(--muted);
+    }
+    .schedule-cell:nth-child(9n) { border-right: 0; }
+    .schedule-grid .schedule-cell:nth-last-child(-n + 9) { border-bottom: 0; }
+    .schedule-time { min-height: 44px; background: var(--panel); color: var(--text); font-weight: 900; }
+    .schedule-name {
+      position: sticky; left: 0; z-index: 2; place-items: start; text-align: left;
+      background: var(--card-bg); box-shadow: 7px 0 12px rgba(0,0,0,.04);
+    }
+    .schedule-time.schedule-name { z-index: 3; place-items: center start; }
+    .schedule-name strong { display: block; color: var(--text); font-size: 15px; }
+    .schedule-row-book {
+      margin-top: 7px; padding: 6px 10px; border: 1px solid var(--ghost-border); border-radius: 999px;
+      background: var(--card-bg); color: var(--accent); font: inherit; font-size: 12px; font-weight: 900; cursor: pointer;
+    }
+    .schedule-slot { position: relative; font-weight: 800; }
+    .schedule-slot.free { background: color-mix(in srgb, var(--secondary) 13%, var(--card-bg)); color: var(--secondary); }
+    .schedule-slot.busy { background: color-mix(in srgb, var(--accent) 18%, var(--card-bg)); color: var(--text); }
+    .schedule-slot::after {
+      content: ""; position: absolute; inset: 9px; border-radius: 6px; border: 1px solid currentColor; opacity: .2;
+    }
+
+    .profile-backdrop {
+      position: fixed; inset: 0; z-index: 230; padding: 20px; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.58);
+    }
+    .profile-backdrop.is-opening { animation: booking-backdrop-in .22s ease-out both; }
+    .profile-backdrop.is-closing { pointer-events: none; animation: booking-backdrop-out .2s ease-in both; }
+    .profile-backdrop.is-opening .profile-modal { animation: booking-modal-in .28s cubic-bezier(.2,.8,.2,1) both; }
+    .profile-backdrop.is-closing .profile-modal { animation: booking-modal-out .2s ease-in both; }
+    .profile-modal {
+      width: min(720px, 100%); max-height: 90dvh; overflow-y: auto; position: relative;
+      padding: 28px; border: 1px solid var(--card-border); border-radius: 8px;
+      background: var(--card-bg); color: var(--text); box-shadow: 0 24px 70px rgba(0,0,0,.34);
+    }
+    .profile-close {
+      position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid var(--card-border); background: var(--card-bg); color: var(--muted); cursor: pointer; font-size: 20px;
+    }
+    .profile-head { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 16px; align-items: center; padding-right: 42px; }
+    .profile-avatar {
+      width: 76px; height: 76px; display: grid; place-items: center; border-radius: 8px;
+      background: var(--panel); color: var(--accent); font-size: 34px; border: 1px solid var(--card-border);
+    }
+    .profile-head h3 { font-size: 28px; line-height: 1.1; }
+    .profile-head p { color: var(--muted); margin-top: 4px; }
+    .profile-rating { color: #d89000; font-weight: 900; margin-top: 5px; }
+    .profile-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
+    .profile-metric { padding: 12px; background: var(--panel); border: 1px solid var(--card-border); border-radius: 8px; }
+    .profile-metric strong { display: block; font-size: 18px; }
+    .profile-metric span { color: var(--muted); font-size: 12px; }
+    .profile-section { padding: 18px 0; border-top: 1px solid var(--card-border); }
+    .profile-section h4 { margin-bottom: 10px; font-size: 18px; }
+    .profile-free { display: flex; flex-wrap: wrap; gap: 8px; }
+    .profile-free span { padding: 7px 10px; border-radius: 999px; background: var(--panel); color: var(--secondary); font-size: 13px; font-weight: 900; }
+    .profile-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .profile-actions .modal-cta { margin: 0; }
+    .profile-review-list { display: grid; gap: 10px; }
+    .profile-review { padding: 13px 14px; border: 1px solid var(--card-border); border-radius: 8px; background: var(--bg); }
+    .profile-review-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 5px; }
+    .profile-review-head span { color: #d89000; font-weight: 900; white-space: nowrap; }
+    .profile-review p { color: var(--muted); }
+    .profile-review-form { margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--card-border); }
+    .profile-review-form input, .profile-review-form textarea {
+      width: 100%; margin-bottom: 10px; padding: 11px 13px; border: 2px solid var(--card-border); border-radius: 8px;
+      background: var(--bg); color: var(--text); font: inherit;
+    }
+    .profile-review-form textarea { min-height: 90px; resize: vertical; }
+    .profile-stars { display: flex; gap: 6px; margin: 4px 0 12px; }
+    .profile-star {
+      width: 42px; height: 40px; border: 1px solid var(--card-border); border-radius: 8px;
+      background: var(--card-bg); color: var(--muted); cursor: pointer; font-size: 22px;
+    }
+    .profile-star.selected { color: #d89000; border-color: #d89000; background: #fff7dd; }
+    .profile-review-status { margin-top: 8px; color: var(--muted); font-size: 13px; }
+
     /* ===== ОПЛАТА ===== */
     .price-note {
       max-width: 620px; margin: 30px auto 0; text-align: center;
@@ -301,7 +419,12 @@
     }
     .choice-list.style-options button { text-align: left; padding: 14px 16px; }
     .groomer-options { margin-top: 16px; }
-    .groomer-options button { text-align: left; }
+    .groomer-choice-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+    .groomer-options .groomer-choice-main { min-width: 0; text-align: left; }
+    .groomer-options .groomer-inspect {
+      width: 126px; padding: 10px; text-align: center; color: var(--accent); border-color: var(--ghost-border);
+      font-size: 13px;
+    }
     .groomer-availability {
       display: block; margin-top: 5px; color: var(--secondary); font-size: 13px; font-weight: 800;
     }
@@ -516,6 +639,16 @@
       .modal-actions { grid-template-columns: 1fr; }
       .breed-grid { grid-template-columns: 1fr; }
       .breed-menu { padding: 10px; }
+      .schedule-heading { align-items: stretch; flex-direction: column; }
+      .schedule-toggle { width: 100%; }
+      .profile-backdrop { padding: 10px; }
+      .profile-modal { padding: 22px 16px; max-height: calc(100dvh - 20px); }
+      .profile-head { grid-template-columns: 60px minmax(0, 1fr); gap: 12px; }
+      .profile-avatar { width: 60px; height: 60px; font-size: 28px; }
+      .profile-head h3 { font-size: 23px; }
+      .profile-metrics { grid-template-columns: 1fr; }
+      .groomer-choice-row { grid-template-columns: minmax(0, 1fr) 112px; }
+      .groomer-options .groomer-inspect { width: 112px; padding: 8px; }
       .chatbot { right: 12px; bottom: 12px; }
       .chat-panel {
         left: 10px; right: 10px; bottom: 76px; transform: none; width: auto;
@@ -539,6 +672,10 @@
       .modal-backdrop.is-closing .modal,
       .booking-step.is-entering,
       .booking-step.is-leaving,
+      .profile-backdrop.is-opening,
+      .profile-backdrop.is-closing,
+      .profile-backdrop.is-opening .profile-modal,
+      .profile-backdrop.is-closing .profile-modal,
       .chat-panel.is-open,
       .chat-panel.is-closing { animation-duration: .01ms !important; }
     }
@@ -622,14 +759,31 @@
   <!-- ГРУМЕРЫ -->
   <section id="groomers">
     <h2>Грумеры и рейтинг</h2>
-    <p class="sub">После выбора породы можно выбрать подходящего мастера</p>
+    <p class="sub">Нажми на карточку, чтобы увидеть опыт, отзывы и свободные часы мастера</p>
     <div class="grid">
-      <div class="card"><div class="groomer-avatar">А</div><h3>Аня</h3><div class="rating-line"><span class="stars">★★★★★</span><span>4.9 · 128 отзывов</span></div><p>Кудрявые породы и выставочные формы.</p></div>
-      <div class="card"><div class="groomer-avatar">М</div><h3>Максим</h3><div class="rating-line"><span class="stars">★★★★☆</span><span>4.7 · 96 отзывов</span></div><p>Крупные активные породы и вычёсывание.</p></div>
-      <div class="card"><div class="groomer-avatar">Л</div><h3>Лера</h3><div class="rating-line"><span class="stars">★★★★★</span><span>4.8 · 112 отзывов</span></div><p>Маленькие породы и мягкие формы.</p></div>
-      <div class="card"><div class="groomer-avatar">К</div><h3>Карина</h3><div class="rating-line"><span class="stars">★★★★☆</span><span>4.6 · 74 отзыва</span></div><p>Спаниели, терьеры и аккуратные лапки.</p></div>
-      <div class="card"><div class="groomer-avatar">Т</div><h3>Тимур</h3><div class="rating-line"><span class="stars">★★★★☆</span><span>4.5 · 58 отзывов</span></div><p>Плотная шерсть, линька и летний уход.</p></div>
-      <div class="card"><div class="groomer-avatar">С</div><h3>София</h3><div class="rating-line"><span class="stars">★★★★★</span><span>5.0 · 41 отзыв</span></div><p>Щенки, деликатный уход и первая стрижка.</p></div>
+      <button class="card groomer-card" data-groomer-id="anya" type="button"><div class="groomer-avatar">А</div><h3>Аня</h3><div class="rating-line"><span class="stars">★★★★★</span><span>4.9 · 128 отзывов</span></div><p>Кудрявые породы и выставочные формы.</p><span class="groomer-card-link">Открыть профиль</span></button>
+      <button class="card groomer-card" data-groomer-id="maxim" type="button"><div class="groomer-avatar">М</div><h3>Максим</h3><div class="rating-line"><span class="stars">★★★★☆</span><span>4.7 · 96 отзывов</span></div><p>Крупные активные породы и вычёсывание.</p><span class="groomer-card-link">Открыть профиль</span></button>
+      <button class="card groomer-card" data-groomer-id="lera" type="button"><div class="groomer-avatar">Л</div><h3>Лера</h3><div class="rating-line"><span class="stars">★★★★★</span><span>4.8 · 112 отзывов</span></div><p>Маленькие породы и мягкие формы.</p><span class="groomer-card-link">Открыть профиль</span></button>
+      <button class="card groomer-card" data-groomer-id="karina" type="button"><div class="groomer-avatar">К</div><h3>Карина</h3><div class="rating-line"><span class="stars">★★★★☆</span><span>4.6 · 74 отзыва</span></div><p>Спаниели, терьеры и аккуратные лапки.</p><span class="groomer-card-link">Открыть профиль</span></button>
+      <button class="card groomer-card" data-groomer-id="timur" type="button"><div class="groomer-avatar">Т</div><h3>Тимур</h3><div class="rating-line"><span class="stars">★★★★☆</span><span>4.5 · 58 отзывов</span></div><p>Плотная шерсть, линька и летний уход.</p><span class="groomer-card-link">Открыть профиль</span></button>
+      <button class="card groomer-card" data-groomer-id="sofia" type="button"><div class="groomer-avatar">С</div><h3>София</h3><div class="rating-line"><span class="stars">★★★★★</span><span>5.0 · 41 отзыв</span></div><p>Щенки, деликатный уход и первая стрижка.</p><span class="groomer-card-link">Открыть профиль</span></button>
+    </div>
+  </section>
+
+  <!-- ОБЩЕЕ РАСПИСАНИЕ -->
+  <section id="groomerSchedule">
+    <div class="schedule-heading">
+      <div>
+        <h2>Расписание грумеров</h2>
+        <p class="sub">Все мастера и свободные часы на сегодня</p>
+      </div>
+      <button class="schedule-toggle" id="scheduleToggle" type="button" aria-expanded="false" aria-controls="schedulePanel">Показать расписание</button>
+    </div>
+    <div class="schedule-panel" id="schedulePanel" hidden>
+      <div class="schedule-legend"><span class="schedule-key">Свободно</span><span class="schedule-key busy">Занято</span><span>Таблицу можно двигать вправо и влево</span></div>
+      <div class="schedule-viewport" id="scheduleViewport" tabindex="0" aria-label="Расписание грумеров с горизонтальной прокруткой">
+        <div class="schedule-grid" id="scheduleGrid"></div>
+      </div>
     </div>
   </section>
 
@@ -816,6 +970,50 @@
     </div>
   </div>
 
+  <!-- ПРОФИЛЬ ГРУМЕРА -->
+  <div class="profile-backdrop" id="groomerProfile" hidden>
+    <div class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profileName">
+      <button class="profile-close" id="profileClose" type="button" aria-label="Закрыть профиль">×</button>
+      <div class="profile-head">
+        <div class="profile-avatar" id="profileAvatar"></div>
+        <div>
+          <h3 id="profileName"></h3>
+          <p id="profileSpecialty"></p>
+          <div class="profile-rating" id="profileRating"></div>
+        </div>
+      </div>
+      <div class="profile-metrics" id="profileMetrics"></div>
+      <div class="profile-section">
+        <h4>О мастере</h4>
+        <p id="profileBio"></p>
+      </div>
+      <div class="profile-section">
+        <h4>Свободные окна сегодня</h4>
+        <div class="profile-free" id="profileFree"></div>
+        <div class="profile-actions">
+          <button class="modal-cta" id="profileBook" type="button">Записаться к мастеру</button>
+        </div>
+      </div>
+      <div class="profile-section">
+        <h4>Отзывы о грумере</h4>
+        <div class="profile-review-list" id="profileReviews"></div>
+        <div class="profile-actions">
+          <button class="modal-cta modal-secondary" id="profileReviewOpen" type="button">Написать отзыв</button>
+        </div>
+        <form class="profile-review-form" id="profileReviewForm" hidden>
+          <label class="field-label" for="profileReviewName">Ваше имя</label>
+          <input id="profileReviewName" maxlength="50" placeholder="Например, Ольга">
+          <span class="field-label">Оценка</span>
+          <div class="profile-stars" id="profileStars" role="radiogroup" aria-label="Оценка грумера"></div>
+          <label class="field-label" for="profileReviewText">Отзыв</label>
+          <textarea id="profileReviewText" minlength="5" maxlength="500" placeholder="Расскажите, что понравилось"></textarea>
+          <button class="modal-cta" type="submit">Опубликовать отзыв</button>
+          <p class="profile-review-status" id="profileReviewStatus" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
     const body = document.body;
 
@@ -852,6 +1050,62 @@
       karina: { name: "Карина", emoji: "👩‍💼", spec: "спаниелей, терьеров и аккуратных лапок", rating: "4.6", reviews: 74, stars: "★★★★☆" },
       timur:  { name: "Тимур",  emoji: "🧑‍🎨", spec: "плотной шерсти, линьки и летнего ухода", rating: "4.5", reviews: 58, stars: "★★★★☆" },
       sofia:  { name: "София",  emoji: "👩‍⚕️", spec: "щенков и деликатного первого ухода", rating: "5.0", reviews: 41, stars: "★★★★★" },
+    };
+    const groomerProfiles = {
+      anya: {
+        title: "Кудрявые породы и выставочные формы",
+        bio: "Спокойно работает с кудрявой шерстью, сохраняет породную форму и заранее обсуждает длину с хозяином.",
+        metrics: [{ value:"6 лет", label:"опыт" }, { value:"4.9", label:"качество формы" }, { value:"4.8", label:"бережный уход" }],
+        reviews: [
+          { authorName:"Марина и Тедди", rating:5, reviewText:"Форма держалась долго, а Тедди вышел спокойным и довольным." },
+          { authorName:"Елена", rating:5, reviewText:"Аня подробно уточнила пожелания и аккуратно оформила мордочку." },
+        ],
+      },
+      maxim: {
+        title: "Крупные активные породы и вычёсывание",
+        bio: "Уверенно работает с крупными и активными собаками, хорошо справляется с плотным подшёрстком и сезонной линькой.",
+        metrics: [{ value:"7 лет", label:"опыт" }, { value:"4.8", label:"работа с шерстью" }, { value:"4.6", label:"комфорт собаки" }],
+        reviews: [
+          { authorName:"Сергей и Рэй", rating:5, reviewText:"С хаски справился отлично, шерсти дома стало заметно меньше." },
+          { authorName:"Анна", rating:4, reviewText:"Хорошая работа с большим псом, всё объяснили по домашнему уходу." },
+        ],
+      },
+      lera: {
+        title: "Маленькие породы и мягкие формы",
+        bio: "Специализируется на маленьких породах, мягких силуэтах и аккуратной работе вокруг глаз и лап.",
+        metrics: [{ value:"5 лет", label:"опыт" }, { value:"4.9", label:"аккуратность" }, { value:"4.8", label:"общение" }],
+        reviews: [
+          { authorName:"Катя и Боня", rating:5, reviewText:"Боня обычно волнуется, но у Леры спокойно перенесла всю стрижку." },
+          { authorName:"Ирина", rating:5, reviewText:"Очень аккуратные лапки и красивая круглая мордочка." },
+        ],
+      },
+      karina: {
+        title: "Спаниели, терьеры и аккуратные лапки",
+        bio: "Любит точные линии, аккуратно оформляет лапы и уши, знает особенности шерсти спаниелей и терьеров.",
+        metrics: [{ value:"4 года", label:"опыт" }, { value:"4.8", label:"детали" }, { value:"4.5", label:"скорость" }],
+        reviews: [
+          { authorName:"Олег и Джесси", rating:5, reviewText:"Лапы и уши оформили очень чисто, всё выглядит естественно." },
+          { authorName:"Вера", rating:4, reviewText:"Результат понравился, мастер внимательно выслушала пожелания." },
+        ],
+      },
+      timur: {
+        title: "Плотная шерсть, линька и летний уход",
+        bio: "Работает с плотной и двойной шерстью, подбирает щадящее вычёсывание и летний уход без лишнего укорачивания.",
+        metrics: [{ value:"5 лет", label:"опыт" }, { value:"4.7", label:"антилинька" }, { value:"4.4", label:"скорость" }],
+        reviews: [
+          { authorName:"Денис и Норд", rating:5, reviewText:"После вычёсывания шерсть стала легче, без проплешин и спешки." },
+          { authorName:"Алёна", rating:4, reviewText:"Хорошо справился с плотным подшёрстком нашей овчарки." },
+        ],
+      },
+      sofia: {
+        title: "Щенки и деликатный первый уход",
+        bio: "Проводит первое знакомство со столом и инструментами без спешки, подходит для щенков и тревожных маленьких собак.",
+        metrics: [{ value:"4 года", label:"опыт" }, { value:"5.0", label:"работа со щенками" }, { value:"5.0", label:"бережность" }],
+        reviews: [
+          { authorName:"Нина и Чип", rating:5, reviewText:"Первая стрижка прошла очень спокойно, щенок быстро привык." },
+          { authorName:"Полина", rating:5, reviewText:"София терпеливая и внимательная, обязательно вернёмся." },
+        ],
+      },
     };
     const demoBookings = {
       anya: [{ startMin:600, endMin:870 }],
@@ -938,6 +1192,7 @@
     };
     let currentGroomer = null;
     let availabilityCache = null;
+    let preferredGroomerId = "";
 
     /* заполнить список пород */
     const select = document.getElementById("breedSelect");
@@ -1095,6 +1350,261 @@
       return "Занят: " + ranges.map(range => toTime(range.startMin) + "–" + toTime(range.endMin)).join(", ");
     }
 
+    function freeRanges(groomerId) {
+      const free = [];
+      let cursor = 600;
+      busyRanges(groomerId).forEach(range => {
+        const start = Math.max(600, range.startMin);
+        const end = Math.min(1080, range.endMin);
+        if (start > cursor) free.push({ startMin:cursor, endMin:start });
+        cursor = Math.max(cursor, end);
+      });
+      if (cursor < 1080) free.push({ startMin:cursor, endMin:1080 });
+      return free.filter(range => range.endMin > range.startMin);
+    }
+
+    function starsText(rating) {
+      const count = Math.max(1, Math.min(5, Math.round(Number(rating) || 5)));
+      return "★".repeat(count) + "☆".repeat(5 - count);
+    }
+
+    const profileModal = document.getElementById("groomerProfile");
+    const profileReviews = document.getElementById("profileReviews");
+    const profileReviewForm = document.getElementById("profileReviewForm");
+    const profileReviewStatus = document.getElementById("profileReviewStatus");
+    let activeProfileId = "";
+    let profileRatingValue = 5;
+    let profileCloseTimer = null;
+
+    function appendProfileReview(review) {
+      const item = document.createElement("article");
+      item.className = "profile-review";
+      const head = document.createElement("div");
+      head.className = "profile-review-head";
+      const author = document.createElement("strong");
+      author.textContent = review.authorName || "Гость";
+      const rating = document.createElement("span");
+      rating.textContent = starsText(review.rating);
+      const text = document.createElement("p");
+      text.textContent = review.reviewText;
+      head.append(author, rating);
+      item.append(head, text);
+      profileReviews.appendChild(item);
+    }
+
+    async function loadProfileReviews(groomerId) {
+      profileReviews.innerHTML = "<p class='note'>Загружаем отзывы...</p>";
+      let remoteReviews = [];
+      try {
+        const response = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action:"reviews", groomerId }),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.ok !== false && Array.isArray(data.reviews)) remoteReviews = data.reviews;
+      } catch (error) {
+        remoteReviews = [];
+      }
+      profileReviews.innerHTML = "";
+      [...remoteReviews, ...(groomerProfiles[groomerId]?.reviews || [])].forEach(appendProfileReview);
+      if (!profileReviews.children.length) profileReviews.innerHTML = "<p class='note'>Отзывов пока нет. Можно стать первым.</p>";
+    }
+
+    function renderProfileFreeTime(groomerId) {
+      const container = document.getElementById("profileFree");
+      container.innerHTML = "";
+      const ranges = freeRanges(groomerId);
+      if (!ranges.length) {
+        container.innerHTML = "<p class='note'>На сегодня свободных окон нет.</p>";
+        return;
+      }
+      ranges.forEach(range => {
+        const chip = document.createElement("span");
+        chip.textContent = toTime(range.startMin) + "–" + toTime(range.endMin);
+        container.appendChild(chip);
+      });
+    }
+
+    async function openGroomerProfile(groomerId) {
+      const groomer = groomers[groomerId];
+      const profile = groomerProfiles[groomerId];
+      if (!groomer || !profile) return;
+      activeProfileId = groomerId;
+      window.clearTimeout(profileCloseTimer);
+      document.getElementById("profileAvatar").textContent = groomer.name.slice(0, 1);
+      document.getElementById("profileName").textContent = groomer.name;
+      document.getElementById("profileSpecialty").textContent = profile.title;
+      document.getElementById("profileRating").textContent = groomer.stars + "  " + groomer.rating + " · " + groomer.reviews + " отзывов";
+      document.getElementById("profileBio").textContent = profile.bio;
+      const metrics = document.getElementById("profileMetrics");
+      metrics.innerHTML = "";
+      profile.metrics.forEach(metric => {
+        const item = document.createElement("div");
+        item.className = "profile-metric";
+        const value = document.createElement("strong");
+        value.textContent = metric.value;
+        const label = document.createElement("span");
+        label.textContent = metric.label;
+        item.append(value, label);
+        metrics.appendChild(item);
+      });
+      profileReviewForm.hidden = true;
+      profileReviewStatus.textContent = "";
+      await loadAvailability();
+      renderProfileFreeTime(groomerId);
+      loadProfileReviews(groomerId);
+      profileModal.hidden = false;
+      document.body.style.overflow = "hidden";
+      profileModal.classList.remove("is-opening", "is-closing");
+      void profileModal.offsetWidth;
+      profileModal.classList.add("is-opening");
+    }
+
+    function closeGroomerProfile() {
+      if (profileModal.hidden || profileModal.classList.contains("is-closing")) return;
+      profileModal.classList.remove("is-opening");
+      profileModal.classList.add("is-closing");
+      const finish = () => {
+        if (!profileModal.classList.contains("is-closing")) return;
+        profileModal.hidden = true;
+        profileModal.classList.remove("is-closing");
+        if (document.getElementById("matchModal").hidden) document.body.style.overflow = "";
+      };
+      profileModal.addEventListener("animationend", finish, { once:true });
+      profileCloseTimer = window.setTimeout(finish, 230);
+    }
+
+    document.querySelectorAll(".groomer-card").forEach(card => {
+      card.addEventListener("click", () => openGroomerProfile(card.dataset.groomerId));
+    });
+    document.getElementById("profileClose").addEventListener("click", closeGroomerProfile);
+    profileModal.addEventListener("click", event => { if (event.target === profileModal) closeGroomerProfile(); });
+    document.getElementById("profileBook").addEventListener("click", () => {
+      const groomerId = activeProfileId;
+      closeGroomerProfile();
+      window.setTimeout(() => openModal(groomerId), 210);
+    });
+    document.getElementById("profileReviewOpen").addEventListener("click", () => {
+      profileReviewForm.hidden = !profileReviewForm.hidden;
+      profileReviewStatus.textContent = "";
+      if (!profileReviewForm.hidden) document.getElementById("profileReviewText").focus();
+    });
+
+    const profileStars = document.getElementById("profileStars");
+    function setProfileRating(value) {
+      profileRatingValue = value;
+      profileStars.querySelectorAll("button").forEach((button, index) => {
+        const selected = index < value;
+        button.classList.toggle("selected", selected);
+        button.setAttribute("aria-checked", String(index + 1 === value));
+      });
+    }
+    for (let value = 1; value <= 5; value += 1) {
+      const star = document.createElement("button");
+      star.type = "button";
+      star.className = "profile-star";
+      star.textContent = "★";
+      star.setAttribute("role", "radio");
+      star.setAttribute("aria-label", value + " из 5");
+      star.addEventListener("click", () => setProfileRating(value));
+      profileStars.appendChild(star);
+    }
+    setProfileRating(5);
+
+    profileReviewForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const authorName = document.getElementById("profileReviewName").value.trim() || "Гость";
+      const reviewText = document.getElementById("profileReviewText").value.trim();
+      if (reviewText.length < 5) {
+        profileReviewStatus.textContent = "Напишите хотя бы 5 символов.";
+        return;
+      }
+      profileReviewStatus.textContent = "Публикуем отзыв...";
+      try {
+        const response = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action:"review", groomerId:activeProfileId, authorName, rating:profileRatingValue, reviewText }),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.ok === false) throw new Error(data.error || "Не удалось сохранить отзыв");
+        document.getElementById("profileReviewName").value = "";
+        document.getElementById("profileReviewText").value = "";
+        setProfileRating(5);
+        profileReviewForm.hidden = true;
+        await loadProfileReviews(activeProfileId);
+      } catch (error) {
+        profileReviewStatus.textContent = error.message;
+      }
+    });
+
+    const scheduleToggle = document.getElementById("scheduleToggle");
+    const schedulePanel = document.getElementById("schedulePanel");
+    const scheduleGrid = document.getElementById("scheduleGrid");
+    const scheduleViewport = document.getElementById("scheduleViewport");
+
+    function scheduleCell(className, text) {
+      const cell = document.createElement("div");
+      cell.className = "schedule-cell " + className;
+      cell.textContent = text;
+      return cell;
+    }
+
+    async function renderSchedule() {
+      scheduleGrid.innerHTML = "<div class='schedule-cell schedule-time schedule-name'>Обновляем...</div>";
+      await loadAvailability(true);
+      scheduleGrid.innerHTML = "";
+      scheduleGrid.appendChild(scheduleCell("schedule-time schedule-name", "Грумер"));
+      for (let hour = 10; hour < 18; hour += 1) scheduleGrid.appendChild(scheduleCell("schedule-time", String(hour).padStart(2, "0") + ":00"));
+
+      Object.entries(groomers).forEach(([groomerId, groomer]) => {
+        const nameCell = scheduleCell("schedule-name", "");
+        const name = document.createElement("strong");
+        name.textContent = groomer.name + " · " + groomer.rating;
+        const book = document.createElement("button");
+        book.type = "button";
+        book.className = "schedule-row-book";
+        book.textContent = "Записаться";
+        book.addEventListener("click", () => openModal(groomerId));
+        nameCell.append(name, book);
+        scheduleGrid.appendChild(nameCell);
+
+        for (let hour = 10; hour < 18; hour += 1) {
+          const startMin = hour * 60;
+          const endMin = startMin + 60;
+          const overlaps = busyRanges(groomerId).some(range => range.startMin < endMin && range.endMin > startMin);
+          const slot = scheduleCell("schedule-slot " + (overlaps ? "busy" : "free"), overlaps ? "Занято" : "Свободно");
+          slot.title = groomer.name + ": " + toTime(startMin) + "–" + toTime(endMin) + " — " + (overlaps ? "занято" : "свободно");
+          scheduleGrid.appendChild(slot);
+        }
+      });
+    }
+
+    scheduleToggle.addEventListener("click", async () => {
+      const open = schedulePanel.hidden;
+      schedulePanel.hidden = !open;
+      scheduleToggle.setAttribute("aria-expanded", String(open));
+      scheduleToggle.textContent = open ? "Скрыть расписание" : "Показать расписание";
+      if (open) await renderSchedule();
+    });
+
+    let scheduleDrag = null;
+    scheduleViewport.addEventListener("pointerdown", event => {
+      if (event.target.closest("button")) return;
+      scheduleDrag = { pointerId:event.pointerId, startX:event.clientX, scrollLeft:scheduleViewport.scrollLeft };
+      scheduleViewport.classList.add("is-dragging");
+      scheduleViewport.setPointerCapture(event.pointerId);
+    });
+    scheduleViewport.addEventListener("pointermove", event => {
+      if (!scheduleDrag || scheduleDrag.pointerId !== event.pointerId) return;
+      scheduleViewport.scrollLeft = scheduleDrag.scrollLeft - (event.clientX - scheduleDrag.startX);
+    });
+    scheduleViewport.addEventListener("pointerup", () => {
+      scheduleDrag = null;
+      scheduleViewport.classList.remove("is-dragging");
+    });
+
     function formatDuration(minutes) {
       if (!minutes) return "около 1 часа";
       const hours = Math.floor(minutes / 60);
@@ -1146,22 +1656,38 @@
       groomerChoices.innerHTML = "<div class='note'>Проверяем расписание мастеров...</div>";
       await loadAvailability();
       groomerChoices.innerHTML = "";
-      (groomersBySize[booking.size] || []).forEach(id => {
+      const ids = [...(groomersBySize[booking.size] || [])];
+      if (preferredGroomerId && ids.includes(preferredGroomerId)) {
+        ids.sort(id => id === preferredGroomerId ? -1 : 0);
+      }
+      ids.forEach(id => {
         const groomer = groomers[id];
-        const b = document.createElement("button");
-        b.innerHTML =
+        const row = document.createElement("div");
+        row.className = "groomer-choice-row";
+        const selectButton = document.createElement("button");
+        selectButton.type = "button";
+        selectButton.className = "groomer-choice-main";
+        selectButton.innerHTML =
           "<span class='style-title'>" + groomer.emoji + " " + groomer.name +
-          " · " + groomer.rating + " · " + groomer.reviews + " отзывов</span>" +
+          " · " + groomer.rating + " · " + groomer.reviews + " отзывов" +
+          (id === preferredGroomerId ? " · выбран вами" : "") + "</span>" +
           "<span class='style-meta'>" + groomer.stars + " · " + groomer.spec + "</span>" +
           "<span class='groomer-availability'>" + availabilityLabel(id) + "</span>";
-        b.addEventListener("click", () => {
+        selectButton.addEventListener("click", () => {
           currentGroomer = groomer;
           booking.groomer = groomer.name;
           booking.groomerId = id;
           buildStyleList();
           showStep("step-style");
         });
-        groomerChoices.appendChild(b);
+        const inspectButton = document.createElement("button");
+        inspectButton.type = "button";
+        inspectButton.className = "groomer-inspect";
+        inspectButton.textContent = "Изучить грумера";
+        inspectButton.setAttribute("aria-label", "Изучить грумера " + groomer.name);
+        inspectButton.addEventListener("click", () => openGroomerProfile(id));
+        row.append(selectButton, inspectButton);
+        groomerChoices.appendChild(row);
       });
     }
 
@@ -1445,8 +1971,9 @@
     /* ===== управление модалкой ===== */
     const modal = document.getElementById("matchModal");
     let modalCloseTimer = null;
-    function openModal() {
+    function openModal(groomerId = "") {
       window.clearTimeout(modalCloseTimer);
+      preferredGroomerId = typeof groomerId === "string" ? groomerId : "";
       select.value = "";
       breedPickerValue.textContent = "Выберите породу";
       setBreedMenu(false);
@@ -1489,12 +2016,13 @@
       modalCloseTimer = window.setTimeout(finishClosing, 230);
     }
 
-    document.querySelectorAll(".open-match").forEach(b => b.addEventListener("click", openModal));
+    document.querySelectorAll(".open-match").forEach(b => b.addEventListener("click", () => openModal()));
     document.getElementById("modalClose").addEventListener("click", closeModal);
     modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
-      if (!breedMenu.hidden) setBreedMenu(false);
+      if (!profileModal.hidden) closeGroomerProfile();
+      else if (!breedMenu.hidden) setBreedMenu(false);
       else closeModal();
     });
 

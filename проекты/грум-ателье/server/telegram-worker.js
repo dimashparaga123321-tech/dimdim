@@ -65,6 +65,50 @@ async function getAvailability(data, env) {
   return json({ ok: true, bookings: result.results || [] });
 }
 
+async function getGroomerReviews(data, env) {
+  if (!env.DB) {
+    return json({ ok: false, error: "Отзывы пока не подключены" }, 503);
+  }
+  const groomerId = String(data.groomerId || "");
+  if (!GROOMER_IDS.has(groomerId)) {
+    return json({ ok: false, error: "Неизвестный грумер" }, 400);
+  }
+
+  const result = await env.DB.prepare(`
+    SELECT id, author_name AS authorName, rating, review_text AS reviewText, created_at AS createdAt
+    FROM groomer_reviews
+    WHERE groomer_id = ?
+    ORDER BY created_at DESC
+    LIMIT 30
+  `).bind(groomerId).all();
+
+  return json({ ok: true, reviews: result.results || [] });
+}
+
+async function saveGroomerReview(data, env) {
+  if (!env.DB) {
+    return json({ ok: false, error: "Отзывы пока не подключены" }, 503);
+  }
+  const groomerId = String(data.groomerId || "");
+  const authorName = String(data.authorName || "Гость").trim().slice(0, 50) || "Гость";
+  const reviewText = String(data.reviewText || "").trim().slice(0, 500);
+  const rating = Number(data.rating);
+  if (!GROOMER_IDS.has(groomerId) || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return json({ ok: false, error: "Проверь выбранного грумера и оценку" }, 400);
+  }
+  if (reviewText.length < 5) {
+    return json({ ok: false, error: "Отзыв должен содержать хотя бы 5 символов" }, 400);
+  }
+
+  const id = crypto.randomUUID();
+  await env.DB.prepare(`
+    INSERT INTO groomer_reviews (id, groomer_id, author_name, rating, review_text)
+    VALUES (?, ?, ?, ?, ?)
+  `).bind(id, groomerId, authorName, rating, reviewText).run();
+
+  return json({ ok: true, review: { id, authorName, rating, reviewText } });
+}
+
 async function reserveAndSendBooking(data, env) {
   if (!env.DB) {
     return json({ ok: false, code: "SCHEDULE_NOT_CONFIGURED", error: "Расписание пока не подключено" }, 503);
@@ -181,6 +225,8 @@ export default {
     try {
       if (data.action === "chat") return await answerWithWorkersAI(data, env);
       if (data.action === "availability") return await getAvailability(data, env);
+      if (data.action === "reviews") return await getGroomerReviews(data, env);
+      if (data.action === "review") return await saveGroomerReview(data, env);
       if (data.action === "booking") return await reserveAndSendBooking(data, env);
       return await sendToTelegram(data, env);
     } catch (error) {
