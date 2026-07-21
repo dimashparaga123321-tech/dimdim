@@ -220,6 +220,8 @@
     }
     .choice-list button:hover { border-color: var(--accent); transform: translateY(-1px); }
     .choice-list.style-options button { text-align: left; padding: 14px 16px; }
+    .groomer-options { margin-top: 16px; }
+    .groomer-options button { text-align: left; }
     .style-title { display: block; font-weight: 900; }
     .style-meta { display: block; color: var(--muted); font-size: 14px; margin-top: 2px; }
     .pay-choice.sbp-choice { border-color: var(--secondary); }
@@ -324,7 +326,7 @@
   <!-- ГОТОВЫЕ ПРИЧЁСКИ -->
   <section id="styles">
     <h2>Готовые причёски</h2>
-    <p class="sub">Выбирай образ для своего питомца — сделаем точь-в-точь</p>
+    <p class="sub">В форме записи список и цены меняются под размер выбранной породы</p>
     <div class="grid">
       <div class="card">
         <div class="style-icon">✂️</div>
@@ -370,7 +372,7 @@
   <!-- ГРУМЕРЫ -->
   <section id="groomers">
     <h2>Грумеры и рейтинг</h2>
-    <p class="sub">В демке мастер выбирается автоматически по породе</p>
+    <p class="sub">После выбора породы можно выбрать подходящего мастера</p>
     <div class="grid">
       <div class="card"><div class="groomer-avatar">А</div><h3>Аня</h3><div class="rating-line"><span class="stars">★★★★★</span><span>4.9 · 128 отзывов</span></div><p>Кудрявые породы и выставочные формы.</p></div>
       <div class="card"><div class="groomer-avatar">М</div><h3>Максим</h3><div class="rating-line"><span class="stars">★★★★☆</span><span>4.7 · 96 отзывов</span></div><p>Крупные активные породы и вычёсывание.</p></div>
@@ -429,7 +431,7 @@
     <div class="price-note">
       💰 <b>Как считается цена:</b> цена породы + цена стрижки.<br>
       🐕 Породы: мелкие — <b>500 ₽</b>, средние — <b>1000 ₽</b>, крупные — <b>1600 ₽</b>.<br>
-      ✂️ Стрижки: от <b>400 ₽</b> до <b>1900 ₽</b>. Спецуслуги можно добавить отдельно.
+      ✂️ Стрижки: для маленьких и крупных собак отличаются по списку и цене. Диапазон: от <b>350 ₽</b> до <b>2200 ₽</b>.
     </div>
   </section>
 
@@ -455,11 +457,10 @@
           <option value="">— выбери породу —</option>
         </select>
         <div class="match-result" id="matchResult" hidden>
-          <div class="emoji" id="mEmoji">👩‍🎨</div>
-          <h4 id="mName">—</h4>
-          <div class="rating-line"><span class="stars" id="mStars">★★★★★</span><span id="mRating">—</span></div>
+          <div class="emoji">👥</div>
+          <h4 id="mName">Выбери грумера</h4>
           <p class="why" id="mWhy">—</p>
-          <button class="modal-cta" id="pickGroomer">Продолжить запись</button>
+          <div id="groomerChoices" class="choice-list groomer-options"></div>
         </div>
       </div>
 
@@ -538,50 +539,40 @@
       timur:  { name: "Тимур",  emoji: "🧑‍🎨", spec: "плотной шерсти, линьки и летнего ухода", rating: "4.5", reviews: 58, stars: "★★★★☆", busyUntil: "15:00" },
       sofia:  { name: "София",  emoji: "👩‍⚕️", spec: "щенков и деликатного первого ухода", rating: "5.0", reviews: 41, stars: "★★★★★", busyUntil: null },
     };
-    const breeds = {
-      "Немецкая овчарка": "maxim", "Лабрадор": "maxim", "Хаски": "timur",
-      "Золотистый ретривер": "timur", "Алабай": "maxim", "Ротвейлер": "maxim",
-      "Пудель": "anya", "Той-пудель": "sofia", "Мальтипу": "sofia",
-      "Бишон-фризе": "anya", "Кокер-спаниель": "karina", "Мальтезе": "sofia", "Керри-блю-терьер": "karina",
-      "Чихуахуа": "lera", "Йоркширский терьер": "karina", "Шпиц": "lera",
-      "Той-терьер": "sofia", "Мопс": "lera", "Такса": "karina",
+    const breedSize = {
+      "Немецкая овчарка": "large", "Лабрадор": "large", "Хаски": "large",
+      "Золотистый ретривер": "large", "Алабай": "large", "Ротвейлер": "large",
+      "Пудель": "large", "Кокер-спаниель": "large", "Керри-блю-терьер": "large",
+      "Той-пудель": "small", "Мальтипу": "small", "Бишон-фризе": "small", "Мальтезе": "small",
+      "Чихуахуа": "small", "Йоркширский терьер": "small", "Шпиц": "small",
+      "Той-терьер": "small", "Мопс": "small", "Такса": "small",
+    };
+    const groomersBySize = {
+      small: ["lera", "sofia", "karina", "anya"],
+      large: ["maxim", "timur", "anya", "karina"],
     };
 
     // 🔒 Адрес нашего сервера (Cloudflare Worker), который прячет токен бота.
     // Вставим сюда ссылку после настройки сервера (см. уроки/урок-04/СЕРВЕР.md).
     const WORKER_URL = "ВСТАВЬ_АДРЕС_СЕРВЕРА";
 
-    const styles = [
-      "Стрижка маленькой собаки",
-      "Стрижка большой собаки",
-      "Классика",
-      "Пёс-мишка",
-      "Летняя лёгкая",
-      "Пудель-шик",
-      "Лапки-сапожки",
-      "Мордочка-сердечко"
-    ];
-    // ⏱ время каждой стрижки
-    const styleDuration = {
-      "Стрижка маленькой собаки":"1,5 часа", "Стрижка большой собаки":"2,5 часа",
-      "Классика":"1 час", "Пёс-мишка":"2 часа", "Летняя лёгкая":"1 час",
-      "Пудель-шик":"2,5 часа", "Лапки-сапожки":"40 минут", "Мордочка-сердечко":"1,5 часа",
-    };
-    // 💰 цена каждой стрижки, ₽
-    const stylePrice = {
-      "Стрижка маленькой собаки":900, "Стрижка большой собаки":1900,
-      "Классика":800, "Пёс-мишка":1200, "Летняя лёгкая":600,
-      "Пудель-шик":1500, "Лапки-сапожки":400, "Мордочка-сердечко":900,
-    };
-    const styleDescription = {
-      "Стрижка маленькой собаки":"пакет для йорков, шпицев, чихуахуа и похожих пород",
-      "Стрижка большой собаки":"пакет для крупных пород с вычёсыванием и уходом",
-      "Классика":"ровный ухоженный силуэт",
-      "Пёс-мишка":"круглая мордочка и мягкий объём",
-      "Летняя лёгкая":"коротко, аккуратно и не жарко",
-      "Пудель-шик":"фигурная модельная форма",
-      "Лапки-сапожки":"акцент на лапах и мордочке",
-      "Мордочка-сердечко":"милый образ для фото",
+    const stylesBySize = {
+      small: [
+        { name:"Мини-классика", price:700, duration:"1 час", description:"аккуратная форма для маленькой собаки" },
+        { name:"Пёс-мишка мини", price:1100, duration:"1,5 часа", description:"круглая мордочка и мягкий пушистый контур" },
+        { name:"Мордочка-сердечко", price:900, duration:"1,5 часа", description:"милый образ для маленьких пород" },
+        { name:"Лапки-сапожки", price:350, duration:"40 минут", description:"оформление лап и мордочки" },
+        { name:"Гигиеническая мини", price:500, duration:"50 минут", description:"живот, лапки, хвост и аккуратный контур" },
+        { name:"SPA-уход мини", price:700, duration:"1 час", description:"купание, кондиционер и лёгкая укладка" },
+      ],
+      large: [
+        { name:"Крупная классика", price:1500, duration:"2 часа", description:"ровная стрижка корпуса и аккуратный силуэт" },
+        { name:"Летняя лёгкая для крупных", price:1600, duration:"2 часа", description:"комфортная короткая форма для жаркой погоды" },
+        { name:"Вычёсывание + контур", price:1800, duration:"2,5 часа", description:"подшёрсток, линия корпуса и лапы" },
+        { name:"Гигиеническая крупная", price:1200, duration:"1,5 часа", description:"живот, лапы, хвост и санитарные зоны" },
+        { name:"Антилинька", price:1900, duration:"2,5 часа", description:"глубокое вычёсывание и уход после линьки" },
+        { name:"Породный уход", price:2200, duration:"3 часа", description:"уход под особенности крупной породы" },
+      ],
     };
     // 💰 цена каждой породы, ₽ (по размеру)
     const breedPrice = {
@@ -594,12 +585,12 @@
     };
     const payMethods = ["💳 Банковская карта", "📱 СБП по номеру +7 900 555 35 35"];
 
-    const booking = { breed:"", groomer:"", style:"", time:"", pay:"", phone:"", price:0 };
+    const booking = { breed:"", size:"", groomer:"", style:"", stylePrice:0, styleDuration:"", time:"", pay:"", phone:"", price:0 };
     let currentGroomer = null;
 
     /* заполнить список пород */
     const select = document.getElementById("breedSelect");
-    Object.keys(breeds).sort().forEach(breed => {
+    Object.keys(breedSize).sort().forEach(breed => {
       const opt = document.createElement("option");
       opt.value = breed; opt.textContent = breed;
       select.appendChild(opt);
@@ -610,49 +601,68 @@
     function showStep(id){ steps.forEach(s => document.getElementById(s).hidden = (s !== id)); }
 
     const result = document.getElementById("matchResult");
+    const groomerChoices = document.getElementById("groomerChoices");
 
-    // Шаг 1: выбрали породу -> показать грумера
+    function sizeLabel(size) {
+      return size === "small" ? "маленькая собака" : "крупная собака";
+    }
+
+    // Шаг 1: выбрали породу -> показать несколько грумеров
     select.addEventListener("change", () => {
       const breed = select.value;
       if (!breed) { result.hidden = true; return; }
-      currentGroomer = groomers[breeds[breed]];
       booking.breed = breed;
-      document.getElementById("mEmoji").textContent = currentGroomer.emoji;
-      document.getElementById("mName").textContent = currentGroomer.name;
-      document.getElementById("mStars").textContent = currentGroomer.stars;
-      document.getElementById("mRating").textContent = currentGroomer.rating + " · " + currentGroomer.reviews + " отзывов";
+      booking.size = breedSize[breed] || "small";
+      currentGroomer = null;
+      booking.groomer = "";
+      document.getElementById("mName").textContent = "Выбери грумера";
       document.getElementById("mWhy").textContent =
-        "Для породы «" + breed + "» в демке назначается " + currentGroomer.name +
-        " — специалист по стрижке " + currentGroomer.spec + ".";
+        "Порода «" + breed + "» относится к категории «" + sizeLabel(booking.size) +
+        "». Ниже только мастера, которые подходят для этой категории.";
+      buildGroomerChoices();
       result.hidden = false;
     });
 
-    // Шаг 1 -> 2: выбрать грумера
-    document.getElementById("pickGroomer").addEventListener("click", () => {
-      if (!currentGroomer) return;
-      booking.groomer = currentGroomer.name;
-      buildStyleList();
-      showStep("step-style");
-    });
+    function buildGroomerChoices(){
+      groomerChoices.innerHTML = "";
+      (groomersBySize[booking.size] || []).forEach(id => {
+        const groomer = groomers[id];
+        const b = document.createElement("button");
+        b.innerHTML =
+          "<span class='style-title'>" + groomer.emoji + " " + groomer.name +
+          " · " + groomer.rating + " · " + groomer.reviews + " отзывов</span>" +
+          "<span class='style-meta'>" + groomer.stars + " · " + groomer.spec + "</span>";
+        b.addEventListener("click", () => {
+          currentGroomer = groomer;
+          booking.groomer = groomer.name;
+          buildStyleList();
+          showStep("step-style");
+        });
+        groomerChoices.appendChild(b);
+      });
+    }
 
-    // Шаг 2: список стрижек (с ценами)
+    // Шаг 2: список стрижек и цен по размеру выбранной породы
     const styleList = document.getElementById("styleList");
     function buildStyleList(){
       styleList.innerHTML = "";
       styleList.classList.add("style-options");
-      styles.forEach(name => {
+      const styles = stylesBySize[booking.size] || stylesBySize.small;
+      styles.forEach(style => {
         const b = document.createElement("button");
         const text = document.createElement("span");
         const title = document.createElement("span");
         title.className = "style-title";
-        title.textContent = name + " · " + stylePrice[name] + " ₽";
+        title.textContent = style.name + " · " + style.price + " ₽";
         const meta = document.createElement("span");
         meta.className = "style-meta";
-        meta.textContent = styleDescription[name] || "подходит для выбранной породы";
+        meta.textContent = style.description;
         text.append(title, meta);
         b.append(text);
         b.addEventListener("click", () => {
-          booking.style = name;
+          booking.style = style.name;
+          booking.stylePrice = style.price;
+          booking.styleDuration = style.duration;
           buildTimeList();
           showStep("step-time");
         });
@@ -709,15 +719,16 @@
     }
 
     // цена = порода + стрижка
-    function currentPrice(){ return (breedPrice[booking.breed] || 0) + (stylePrice[booking.style] || 0); }
+    function currentPrice(){ return (breedPrice[booking.breed] || 0) + (booking.stylePrice || 0); }
 
     // Шаг 5: сводка заявки
     function showSummary(){
       const price = currentPrice();
       booking.price = price;
-      const duration = styleDuration[booking.style] || "около 1,5 часа";
+      const duration = booking.styleDuration || "около 1,5 часа";
       document.getElementById("summary").innerHTML =
         "<div>🐶 Порода: <b>"+booking.breed+"</b></div>" +
+        "<div>📏 Размер: <b>"+sizeLabel(booking.size)+"</b></div>" +
         "<div>💇 Грумер: <b>"+booking.groomer+"</b></div>" +
         "<div>✂️ Стрижка: <b>"+booking.style+"</b></div>" +
         "<div>🕐 Время: <b>"+booking.time+"</b></div>" +
@@ -740,11 +751,12 @@
       }
       phoneError.hidden = true;
       booking.phone = phone;
-      const duration = styleDuration[booking.style] || "около 1,5 часа";
+      const duration = booking.styleDuration || "около 1,5 часа";
       const price = currentPrice();
       const text =
         "🐶 Новая заявка на стрижку!\n\n" +
         "Порода: " + booking.breed + "\n" +
+        "Размер: " + sizeLabel(booking.size) + "\n" +
         "Грумер: " + booking.groomer + "\n" +
         "Стрижка: " + booking.style + "\n" +
         "Время записи: " + booking.time + "\n" +
@@ -770,7 +782,10 @@
       select.value = "";
       result.hidden = true;
       currentGroomer = null;
-      booking.breed = booking.groomer = booking.style = booking.time = booking.pay = booking.phone = "";
+      booking.breed = booking.size = booking.groomer = booking.style = booking.time = booking.pay = booking.phone = "";
+      booking.stylePrice = booking.price = 0;
+      booking.styleDuration = "";
+      groomerChoices.innerHTML = "";
       document.getElementById("clientPhone").value = "";
       document.getElementById("phoneError").hidden = true;
       showStep("step-breed");
