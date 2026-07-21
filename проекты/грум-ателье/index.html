@@ -219,11 +219,28 @@
       cursor: pointer; transition: border-color .15s, transform .1s;
     }
     .choice-list button:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .choice-list button.selected {
+      border-color: var(--accent); background: var(--panel);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+    }
     .choice-list.style-options button { text-align: left; padding: 14px 16px; }
     .groomer-options { margin-top: 16px; }
     .groomer-options button { text-align: left; }
     .style-title { display: block; font-weight: 900; }
     .style-meta { display: block; color: var(--muted); font-size: 14px; margin-top: 2px; }
+    .modal-actions {
+      display: grid; gap: 10px; grid-template-columns: 1fr 1fr; margin-top: 16px;
+    }
+    .modal-actions .modal-cta { margin-top: 0; width: 100%; }
+    .modal-secondary {
+      background: var(--card-bg); color: var(--accent);
+      border: 2px solid var(--ghost-border);
+    }
+    .selection-note { margin-top: 12px; }
+    .service-total {
+      margin-top: 14px; padding: 12px 14px; border-radius: 14px;
+      background: var(--panel); color: var(--text); font-size: 14px; text-align: left;
+    }
     .pay-choice.sbp-choice { border-color: var(--secondary); }
     .note {
       font-size: 14px; color: var(--muted); background: var(--bg);
@@ -291,6 +308,7 @@
       .contact .phone { font-size: 28px; }
       .sbp-box { grid-template-columns: 1fr; text-align: center; }
       .qr-placeholder { margin: 0 auto; }
+      .modal-actions { grid-template-columns: 1fr; }
     }
     footer { text-align: center; padding: 34px; color: var(--muted); font-size: 14px; }
   </style>
@@ -429,9 +447,9 @@
       </div>
     </div>
     <div class="price-note">
-      💰 <b>Как считается цена:</b> цена породы + цена стрижки.<br>
+      💰 <b>Как считается цена:</b> цена породы + цена стрижки + выбранные спецуслуги.<br>
       🐕 Породы: мелкие — <b>500 ₽</b>, средние — <b>1000 ₽</b>, крупные — <b>1600 ₽</b>.<br>
-      ✂️ Стрижки: для маленьких и крупных собак отличаются по списку и цене. Диапазон: от <b>350 ₽</b> до <b>2200 ₽</b>.
+      ✂️ Стрижки и спецуслуги меняют итоговую цену и длительность записи.
     </div>
   </section>
 
@@ -469,6 +487,21 @@
         <h3>✂️ Выбор стрижки</h3>
         <p class="sub">Шаг 2. Какую причёску сделать?</p>
         <div id="styleList" class="choice-list"></div>
+        <div class="note selection-note" id="styleChoiceNote" hidden></div>
+        <div class="modal-actions" id="styleActions" hidden>
+          <button class="modal-cta" id="continueAfterStyle">Продолжить</button>
+          <button class="modal-cta modal-secondary" id="addSpecialService">Добавить спецуслугу</button>
+        </div>
+      </div>
+
+      <!-- Шаг 2.5: спецуслуги -->
+      <div id="step-special" hidden>
+        <h3>🧴 Спецуслуги</h3>
+        <p class="sub">Добавь уход к выбранной стрижке</p>
+        <div class="note" id="specialNote"></div>
+        <div id="specialList" class="choice-list"></div>
+        <div class="service-total" id="specialTotal"></div>
+        <button class="modal-cta" id="continueAfterSpecial">Продолжить</button>
       </div>
 
       <!-- Шаг 3: время -->
@@ -563,22 +596,48 @@
 
     const stylesBySize = {
       small: [
-        { name:"Мини-классика", price:700, duration:"1 час", description:"аккуратная форма для маленькой собаки" },
-        { name:"Пёс-мишка мини", price:1100, duration:"1,5 часа", description:"круглая мордочка и мягкий пушистый контур" },
-        { name:"Мордочка-сердечко", price:900, duration:"1,5 часа", description:"милый образ для маленьких пород" },
-        { name:"Лапки-сапожки", price:350, duration:"40 минут", description:"оформление лап и мордочки" },
-        { name:"Гигиеническая мини", price:500, duration:"50 минут", description:"живот, лапки, хвост и аккуратный контур" },
-        { name:"SPA-уход мини", price:700, duration:"1 час", description:"купание, кондиционер и лёгкая укладка" },
+        { name:"Мини-классика", price:700, durationMin:60, description:"аккуратная форма для маленькой собаки" },
+        { name:"Пёс-мишка мини", price:1100, durationMin:90, description:"круглая мордочка и мягкий пушистый контур" },
+        { name:"Мордочка-сердечко", price:900, durationMin:90, description:"милый образ для маленьких пород" },
+        { name:"Лапки-сапожки", price:350, durationMin:40, description:"оформление лап и мордочки" },
+        { name:"Гигиеническая мини", price:500, durationMin:50, description:"живот, лапки, хвост и аккуратный контур" },
+        { name:"SPA-уход мини", price:700, durationMin:60, description:"купание, кондиционер и лёгкая укладка" },
       ],
       large: [
-        { name:"Крупная классика", price:1500, duration:"2 часа", description:"ровная стрижка корпуса и аккуратный силуэт" },
-        { name:"Летняя лёгкая для крупных", price:1600, duration:"2 часа", description:"комфортная короткая форма для жаркой погоды" },
-        { name:"Вычёсывание + контур", price:1800, duration:"2,5 часа", description:"подшёрсток, линия корпуса и лапы" },
-        { name:"Гигиеническая крупная", price:1200, duration:"1,5 часа", description:"живот, лапы, хвост и санитарные зоны" },
-        { name:"Антилинька", price:1900, duration:"2,5 часа", description:"глубокое вычёсывание и уход после линьки" },
-        { name:"Породный уход", price:2200, duration:"3 часа", description:"уход под особенности крупной породы" },
+        { name:"Крупная классика", price:1500, durationMin:120, description:"ровная стрижка корпуса и аккуратный силуэт" },
+        { name:"Летняя лёгкая для крупных", price:1600, durationMin:120, description:"комфортная короткая форма для жаркой погоды" },
+        { name:"Вычёсывание + контур", price:1800, durationMin:150, description:"подшёрсток, линия корпуса и лапы" },
+        { name:"Гигиеническая крупная", price:1200, durationMin:90, description:"живот, лапы, хвост и санитарные зоны" },
+        { name:"Антилинька", price:1900, durationMin:150, description:"глубокое вычёсывание и уход после линьки" },
+        { name:"Породный уход", price:2200, durationMin:180, description:"уход под особенности крупной породы" },
       ],
     };
+    const specialServices = [
+      {
+        id:"spa", emoji:"🛁", name:"SPA-купание", description:"шампунь под тип шерсти, кондиционер и сушка",
+        small:{ price:700, durationMin:40 }, large:{ price:1100, durationMin:70 }
+      },
+      {
+        id:"hygiene", emoji:"🧼", name:"Гигиенический комплекс", description:"лапки, живот, хвост и санитарные зоны",
+        small:{ price:600, durationMin:35 }, large:{ price:900, durationMin:50 }
+      },
+      {
+        id:"deshedding", emoji:"🪮", name:"Вычёсывание", description:"убираем лишний подшёрсток и линьку",
+        small:{ price:800, durationMin:45 }, large:{ price:1400, durationMin:90 }
+      },
+      {
+        id:"nails", emoji:"💅", name:"Когти и лапки", description:"когти, подушечки и аккуратная форма лап",
+        small:{ price:350, durationMin:15 }, large:{ price:450, durationMin:20 }
+      },
+      {
+        id:"ears", emoji:"👂", name:"Уши и глаза", description:"деликатная чистка и лёгкий уход",
+        small:{ price:300, durationMin:15 }, large:{ price:400, durationMin:20 }
+      },
+      {
+        id:"dematting", emoji:"🌿", name:"Антиколтун", description:"разбор колтунов и подбор ухода",
+        small:{ price:500, durationMin:30 }, large:{ price:900, durationMin:60 }
+      },
+    ];
     // 💰 цена каждой породы, ₽ (по размеру)
     const breedPrice = {
       "Немецкая овчарка":1600, "Лабрадор":1600, "Хаски":1600,
@@ -590,7 +649,10 @@
     };
     const payMethods = ["💳 Банковская карта", "📱 СБП по номеру +7 900 555 35 35"];
 
-    const booking = { breed:"", size:"", groomer:"", style:"", stylePrice:0, styleDuration:"", time:"", pay:"", phone:"", price:0 };
+    const booking = {
+      breed:"", size:"", groomer:"", style:"", stylePrice:0, styleDurationMin:0,
+      specialServices:[], time:"", pay:"", phone:"", price:0
+    };
     let currentGroomer = null;
 
     /* заполнить список пород */
@@ -602,7 +664,7 @@
     });
 
     // показать один шаг, спрятать остальные
-    const steps = ["step-breed","step-style","step-time","step-pay","step-confirm","step-done"];
+    const steps = ["step-breed","step-style","step-special","step-time","step-pay","step-confirm","step-done"];
     function showStep(id){ steps.forEach(s => document.getElementById(s).hidden = (s !== id)); }
 
     const result = document.getElementById("matchResult");
@@ -610,6 +672,36 @@
 
     function sizeLabel(size) {
       return size === "small" ? "маленькая собака" : "крупная собака";
+    }
+
+    function formatDuration(minutes) {
+      if (!minutes) return "около 1 часа";
+      const hours = Math.floor(minutes / 60);
+      const rest = minutes % 60;
+      const hourWord = hours === 1 ? "час" : (hours >= 2 && hours <= 4 ? "часа" : "часов");
+      if (!hours) return rest + " мин";
+      if (!rest) return hours + " " + hourWord;
+      return hours + " ч " + rest + " мин";
+    }
+
+    function specialMeta(service) {
+      return service[booking.size] || service.small;
+    }
+
+    function selectedSpecials() {
+      return specialServices.filter(service => booking.specialServices.includes(service.id));
+    }
+
+    function specialsPrice() {
+      return selectedSpecials().reduce((sum, service) => sum + specialMeta(service).price, 0);
+    }
+
+    function specialsDuration() {
+      return selectedSpecials().reduce((sum, service) => sum + specialMeta(service).durationMin, 0);
+    }
+
+    function currentDurationMin() {
+      return (booking.styleDurationMin || 0) + specialsDuration();
     }
 
     // Шаг 1: выбрали породу -> показать несколько грумеров
@@ -649,8 +741,16 @@
 
     // Шаг 2: список стрижек и цен по размеру выбранной породы
     const styleList = document.getElementById("styleList");
+    const styleChoiceNote = document.getElementById("styleChoiceNote");
+    const styleActions = document.getElementById("styleActions");
     function buildStyleList(){
       styleList.innerHTML = "";
+      styleChoiceNote.hidden = true;
+      styleActions.hidden = true;
+      booking.style = "";
+      booking.stylePrice = 0;
+      booking.styleDurationMin = 0;
+      booking.specialServices = [];
       styleList.classList.add("style-options");
       const styles = stylesBySize[booking.size] || stylesBySize.small;
       styles.forEach(style => {
@@ -661,19 +761,84 @@
         title.textContent = style.name + " · " + style.price + " ₽";
         const meta = document.createElement("span");
         meta.className = "style-meta";
-        meta.textContent = style.description;
+        meta.textContent = style.description + " · " + formatDuration(style.durationMin);
         text.append(title, meta);
         b.append(text);
         b.addEventListener("click", () => {
+          styleList.querySelectorAll("button").forEach(btn => btn.classList.remove("selected"));
+          b.classList.add("selected");
           booking.style = style.name;
           booking.stylePrice = style.price;
-          booking.styleDuration = style.duration;
-          buildTimeList();
-          showStep("step-time");
+          booking.styleDurationMin = style.durationMin;
+          booking.specialServices = [];
+          styleChoiceNote.textContent =
+            "Выбрано: " + style.name + " · " + formatDuration(style.durationMin) +
+            " · " + style.price + " ₽. Можно продолжить или добавить спецуслугу.";
+          styleChoiceNote.hidden = false;
+          styleActions.hidden = false;
         });
         styleList.appendChild(b);
       });
     }
+
+    document.getElementById("continueAfterStyle").addEventListener("click", () => {
+      if (!booking.style) return;
+      booking.specialServices = [];
+      buildTimeList();
+      showStep("step-time");
+    });
+
+    document.getElementById("addSpecialService").addEventListener("click", () => {
+      if (!booking.style) return;
+      buildSpecialList();
+      showStep("step-special");
+    });
+
+    const specialList = document.getElementById("specialList");
+    const specialNote = document.getElementById("specialNote");
+    const specialTotal = document.getElementById("specialTotal");
+
+    function updateSpecialTotal() {
+      const names = selectedSpecials().map(service => service.name).join(", ");
+      const extraPrice = specialsPrice();
+      const extraDuration = specialsDuration();
+      specialTotal.textContent = selectedSpecials().length
+        ? "Добавлено: " + names + ". Плюс " + extraPrice + " ₽ и " + formatDuration(extraDuration) + "."
+        : "Спецуслуги не выбраны. Можно продолжить без них.";
+    }
+
+    function buildSpecialList(){
+      specialList.innerHTML = "";
+      specialNote.textContent =
+        "Для категории «" + sizeLabel(booking.size) + "» время и цена спецуслуг считаются отдельно.";
+      specialServices.forEach(service => {
+        const meta = specialMeta(service);
+        const b = document.createElement("button");
+        b.innerHTML =
+          "<span class='style-title'>" + service.emoji + " " + service.name +
+          " · " + meta.price + " ₽</span>" +
+          "<span class='style-meta'>+" + formatDuration(meta.durationMin) +
+          " · " + service.description + "</span>";
+        b.addEventListener("click", () => {
+          if (booking.specialServices.includes(service.id)) {
+            booking.specialServices = booking.specialServices.filter(id => id !== service.id);
+            b.classList.remove("selected");
+          } else {
+            booking.specialServices.push(service.id);
+            b.classList.add("selected");
+          }
+          updateSpecialTotal();
+        });
+        if (booking.specialServices.includes(service.id)) b.classList.add("selected");
+        specialList.appendChild(b);
+      });
+      updateSpecialTotal();
+    }
+
+    document.getElementById("continueAfterSpecial").addEventListener("click", () => {
+      buildTimeList();
+      showStep("step-time");
+    });
 
     // Шаг 3: свободное время с учётом занятости грумера
     const WORK_START = 10, WORK_END = 18;
@@ -684,15 +849,26 @@
     function buildTimeList(){
       timeList.innerHTML = "";
       let start = WORK_START*60;
+      const totalDuration = currentDurationMin();
       const busy = currentGroomer.busyUntil;
       if (busy) {
         start = Math.max(start, Math.ceil(toMin(busy)/60)*60);
         timeNote.textContent = currentGroomer.name + " освободится в " + busy +
-          ", поэтому запись доступна с " + toTime(start) + ".";
+          ", поэтому запись доступна с " + toTime(start) +
+          ". Общая длительность: " + formatDuration(totalDuration) + ".";
       } else {
-        timeNote.textContent = currentGroomer.name + " сейчас свободна — выбирай любое время.";
+        timeNote.textContent = currentGroomer.name + " сейчас свободна — выбирай любое время. " +
+          "Общая длительность: " + formatDuration(totalDuration) + ".";
       }
-      for (let t = start; t <= WORK_END*60; t += 60) {
+      const lastStart = WORK_END*60 - totalDuration;
+      if (start > lastStart) {
+        const p = document.createElement("p");
+        p.className = "note";
+        p.textContent = "Сегодня уже не хватает времени на такой набор услуг. Попробуй убрать спецуслугу или выбрать другого грумера.";
+        timeList.appendChild(p);
+        return;
+      }
+      for (let t = start; t <= lastStart; t += 60) {
         const time = toTime(t);
         const b = document.createElement("button");
         b.textContent = "🕐 " + time;
@@ -723,19 +899,21 @@
       });
     }
 
-    // цена = порода + стрижка
-    function currentPrice(){ return (breedPrice[booking.breed] || 0) + (booking.stylePrice || 0); }
+    // цена = порода + стрижка + выбранные спецуслуги
+    function currentPrice(){ return (breedPrice[booking.breed] || 0) + (booking.stylePrice || 0) + specialsPrice(); }
 
     // Шаг 5: сводка заявки
     function showSummary(){
       const price = currentPrice();
       booking.price = price;
-      const duration = booking.styleDuration || "около 1,5 часа";
+      const duration = formatDuration(currentDurationMin());
+      const specials = selectedSpecials().map(service => service.name).join(", ") || "не выбраны";
       document.getElementById("summary").innerHTML =
         "<div>🐶 Порода: <b>"+booking.breed+"</b></div>" +
         "<div>📏 Размер: <b>"+sizeLabel(booking.size)+"</b></div>" +
         "<div>💇 Грумер: <b>"+booking.groomer+"</b></div>" +
         "<div>✂️ Стрижка: <b>"+booking.style+"</b></div>" +
+        "<div>🧴 Спецуслуги: <b>"+specials+"</b></div>" +
         "<div>🕐 Время: <b>"+booking.time+"</b></div>" +
         "<div>💳 Оплата: <b>"+booking.pay+"</b></div>" +
         "<div>⏱ Займёт: <b>"+duration+"</b></div>" +
@@ -766,14 +944,16 @@
       }
       phoneError.hidden = true;
       booking.phone = phone;
-      const duration = booking.styleDuration || "около 1,5 часа";
+      const duration = formatDuration(currentDurationMin());
       const price = currentPrice();
+      const specials = selectedSpecials().map(service => service.name).join(", ") || "не выбраны";
       const text =
         "🐶 Новая заявка на стрижку!\n\n" +
         "Порода: " + booking.breed + "\n" +
         "Размер: " + sizeLabel(booking.size) + "\n" +
         "Грумер: " + booking.groomer + "\n" +
         "Стрижка: " + booking.style + "\n" +
+        "Спецуслуги: " + specials + "\n" +
         "Время записи: " + booking.time + "\n" +
         "Оплата: " + booking.pay + "\n" +
         "☎️ Телефон клиента: " + phone + "\n" +
@@ -819,8 +999,13 @@
       currentGroomer = null;
       booking.breed = booking.size = booking.groomer = booking.style = booking.time = booking.pay = booking.phone = "";
       booking.stylePrice = booking.price = 0;
-      booking.styleDuration = "";
+      booking.styleDurationMin = 0;
+      booking.specialServices = [];
       groomerChoices.innerHTML = "";
+      styleList.innerHTML = "";
+      specialList.innerHTML = "";
+      styleChoiceNote.hidden = true;
+      styleActions.hidden = true;
       document.getElementById("clientPhone").value = "";
       document.getElementById("phoneError").hidden = true;
       showStep("step-breed");
