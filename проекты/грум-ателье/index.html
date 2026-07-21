@@ -187,6 +187,32 @@
       padding: 32px 28px; max-width: 420px; width: 100%; text-align: center; position: relative;
       box-shadow: 0 20px 60px rgba(0,0,0,.35); max-height: 90vh; overflow-y: auto;
     }
+    .modal-backdrop.is-opening { animation: booking-backdrop-in .22s ease-out both; }
+    .modal-backdrop.is-closing {
+      pointer-events: none; animation: booking-backdrop-out .2s ease-in both;
+    }
+    .modal-backdrop.is-opening .modal { animation: booking-modal-in .28s cubic-bezier(.2,.8,.2,1) both; }
+    .modal-backdrop.is-closing .modal { animation: booking-modal-out .2s ease-in both; }
+    .booking-step.is-entering { animation: booking-step-in .22s ease-out both; }
+    .booking-step.is-leaving { pointer-events: none; animation: booking-step-out .15s ease-in both; }
+    @keyframes booking-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes booking-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes booking-modal-in {
+      from { opacity: 0; transform: translateY(24px) scale(.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes booking-modal-out {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(18px) scale(.96); }
+    }
+    @keyframes booking-step-in {
+      from { opacity: 0; transform: translateX(18px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes booking-step-out {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(-14px); }
+    }
     .modal .close {
       position: absolute; top: 14px; right: 16px; cursor: pointer;
       background: none; border: none; font-size: 24px; color: var(--muted); line-height: 1;
@@ -447,6 +473,16 @@
         to { opacity: 0; transform: translateY(18px) scale(.96); }
       }
     }
+    @media (prefers-reduced-motion: reduce) {
+      .modal-backdrop.is-opening,
+      .modal-backdrop.is-closing,
+      .modal-backdrop.is-opening .modal,
+      .modal-backdrop.is-closing .modal,
+      .booking-step.is-entering,
+      .booking-step.is-leaving,
+      .chat-panel.is-open,
+      .chat-panel.is-closing { animation-duration: .01ms !important; }
+    }
     footer { text-align: center; padding: 34px; color: var(--muted); font-size: 14px; }
   </style>
 </head>
@@ -612,7 +648,7 @@
           <div class="chat-avatar">🐶</div>
           <div>
             <strong>Лохматый AI</strong>
-            <span>консультант на DeepSeek</span>
+            <span>бесплатный AI-консультант</span>
           </div>
         </div>
         <button class="chat-close" id="chatClose" aria-label="Закрыть чат">×</button>
@@ -832,7 +868,31 @@
 
     // показать один шаг, спрятать остальные
     const steps = ["step-breed","step-style","step-special","step-time","step-pay","step-confirm","step-done"];
-    function showStep(id){ steps.forEach(s => document.getElementById(s).hidden = (s !== id)); }
+    const bookingSteps = steps.map(id => document.getElementById(id));
+    bookingSteps.forEach(step => step.classList.add("booking-step"));
+    let stepTransitionTimer = null;
+
+    function showStep(id, animate = true) {
+      const next = document.getElementById(id);
+      const current = bookingSteps.find(step => !step.hidden);
+      window.clearTimeout(stepTransitionTimer);
+      bookingSteps.forEach(step => step.classList.remove("is-entering", "is-leaving"));
+
+      if (!animate || !current || current === next || modal.hidden) {
+        bookingSteps.forEach(step => { step.hidden = step !== next; });
+        return;
+      }
+
+      current.classList.add("is-leaving");
+      stepTransitionTimer = window.setTimeout(() => {
+        bookingSteps.forEach(step => {
+          step.hidden = step !== next;
+          step.classList.remove("is-entering", "is-leaving");
+        });
+        next.classList.add("is-entering");
+        next.addEventListener("animationend", () => next.classList.remove("is-entering"), { once: true });
+      }, 150);
+    }
 
     const result = document.getElementById("matchResult");
     const groomerChoices = document.getElementById("groomerChoices");
@@ -1160,7 +1220,9 @@
 
     /* ===== управление модалкой ===== */
     const modal = document.getElementById("matchModal");
+    let modalCloseTimer = null;
     function openModal() {
+      window.clearTimeout(modalCloseTimer);
       select.value = "";
       result.hidden = true;
       currentGroomer = null;
@@ -1175,10 +1237,30 @@
       styleActions.hidden = true;
       document.getElementById("clientPhone").value = "";
       document.getElementById("phoneError").hidden = true;
-      showStep("step-breed");
+      showStep("step-breed", false);
       modal.hidden = false;
+      document.body.style.overflow = "hidden";
+      modal.classList.remove("is-opening", "is-closing");
+      void modal.offsetWidth;
+      modal.classList.add("is-opening");
+      modal.addEventListener("animationend", () => modal.classList.remove("is-opening"), { once: true });
     }
-    function closeModal() { modal.hidden = true; }
+    function closeModal() {
+      if (modal.hidden || modal.classList.contains("is-closing")) return;
+      window.clearTimeout(stepTransitionTimer);
+      modal.classList.remove("is-opening");
+      modal.classList.add("is-closing");
+
+      const finishClosing = () => {
+        if (!modal.classList.contains("is-closing")) return;
+        modal.hidden = true;
+        modal.classList.remove("is-closing");
+        bookingSteps.forEach(step => step.classList.remove("is-entering", "is-leaving"));
+        document.body.style.overflow = "";
+      };
+
+      modalCloseTimer = window.setTimeout(finishClosing, 230);
+    }
 
     document.querySelectorAll(".open-match").forEach(b => b.addEventListener("click", openModal));
     document.getElementById("modalClose").addEventListener("click", closeModal);
@@ -1262,7 +1344,7 @@
       chatPanel.classList.add("is-open");
       if (!chatStarted) {
         chatStarted = true;
-        botSay("Привет! Я AI-консультант на DeepSeek. Спроси меня о стрижках, ценах, грумерах, спецуслугах или записи.");
+        botSay("Привет! Я бесплатный AI-консультант на Cloudflare. Спроси меня о стрижках, ценах, грумерах, спецуслугах или записи.");
         renderChatActions([
           { label:"Записаться на стрижку", action: () => { botSay("Открываю запись. Выбери породу, мастера, стрижку и удобное время."); openModal(); } },
           { label:"Посчитать оплату", action: () => showPaymentDemo(1900) },
@@ -1400,7 +1482,7 @@
       chatSend.disabled = value;
     }
 
-    async function askDeepSeek(message) {
+    async function askCloudflareAI(message) {
       chatHistory.push({ role: "user", content: message });
       chatHistory = chatHistory.slice(-10);
       const thinking = appendChatMessage("Печатает...", "bot thinking");
@@ -1414,7 +1496,7 @@
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok || data.ok === false || !data.reply) {
-          const error = new Error(data.error || "DeepSeek не ответил");
+          const error = new Error(data.error || "AI-консультант не ответил");
           error.code = data.code || "";
           throw error;
         }
@@ -1426,9 +1508,9 @@
         thinking.remove();
         chatHistory = chatHistory.slice(0, -1);
         if (error.code === "AI_NOT_CONFIGURED") {
-          botSay("DeepSeek уже подготовлен, но ключ API ещё не добавлен в Cloudflare. После добавления ключа я начну отвечать сам.");
+          botSay("AI-консультант ещё подключается к Cloudflare. Попробуй снова через минуту.");
         } else {
-          botSay("Сейчас не получилось связаться с DeepSeek. Попробуй ещё раз чуть позже или открой форму записи.");
+          botSay("Сейчас не получилось связаться с AI-консультантом. Попробуй ещё раз чуть позже или открой форму записи.");
         }
       } finally {
         setChatBusy(false);
@@ -1440,7 +1522,7 @@
       const text = message.trim();
       if (!text || chatBusy) return;
       userSay(text);
-      await askDeepSeek(text);
+      await askCloudflareAI(text);
     }
 
     chatToggle.addEventListener("click", toggleChat);

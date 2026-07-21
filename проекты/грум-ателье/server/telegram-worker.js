@@ -1,4 +1,4 @@
-// Cloudflare Worker keeps Telegram and DeepSeek credentials away from the browser.
+// Cloudflare Worker keeps Telegram credentials and AI requests away from the browser.
 
 const JSON_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -41,12 +41,12 @@ function sanitizeMessages(messages) {
     .filter(message => message.content);
 }
 
-async function answerWithDeepSeek(data, env) {
-  if (!env.DEEPSEEK_API_KEY) {
+async function answerWithWorkersAI(data, env) {
+  if (!env.AI) {
     return json({
       ok: false,
       code: "AI_NOT_CONFIGURED",
-      error: "DeepSeek пока не подключён: добавьте секрет DEEPSEEK_API_KEY",
+      error: "Workers AI пока не подключён: добавьте привязку AI в Cloudflare",
     }, 503);
   }
 
@@ -55,32 +55,18 @@ async function answerWithDeepSeek(data, env) {
     return json({ ok: false, error: "Нужно отправить сообщение пользователя" }, 400);
   }
 
-  const deepSeekResponse = await fetch("https://api.deepseek.com/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer " + env.DEEPSEEK_API_KEY,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "deepseek-v4-flash",
-      messages: [{ role: "system", content: GROOMING_PROMPT }, ...messages],
-      thinking: { type: "disabled" },
-      max_tokens: 450,
-      temperature: 0.4,
-      stream: false,
-    }),
+  const aiResult = await env.AI.run("@cf/meta/llama-3.1-8b-instruct-fp8-fast", {
+    messages: [{ role: "system", content: GROOMING_PROMPT }, ...messages],
+    max_tokens: 450,
+    temperature: 0.4,
   });
 
-  const deepSeekData = await deepSeekResponse.json().catch(() => ({}));
-  const reply = deepSeekData.choices?.[0]?.message?.content?.trim();
-  if (!deepSeekResponse.ok || !reply) {
-    return json({
-      ok: false,
-      error: deepSeekData.error?.message || "DeepSeek не смог ответить",
-    }, deepSeekResponse.status >= 400 ? deepSeekResponse.status : 502);
-  }
+  const reply = typeof aiResult?.response === "string"
+    ? aiResult.response.trim()
+    : aiResult?.choices?.[0]?.message?.content?.trim();
+  if (!reply) return json({ ok: false, error: "Workers AI не смог ответить" }, 502);
 
-  return json({ ok: true, reply });
+  return json({ ok: true, reply, provider: "cloudflare-workers-ai" });
 }
 
 async function sendToTelegram(data, env) {
@@ -122,7 +108,7 @@ export default {
     }
 
     try {
-      if (data.action === "chat") return await answerWithDeepSeek(data, env);
+      if (data.action === "chat") return await answerWithWorkersAI(data, env);
       return await sendToTelegram(data, env);
     } catch (error) {
       return json({ ok: false, error: "Сервис временно недоступен" }, 502);
