@@ -310,9 +310,8 @@
 
       <!-- Готово -->
       <div id="step-done" hidden>
-        <h3>✅ Заявка готова!</h3>
-        <p class="sub">Открылась твоя почта с готовым письмом — нажми в ней «Отправить»,
-           и ателье свяжется с тобой. Спасибо! 🐾</p>
+        <h3>✅ Заявка отправлена!</h3>
+        <p class="sub" id="doneText">Спасибо! Ателье получило твою заявку и свяжется с тобой. 🐾</p>
       </div>
     </div>
   </div>
@@ -365,8 +364,19 @@
 
     /* показать грумера при выборе породы */
     const result = document.getElementById("matchResult");
-    const OWNER_EMAIL = "dimashparaga123321@gmail.com"; // 📧 сюда придёт заявка
+    // 🤖 Telegram-бот (простая версия — токен в коде; позже спрячем на сервере)
+    const BOT_TOKEN = "8710877365:AAFbL7LdcaY6Q4fld7cCNLpQOuDKhK5EK4Y";
+    const CHAT_ID = "8969341722";
     const styles = ["Классика","Пёс-мишка","Летняя лёгкая","Пудель-шик","Лапки-сапожки","Мордочка-сердечко"];
+    // ⏱ сколько занимает каждая стрижка
+    const styleDuration = {
+      "Классика": "1 час",
+      "Пёс-мишка": "2 часа",
+      "Летняя лёгкая": "1 час",
+      "Пудель-шик": "2,5 часа",
+      "Лапки-сапожки": "40 минут",
+      "Мордочка-сердечко": "1,5 часа",
+    };
     const booking = { breed:"", groomer:"", style:"", time:"" };
     let currentGroomer = null;
 
@@ -451,19 +461,26 @@
         "<div>🕐 Время: <b>"+booking.time+"</b></div>";
     }
 
-    // Отправить заявку через почту (mailto)
+    // Отправить заявку в Telegram-бот
     document.getElementById("sendBooking").addEventListener("click", () => {
-      const subject = "Запись в Лохматый Стиль";
-      const bodyText =
-        "Здравствуйте! Хочу записаться на стрижку собаки:\n\n" +
+      const duration = styleDuration[booking.style] || "около 1,5 часа";
+      const text =
+        "🐶 Новая заявка на стрижку!\n\n" +
         "Порода: " + booking.breed + "\n" +
         "Грумер: " + booking.groomer + "\n" +
         "Стрижка: " + booking.style + "\n" +
-        "Время: " + booking.time + "\n";
-      const url = "mailto:" + OWNER_EMAIL +
-        "?subject=" + encodeURIComponent(subject) +
-        "&body=" + encodeURIComponent(bodyText);
-      window.location.href = url;   // откроется почта с готовым письмом
+        "Время записи: " + booking.time + "\n" +
+        "⏱ Стрижка займёт примерно: " + duration;
+      // отправляем сообщение в Telegram через бота
+      fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: CHAT_ID, text: text })
+      });
+      // показываем клиенту, сколько займёт стрижка
+      document.getElementById("doneText").textContent =
+        "Спасибо! Заявка отправлена. ✂️ Стрижка займёт примерно " + duration +
+        ". Ателье свяжется с тобой. 🐾";
       showStep("step-done");
     });
 
