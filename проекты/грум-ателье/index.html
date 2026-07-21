@@ -88,7 +88,14 @@
       border-radius: 999px; color: var(--muted); font-weight: 800; font-size: 14px;
       box-shadow: 0 10px 30px rgba(0,0,0,.08);
     }
-    .brand-mark .logo { font-size: 24px; line-height: 1; }
+    .brand-logo {
+      width: 76px; height: 76px; margin: 0 auto 14px;
+      display: grid; place-items: center; color: var(--accent);
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 24px; box-shadow: 0 18px 38px rgba(255,122,61,.16);
+    }
+    .brand-logo svg { width: 52px; height: 52px; display: block; }
+    .brand-mark .logo { font-size: 20px; line-height: 1; }
     .hero h1 {
       font-size: clamp(42px, 8vw, 78px); font-weight: 900; margin: 14px 0 10px;
       color: var(--hero-ink); line-height: .98;
@@ -114,17 +121,26 @@
       box-shadow: 0 8px 24px rgba(0,0,0,.06); border: 1px solid var(--card-border);
     }
     .card .emoji { font-size: 44px; }
-    .card-img { width: 100%; height: 170px; object-fit: cover; border-radius: 16px; margin-bottom: 14px; display: block; }
+    .style-icon {
+      width: 82px; height: 82px; margin: 0 auto 14px;
+      display: grid; place-items: center; border-radius: 24px;
+      background: var(--panel); color: var(--accent); font-size: 34px;
+      border: 1px solid var(--card-border);
+    }
     .card h3 { margin: 6px 0; font-size: 20px; }
     .card p { color: var(--muted); font-size: 15px; }
     .price { margin-top: 10px; font-weight: 800; color: var(--accent); font-size: 17px; }
     .stars { color: #ffb020; font-size: 17px; letter-spacing: 2px; }
-    .gallery-grid { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
-    .breed-card { overflow: hidden; padding: 0; text-align: left; }
-    .breed-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
-    .breed-card .breed-body { padding: 18px 18px 20px; }
-    .breed-card h3 { margin: 0 0 6px; }
-    .breed-card p { margin: 0; }
+    .rating-line {
+      margin: 8px 0 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
+      color: var(--muted); font-size: 14px; font-weight: 700;
+    }
+    .rating-line .stars { font-size: 14px; letter-spacing: 1px; }
+    .groomer-avatar {
+      width: 66px; height: 66px; margin: 0 auto 10px; border-radius: 22px;
+      display: grid; place-items: center; color: var(--accent); background: var(--panel);
+      border: 1px solid var(--card-border); font-size: 30px; font-weight: 900;
+    }
 
     /* ===== ОПЛАТА ===== */
     .price-note {
@@ -186,10 +202,6 @@
     .match-result .emoji { font-size: 48px; }
     .match-result h4 { font-size: 22px; margin: 6px 0; color: var(--accent); }
     .match-result .why { color: var(--muted); margin: 6px 0 14px; font-size: 15px; }
-    .breed-preview {
-      width: 100%; height: 150px; object-fit: cover; border-radius: 18px;
-      display: block; margin-bottom: 14px; border: 1px solid var(--card-border);
-    }
 
     /* шаги записи */
     .modal-cta {
@@ -205,13 +217,7 @@
       cursor: pointer; transition: border-color .15s, transform .1s;
     }
     .choice-list button:hover { border-color: var(--accent); transform: translateY(-1px); }
-    .choice-list.style-options button {
-      display: grid; grid-template-columns: 82px 1fr; gap: 12px; align-items: center;
-      text-align: left; padding: 10px;
-    }
-    .style-thumb {
-      width: 82px; height: 70px; object-fit: cover; border-radius: 12px; display: block;
-    }
+    .choice-list.style-options button { text-align: left; padding: 14px 16px; }
     .style-title { display: block; font-weight: 900; }
     .style-meta { display: block; color: var(--muted); font-size: 14px; margin-top: 2px; }
     .pay-choice.sbp-choice { border-color: var(--secondary); }
@@ -281,8 +287,6 @@
       .contact .phone { font-size: 28px; }
       .sbp-box { grid-template-columns: 1fr; text-align: center; }
       .qr-placeholder { margin: 0 auto; }
-      .choice-list.style-options button { grid-template-columns: 76px 1fr; }
-      .style-thumb { width: 76px; height: 64px; }
     }
     footer { text-align: center; padding: 34px; color: var(--muted); font-size: 14px; }
   </style>
@@ -303,14 +307,22 @@
 
   <!-- ШАПКА -->
   <header class="hero">
-    <div class="brand-mark"><span class="logo">🐶✂️</span><span>груминг-ателье для собак</span></div>
+    <div class="brand-logo" aria-label="Логотип Лохматый Стиль">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="30" r="18" fill="none" stroke="currentColor" stroke-width="5"></circle>
+        <path d="M19 18 12 10M45 18l7-8M22 47c5 5 15 5 20 0" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"></path>
+        <circle cx="25" cy="29" r="3.5" fill="currentColor"></circle>
+        <circle cx="39" cy="29" r="3.5" fill="currentColor"></circle>
+        <path d="M29 38h6" stroke="currentColor" stroke-width="5" stroke-linecap="round"></path>
+        <path d="M47 46 58 57M58 46 47 57" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
+      </svg>
+    </div>
+    <div class="brand-mark"><span class="logo">LS</span><span>демо груминг-ателье</span></div>
     <h1>Лохматый<br><span>Стиль</span></h1>
     <p class="tagline">Груминг-ателье для собак. Стрижки, купание и укладки —
        твой пёс выйдет от нас настоящей звездой!</p>
     <div class="btns">
       <button class="btn btn-main open-match">Записаться на стрижку</button>
-      <button class="btn btn-ghost open-match">🐾 Подобрать грумера</button>
-      <a class="btn btn-ghost" href="#payment">Оплата СБП</a>
     </div>
   </header>
 
@@ -320,61 +332,43 @@
     <p class="sub">Выбирай образ для своего питомца — сделаем точь-в-точь</p>
     <div class="grid">
       <div class="card">
-        <img class="card-img" src="https://loremflickr.com/420/300/dog,grooming,classic?lock=10" alt="Классика" loading="lazy" onerror="this.remove()">
+        <div class="style-icon">✂️</div>
         <h3>Классика</h3><p>Аккуратная ровная стрижка на каждый день.</p><div class="price">от 800 ₽</div>
       </div>
       <div class="card">
-        <img class="card-img" src="https://loremflickr.com/420/300/fluffy,dog,grooming?lock=20" alt="Пёс-мишка" loading="lazy" onerror="this.remove()">
+        <div class="style-icon">🧸</div>
         <h3>Пёс-мишка</h3><p>Округлая пушистая стрижка «плюшевый медвежонок».</p><div class="price">от 1200 ₽</div>
       </div>
       <div class="card">
-        <img class="card-img" src="https://loremflickr.com/420/300/short-haired,dog,grooming?lock=30" alt="Летняя лёгкая" loading="lazy" onerror="this.remove()">
+        <div class="style-icon">☀️</div>
         <h3>Летняя лёгкая</h3><p>Короткая стрижка, чтобы было не жарко.</p><div class="price">от 600 ₽</div>
       </div>
       <div class="card">
-        <img class="card-img" src="https://loremflickr.com/420/300/poodle,grooming?lock=50" alt="Пудель-шик" loading="lazy" onerror="this.remove()">
+        <div class="style-icon">👑</div>
         <h3>Пудель-шик</h3><p>Модельная стрижка для выставок и фото.</p><div class="price">от 1500 ₽</div>
       </div>
       <div class="card">
-        <img class="card-img" src="https://loremflickr.com/420/300/dog,paws,grooming?lock=80" alt="Лапки-сапожки" loading="lazy" onerror="this.remove()">
+        <div class="style-icon">🐾</div>
         <h3>Лапки-сапожки</h3><p>Аккуратное оформление лап и мордочки.</p><div class="price">от 400 ₽</div>
       </div>
       <div class="card">
-        <img class="card-img" src="https://loremflickr.com/420/300/small,dog,grooming?lock=100" alt="Мордочка-сердечко" loading="lazy" onerror="this.remove()">
+        <div class="style-icon">♡</div>
         <h3>Мордочка-сердечко</h3><p>Милый образ для маленьких пород.</p><div class="price">от 900 ₽</div>
       </div>
     </div>
   </section>
 
-  <!-- ФОТО ПО ПОРОДАМ -->
-  <section id="breed-gallery">
-    <h2>Фото стрижек по породам</h2>
-    <p class="sub">В заявке фото подбираются под выбранную породу и тип стрижки</p>
-    <div class="grid gallery-grid">
-      <div class="card breed-card">
-        <img src="https://loremflickr.com/520/360/poodle,dog,grooming?lock=114" alt="Пудель — пудель-шик" loading="lazy">
-        <div class="breed-body"><h3>Пудель</h3><p>Фигурная стрижка, объём на лапах и аккуратная мордочка.</p></div>
-      </div>
-      <div class="card breed-card">
-        <img src="https://loremflickr.com/520/360/yorkshire-terrier,dog,grooming?lock=124" alt="Йоркширский терьер — классика" loading="lazy">
-        <div class="breed-body"><h3>Йоркширский терьер</h3><p>Ровный силуэт, чистые лапки и ухоженная шерсть.</p></div>
-      </div>
-      <div class="card breed-card">
-        <img src="https://loremflickr.com/520/360/pomeranian,dog,grooming?lock=136" alt="Шпиц — пёс-мишка" loading="lazy">
-        <div class="breed-body"><h3>Шпиц</h3><p>Пушистый образ «мишка» с мягким контуром.</p></div>
-      </div>
-      <div class="card breed-card">
-        <img src="https://loremflickr.com/520/360/maltipoo,dog,grooming?lock=148" alt="Мальтипу — мордочка-сердечко" loading="lazy">
-        <div class="breed-body"><h3>Мальтипу</h3><p>Милая круглая мордочка и лёгкая укладка.</p></div>
-      </div>
-      <div class="card breed-card">
-        <img src="https://loremflickr.com/520/360/husky,dog,grooming?lock=158" alt="Хаски — летняя лёгкая" loading="lazy">
-        <div class="breed-body"><h3>Хаски</h3><p>Лёгкий уход, вычёсывание и комфорт в жаркую погоду.</p></div>
-      </div>
-      <div class="card breed-card">
-        <img src="https://loremflickr.com/520/360/cocker-spaniel,dog,grooming?lock=168" alt="Кокер-спаниель — лапки-сапожки" loading="lazy">
-        <div class="breed-body"><h3>Кокер-спаниель</h3><p>Акцент на ушах, лапах и аккуратной форме корпуса.</p></div>
-      </div>
+  <!-- ГРУМЕРЫ -->
+  <section id="groomers">
+    <h2>Грумеры и рейтинг</h2>
+    <p class="sub">В демке мастер выбирается автоматически по породе</p>
+    <div class="grid">
+      <div class="card"><div class="groomer-avatar">А</div><h3>Аня</h3><div class="rating-line"><span class="stars">★★★★★</span><span>4.9 · 128 отзывов</span></div><p>Кудрявые породы и выставочные формы.</p></div>
+      <div class="card"><div class="groomer-avatar">М</div><h3>Максим</h3><div class="rating-line"><span class="stars">★★★★☆</span><span>4.7 · 96 отзывов</span></div><p>Крупные активные породы и вычёсывание.</p></div>
+      <div class="card"><div class="groomer-avatar">Л</div><h3>Лера</h3><div class="rating-line"><span class="stars">★★★★★</span><span>4.8 · 112 отзывов</span></div><p>Маленькие породы и мягкие формы.</p></div>
+      <div class="card"><div class="groomer-avatar">К</div><h3>Карина</h3><div class="rating-line"><span class="stars">★★★★☆</span><span>4.6 · 74 отзыва</span></div><p>Спаниели, терьеры и аккуратные лапки.</p></div>
+      <div class="card"><div class="groomer-avatar">Т</div><h3>Тимур</h3><div class="rating-line"><span class="stars">★★★★☆</span><span>4.5 · 58 отзывов</span></div><p>Плотная шерсть, линька и летний уход.</p></div>
+      <div class="card"><div class="groomer-avatar">С</div><h3>София</h3><div class="rating-line"><span class="stars">★★★★★</span><span>5.0 · 41 отзыв</span></div><p>Щенки, деликатный уход и первая стрижка.</p></div>
     </div>
   </section>
 
@@ -409,12 +403,11 @@
     <h2>Оплата и цены</h2>
     <p class="sub">Плати удобным способом</p>
     <div class="grid">
-      <div class="card"><div class="emoji">💵</div><h3>Наличные</h3><p>Оплата в ателье после стрижки.</p></div>
       <div class="card"><div class="emoji">💳</div><h3>Банковская карта</h3><p>Оплата картой прямо на месте.</p></div>
       <div class="card sbp-card">
         <span class="sbp-badge">СБП</span>
         <div class="emoji">📱</div><h3>Перевод по номеру</h3>
-        <p>Быстрый перевод через СБП на <b>+7 911 159 53 39</b>.</p>
+        <p>Быстрый перевод через СБП на демо-номер <b>+7 900 555 35 35</b>.</p>
       </div>
     </div>
     <div class="sbp-box">
@@ -435,7 +428,7 @@
   <section id="contact" class="contact">
     <h2>Записаться на стрижку</h2>
     <p class="sub">Позвони администратору — подберём время и грумера</p>
-    <a class="phone" href="tel:+79111595339">+7 911 159 53 39</a>
+    <a class="phone" href="tel:+79005553535">+7 900 555 35 35</a>
   </section>
 
   <footer>© 2026 · Лохматый Стиль · груминг-ателье для собак 🐾</footer>
@@ -453,12 +446,11 @@
           <option value="">— выбери породу —</option>
         </select>
         <div class="match-result" id="matchResult" hidden>
-          <img class="breed-preview" id="breedPreview" src="" alt="" hidden>
           <div class="emoji" id="mEmoji">👩‍🎨</div>
           <h4 id="mName">—</h4>
-          <div class="stars">★★★★★</div>
+          <div class="rating-line"><span class="stars" id="mStars">★★★★★</span><span id="mRating">—</span></div>
           <p class="why" id="mWhy">—</p>
-          <button class="modal-cta" id="pickGroomer">✅ Выбрать грумера</button>
+          <button class="modal-cta" id="pickGroomer">Продолжить запись</button>
         </div>
       </div>
 
@@ -489,7 +481,7 @@
         <h3>📋 Проверь заявку</h3>
         <div class="summary" id="summary"></div>
         <div class="sbp-hint" id="sbpHint" hidden>
-          Для СБП используем номер <b>+7 911 159 53 39</b>. Настоящее получение денег подключим позже, а пока способ оплаты сохранится в заявке.
+          Для СБП используем демо-номер <b>+7 900 555 35 35</b>. Настоящее получение денег подключим позже, а пока способ оплаты сохранится в заявке.
         </div>
         <label class="field-label" for="clientPhone">Телефон клиента</label>
         <input id="clientPhone" class="contact-input" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 900 000 00 00">
@@ -530,17 +522,20 @@
     /* ===== ДАННЫЕ ===== */
     const groomers = {
       // busyUntil — до какого времени грумер занят (задано вручную для примера; позже возьмём из базы)
-      anya:  { name: "Аня",    emoji: "👩‍🎨", spec: "кудрявых и выставочных пород", busyUntil: "14:30" },
-      maxim: { name: "Максим", emoji: "🧑‍🔧", spec: "крупных и активных пород",   busyUntil: "12:00" },
-      lera:  { name: "Лера",   emoji: "👩‍🦰", spec: "мелких и капризных пород",    busyUntil: null },
+      anya:   { name: "Аня",    emoji: "👩‍🎨", spec: "кудрявых и выставочных пород", rating: "4.9", reviews: 128, stars: "★★★★★", busyUntil: "14:30" },
+      maxim:  { name: "Максим", emoji: "🧑‍🔧", spec: "крупных и активных пород", rating: "4.7", reviews: 96, stars: "★★★★☆", busyUntil: "12:00" },
+      lera:   { name: "Лера",   emoji: "👩‍🦰", spec: "мелких пород и мягких форм", rating: "4.8", reviews: 112, stars: "★★★★★", busyUntil: null },
+      karina: { name: "Карина", emoji: "👩‍💼", spec: "спаниелей, терьеров и аккуратных лапок", rating: "4.6", reviews: 74, stars: "★★★★☆", busyUntil: "13:00" },
+      timur:  { name: "Тимур",  emoji: "🧑‍🎨", spec: "плотной шерсти, линьки и летнего ухода", rating: "4.5", reviews: 58, stars: "★★★★☆", busyUntil: "15:00" },
+      sofia:  { name: "София",  emoji: "👩‍⚕️", spec: "щенков и деликатного первого ухода", rating: "5.0", reviews: 41, stars: "★★★★★", busyUntil: null },
     };
     const breeds = {
-      "Немецкая овчарка": "maxim", "Лабрадор": "maxim", "Хаски": "maxim",
-      "Золотистый ретривер": "maxim", "Алабай": "maxim", "Ротвейлер": "maxim",
-      "Пудель": "anya", "Той-пудель": "anya", "Мальтипу": "anya",
-      "Бишон-фризе": "anya", "Кокер-спаниель": "anya", "Мальтезе": "anya", "Керри-блю-терьер": "anya",
-      "Чихуахуа": "lera", "Йоркширский терьер": "lera", "Шпиц": "lera",
-      "Той-терьер": "lera", "Мопс": "lera", "Такса": "lera",
+      "Немецкая овчарка": "maxim", "Лабрадор": "maxim", "Хаски": "timur",
+      "Золотистый ретривер": "timur", "Алабай": "maxim", "Ротвейлер": "maxim",
+      "Пудель": "anya", "Той-пудель": "sofia", "Мальтипу": "sofia",
+      "Бишон-фризе": "anya", "Кокер-спаниель": "karina", "Мальтезе": "sofia", "Керри-блю-терьер": "karina",
+      "Чихуахуа": "lera", "Йоркширский терьер": "karina", "Шпиц": "lera",
+      "Той-терьер": "sofia", "Мопс": "lera", "Такса": "karina",
     };
 
     // 🔒 Адрес нашего сервера (Cloudflare Worker), который прячет токен бота.
@@ -575,36 +570,10 @@
       "Чихуахуа":500, "Йоркширский терьер":500, "Шпиц":500,
       "Той-терьер":500, "Мопс":500, "Такса":500,
     };
-    const payMethods = ["💵 Наличные", "💳 Банковская карта", "📱 СБП по номеру +7 911 159 53 39"];
+    const payMethods = ["💳 Банковская карта", "📱 СБП по номеру +7 900 555 35 35"];
 
     const booking = { breed:"", groomer:"", style:"", time:"", pay:"", phone:"", price:0 };
     let currentGroomer = null;
-
-    const breedPhotoSeed = {
-      "Немецкая овчарка":210, "Лабрадор":220, "Хаски":230,
-      "Золотистый ретривер":240, "Алабай":250, "Ротвейлер":260,
-      "Пудель":110, "Той-пудель":112, "Мальтипу":114,
-      "Бишон-фризе":116, "Кокер-спаниель":118, "Мальтезе":120, "Керри-блю-терьер":122,
-      "Чихуахуа":130, "Йоркширский терьер":132, "Шпиц":134,
-      "Той-терьер":136, "Мопс":138, "Такса":140,
-    };
-    const breedPhotoQuery = {
-      "Немецкая овчарка":"german-shepherd", "Лабрадор":"labrador", "Хаски":"husky",
-      "Золотистый ретривер":"golden-retriever", "Алабай":"central-asian-shepherd", "Ротвейлер":"rottweiler",
-      "Пудель":"poodle", "Той-пудель":"toy-poodle", "Мальтипу":"maltipoo",
-      "Бишон-фризе":"bichon-frise", "Кокер-спаниель":"cocker-spaniel", "Мальтезе":"maltese-dog", "Керри-блю-терьер":"kerry-blue-terrier",
-      "Чихуахуа":"chihuahua", "Йоркширский терьер":"yorkshire-terrier", "Шпиц":"pomeranian",
-      "Той-терьер":"toy-terrier", "Мопс":"pug", "Такса":"dachshund",
-    };
-    const stylePhotoOffset = {
-      "Классика":1, "Пёс-мишка":2, "Летняя лёгкая":3,
-      "Пудель-шик":4, "Лапки-сапожки":5, "Мордочка-сердечко":6,
-    };
-    function dogPhotoUrl(breed, style){
-      const seed = (breedPhotoSeed[breed] || 100) + (stylePhotoOffset[style] || 0);
-      const query = breedPhotoQuery[breed] || "dog";
-      return "https://loremflickr.com/420/300/" + query + ",dog,grooming?lock=" + seed;
-    }
 
     /* заполнить список пород */
     const select = document.getElementById("breedSelect");
@@ -626,14 +595,12 @@
       if (!breed) { result.hidden = true; return; }
       currentGroomer = groomers[breeds[breed]];
       booking.breed = breed;
-      const preview = document.getElementById("breedPreview");
-      preview.src = dogPhotoUrl(breed, "Классика");
-      preview.alt = breed + " — пример стрижки";
-      preview.hidden = false;
       document.getElementById("mEmoji").textContent = currentGroomer.emoji;
       document.getElementById("mName").textContent = currentGroomer.name;
+      document.getElementById("mStars").textContent = currentGroomer.stars;
+      document.getElementById("mRating").textContent = currentGroomer.rating + " · " + currentGroomer.reviews + " отзывов";
       document.getElementById("mWhy").textContent =
-        "Для породы «" + breed + "» лучше всего подходит " + currentGroomer.name +
+        "Для породы «" + breed + "» в демке назначается " + currentGroomer.name +
         " — специалист по стрижке " + currentGroomer.spec + ".";
       result.hidden = false;
     });
@@ -653,12 +620,6 @@
       styleList.classList.add("style-options");
       styles.forEach(name => {
         const b = document.createElement("button");
-        const img = document.createElement("img");
-        img.className = "style-thumb";
-        img.src = dogPhotoUrl(booking.breed, name);
-        img.alt = booking.breed + " — " + name;
-        img.loading = "lazy";
-
         const text = document.createElement("span");
         const title = document.createElement("span");
         title.className = "style-title";
@@ -667,7 +628,7 @@
         meta.className = "style-meta";
         meta.textContent = styleDescription[name] || "подходит для выбранной породы";
         text.append(title, meta);
-        b.append(img, text);
+        b.append(text);
         b.addEventListener("click", () => {
           booking.style = name;
           buildTimeList();
@@ -786,7 +747,6 @@
     function openModal() {
       select.value = "";
       result.hidden = true;
-      document.getElementById("breedPreview").hidden = true;
       currentGroomer = null;
       booking.breed = booking.groomer = booking.style = booking.time = booking.pay = booking.phone = "";
       document.getElementById("clientPhone").value = "";
