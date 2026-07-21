@@ -89,12 +89,12 @@
       box-shadow: 0 10px 30px rgba(0,0,0,.08);
     }
     .brand-logo {
-      width: 76px; height: 76px; margin: 0 auto 14px;
+      width: 112px; height: 112px; margin: 0 auto 14px;
       display: grid; place-items: center; color: var(--accent);
       background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 24px; box-shadow: 0 18px 38px rgba(255,122,61,.16);
+      border-radius: 30px; box-shadow: 0 18px 38px rgba(255,122,61,.16);
     }
-    .brand-logo svg { width: 52px; height: 52px; display: block; }
+    .brand-logo img { width: 94px; height: 94px; object-fit: contain; display: block; }
     .brand-mark .logo { font-size: 20px; line-height: 1; }
     .hero h1 {
       font-size: clamp(42px, 8vw, 78px); font-weight: 900; margin: 14px 0 10px;
@@ -141,6 +141,17 @@
       display: grid; place-items: center; color: var(--accent); background: var(--panel);
       border: 1px solid var(--card-border); font-size: 30px; font-weight: 900;
     }
+    .size-card {
+      text-align: left; padding: 28px; display: flex; flex-direction: column; min-height: 230px;
+    }
+    .size-card .style-icon { margin: 0 0 16px; }
+    .size-card ul, .service-list { list-style: none; margin-top: 14px; color: var(--muted); font-size: 15px; }
+    .size-card li, .service-list li { margin: 7px 0; }
+    .service-price {
+      margin-top: auto; padding-top: 18px; color: var(--accent); font-size: 20px; font-weight: 900;
+    }
+    .service-card { text-align: left; }
+    .service-card .emoji { font-size: 34px; margin-bottom: 8px; }
 
     /* ===== ОПЛАТА ===== */
     .price-note {
@@ -308,14 +319,7 @@
   <!-- ШАПКА -->
   <header class="hero">
     <div class="brand-logo" aria-label="Логотип Лохматый Стиль">
-      <svg viewBox="0 0 64 64" aria-hidden="true">
-        <circle cx="32" cy="30" r="18" fill="none" stroke="currentColor" stroke-width="5"></circle>
-        <path d="M19 18 12 10M45 18l7-8M22 47c5 5 15 5 20 0" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"></path>
-        <circle cx="25" cy="29" r="3.5" fill="currentColor"></circle>
-        <circle cx="39" cy="29" r="3.5" fill="currentColor"></circle>
-        <path d="M29 38h6" stroke="currentColor" stroke-width="5" stroke-linecap="round"></path>
-        <path d="M47 46 58 57M58 46 47 57" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
-      </svg>
+      <img src="assets/logo.png" alt="Логотип Лохматый Стиль">
     </div>
     <div class="brand-mark"><span class="logo">LS</span><span>демо груминг-ателье</span></div>
     <h1>Лохматый<br><span>Стиль</span></h1>
@@ -355,6 +359,50 @@
         <div class="style-icon">♡</div>
         <h3>Мордочка-сердечко</h3><p>Милый образ для маленьких пород.</p><div class="price">от 900 ₽</div>
       </div>
+    </div>
+  </section>
+
+  <!-- СТРИЖКА ПО РАЗМЕРУ -->
+  <section id="size-cuts">
+    <h2>Стрижка по размеру</h2>
+    <p class="sub">Отдельные пакеты для маленьких и больших собак</p>
+    <div class="grid">
+      <div class="card size-card">
+        <div class="style-icon">🐕‍🦺</div>
+        <h3>Маленькие собаки</h3>
+        <p>Йорк, шпиц, чихуахуа, той-пудель, мальтезе и похожие породы.</p>
+        <ul>
+          <li>✓ аккуратная стрижка корпуса</li>
+          <li>✓ мордочка и лапки</li>
+          <li>✓ лёгкая укладка после ухода</li>
+        </ul>
+        <div class="service-price">от 900 ₽</div>
+      </div>
+      <div class="card size-card">
+        <div class="style-icon">🐕</div>
+        <h3>Большие собаки</h3>
+        <p>Лабрадор, хаски, овчарка, ретривер, ротвейлер и крупные породы.</p>
+        <ul>
+          <li>✓ вычёсывание подшёрстка</li>
+          <li>✓ гигиеническая стрижка</li>
+          <li>✓ уход после линьки</li>
+        </ul>
+        <div class="service-price">от 1900 ₽</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- СПЕЦУСЛУГИ -->
+  <section id="special-services">
+    <h2>Спецуслуги для собак</h2>
+    <p class="sub">Можно добавить к любой записи</p>
+    <div class="grid">
+      <div class="card service-card"><div class="emoji">🛁</div><h3>SPA-купание</h3><p>Шампунь под тип шерсти, мягкий кондиционер и сушка.</p><div class="price">от 700 ₽</div></div>
+      <div class="card service-card"><div class="emoji">🧼</div><h3>Гигиенический комплекс</h3><p>Лапки, живот, зона хвоста и аккуратная санитарная стрижка.</p><div class="price">от 600 ₽</div></div>
+      <div class="card service-card"><div class="emoji">🪮</div><h3>Вычёсывание</h3><p>Убираем лишний подшёрсток и делаем шерсть легче.</p><div class="price">от 800 ₽</div></div>
+      <div class="card service-card"><div class="emoji">💅</div><h3>Когти и лапки</h3><p>Стрижка когтей, обработка подушечек и форма лап.</p><div class="price">от 350 ₽</div></div>
+      <div class="card service-card"><div class="emoji">👂</div><h3>Уши и глаза</h3><p>Деликатный уход без лишнего стресса для собаки.</p><div class="price">от 300 ₽</div></div>
+      <div class="card service-card"><div class="emoji">🌿</div><h3>Антиколтун</h3><p>Разбор колтунов и подбор ухода, чтобы они не возвращались.</p><div class="price">от 500 ₽</div></div>
     </div>
   </section>
 
@@ -420,7 +468,7 @@
     <div class="price-note">
       💰 <b>Как считается цена:</b> цена породы + цена стрижки.<br>
       🐕 Породы: мелкие — <b>500 ₽</b>, средние — <b>1000 ₽</b>, крупные — <b>1600 ₽</b>.<br>
-      ✂️ Стрижки: от <b>400 ₽</b> до <b>1500 ₽</b>. Точную сумму покажем при записи.
+      ✂️ Стрижки: от <b>400 ₽</b> до <b>1900 ₽</b>. Спецуслуги можно добавить отдельно.
     </div>
   </section>
 
@@ -542,18 +590,31 @@
     // Вставим сюда ссылку после настройки сервера (см. уроки/урок-04/СЕРВЕР.md).
     const WORKER_URL = "ВСТАВЬ_АДРЕС_СЕРВЕРА";
 
-    const styles = ["Классика","Пёс-мишка","Летняя лёгкая","Пудель-шик","Лапки-сапожки","Мордочка-сердечко"];
+    const styles = [
+      "Стрижка маленькой собаки",
+      "Стрижка большой собаки",
+      "Классика",
+      "Пёс-мишка",
+      "Летняя лёгкая",
+      "Пудель-шик",
+      "Лапки-сапожки",
+      "Мордочка-сердечко"
+    ];
     // ⏱ время каждой стрижки
     const styleDuration = {
+      "Стрижка маленькой собаки":"1,5 часа", "Стрижка большой собаки":"2,5 часа",
       "Классика":"1 час", "Пёс-мишка":"2 часа", "Летняя лёгкая":"1 час",
       "Пудель-шик":"2,5 часа", "Лапки-сапожки":"40 минут", "Мордочка-сердечко":"1,5 часа",
     };
     // 💰 цена каждой стрижки, ₽
     const stylePrice = {
+      "Стрижка маленькой собаки":900, "Стрижка большой собаки":1900,
       "Классика":800, "Пёс-мишка":1200, "Летняя лёгкая":600,
       "Пудель-шик":1500, "Лапки-сапожки":400, "Мордочка-сердечко":900,
     };
     const styleDescription = {
+      "Стрижка маленькой собаки":"пакет для йорков, шпицев, чихуахуа и похожих пород",
+      "Стрижка большой собаки":"пакет для крупных пород с вычёсыванием и уходом",
       "Классика":"ровный ухоженный силуэт",
       "Пёс-мишка":"круглая мордочка и мягкий объём",
       "Летняя лёгкая":"коротко, аккуратно и не жарко",
