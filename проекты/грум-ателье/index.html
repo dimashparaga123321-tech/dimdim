@@ -82,27 +82,23 @@
 
     .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
     .card {
-      background: var(--card-bg); border-radius: 22px; padding: 26px; text-align: center;
+      background: var(--card-bg); border-radius: 22px; padding: 20px; text-align: center;
       box-shadow: 0 8px 24px rgba(0,0,0,.06); border: 1px solid var(--card-border);
     }
     .card .emoji { font-size: 44px; }
-    .card h3 { margin: 10px 0 6px; font-size: 20px; }
+    .card-img { width: 100%; height: 170px; object-fit: cover; border-radius: 16px; margin-bottom: 14px; display: block; }
+    .card h3 { margin: 6px 0; font-size: 20px; }
     .card p { color: var(--muted); font-size: 15px; }
+    .price { margin-top: 10px; font-weight: 800; color: var(--accent); font-size: 17px; }
     .stars { color: #ffb020; font-size: 17px; letter-spacing: 2px; }
-    .chat-btn {
-      display: inline-block; margin-top: 14px; padding: 10px 20px;
-      background: var(--secondary); color: #fff; border-radius: 999px; font-weight: 700; font-size: 14px;
-    }
-    .chat-btn:hover { filter: brightness(.95); }
 
-    /* ===== БЛОК «ПОДОБРАТЬ ГРУМЕРА» ===== */
-    .match-cta { text-align: center; }
-    .match-cta .big-btn {
-      font-size: 18px; padding: 18px 34px; margin-top: 6px;
-      background: var(--accent); color: var(--accent-text); border: none;
-      border-radius: 999px; font-weight: 800; cursor: pointer; transition: transform .15s;
+    /* ===== ОПЛАТА ===== */
+    .price-note {
+      max-width: 620px; margin: 30px auto 0; text-align: center;
+      background: var(--panel); border-radius: 18px; padding: 20px 24px;
+      color: var(--text); font-size: 16px; line-height: 1.8;
     }
-    .match-cta .big-btn:hover { transform: translateY(-2px); }
+    .price-note b { color: var(--accent); }
 
     /* ===== МОДАЛКА ===== */
     .modal-backdrop {
@@ -112,7 +108,7 @@
     .modal {
       background: var(--card-bg); color: var(--text); border-radius: 24px;
       padding: 32px 28px; max-width: 420px; width: 100%; text-align: center; position: relative;
-      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      box-shadow: 0 20px 60px rgba(0,0,0,.35); max-height: 90vh; overflow-y: auto;
     }
     .modal .close {
       position: absolute; top: 14px; right: 16px; cursor: pointer;
@@ -132,9 +128,70 @@
     .match-result h4 { font-size: 22px; margin: 6px 0; color: var(--accent); }
     .match-result .why { color: var(--muted); margin: 6px 0 14px; font-size: 15px; }
 
+    /* шаги записи */
+    .modal-cta {
+      display: inline-block; margin-top: 8px; padding: 12px 24px;
+      background: var(--accent); color: var(--accent-text); border: none;
+      border-radius: 999px; font-weight: 700; font-size: 16px; cursor: pointer;
+    }
+    .modal-cta:hover { filter: brightness(1.05); }
+    .choice-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+    .choice-list button {
+      padding: 14px 18px; border-radius: 14px; border: 2px solid var(--card-border);
+      background: var(--card-bg); color: var(--text); font-size: 16px; font-weight: 600;
+      cursor: pointer; transition: border-color .15s, transform .1s;
+    }
+    .choice-list button:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .note {
+      font-size: 14px; color: var(--muted); background: var(--bg);
+      border-radius: 12px; padding: 10px 14px; margin-bottom: 12px;
+    }
+    .summary {
+      text-align: left; background: var(--bg); border-radius: 16px;
+      padding: 18px 20px; margin: 8px 0 14px;
+    }
+    .summary div { margin: 4px 0; font-size: 16px; }
+    .summary b { color: var(--accent); }
+    .contact-input {
+      width: 100%; padding: 13px 16px; margin-bottom: 14px; font-size: 15px;
+      border: 2px solid var(--card-border); border-radius: 14px;
+      background: var(--card-bg); color: var(--text);
+    }
+
+    /* ===== ФОРМА ОТЗЫВА ===== */
+    .review-actions { text-align: center; margin-top: 30px; }
+    .add-review-btn {
+      background: var(--accent); color: var(--accent-text); border: none;
+      padding: 14px 28px; border-radius: 999px; font-weight: 700; font-size: 16px; cursor: pointer;
+      transition: transform .15s;
+    }
+    .add-review-btn:hover { transform: translateY(-2px); }
+    .review-form { max-width: 560px; margin: 22px auto 0; text-align: left; }
+    .review-form input {
+      width: 100%; padding: 12px 16px; margin-bottom: 10px; font-size: 15px;
+      border: 2px solid var(--card-border); border-radius: 14px;
+      background: var(--card-bg); color: var(--text);
+    }
+    .review-row { display: flex; gap: 10px; align-items: flex-end; }
+    .review-form textarea {
+      flex: 1; padding: 12px 16px; font-size: 15px; font-family: inherit; resize: vertical;
+      min-height: 54px; border: 2px solid var(--card-border); border-radius: 14px;
+      background: var(--card-bg); color: var(--text);
+    }
+    .send-btn {
+      flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer;
+      background: var(--accent); color: var(--accent-text);
+      display: flex; align-items: center; justify-content: center; transition: transform .15s;
+    }
+    .send-btn:hover { transform: scale(1.08); }
+    .send-btn svg { width: 24px; height: 24px; }
+
     /* КОНТАКТЫ */
     .contact { text-align: center; background: var(--panel); border-radius: 28px; margin: 40px 24px; padding: 56px 24px; }
-    .contact .phone { font-size: clamp(26px, 6vw, 40px); font-weight: 800; color: var(--accent); display: inline-block; margin-top: 10px; }
+    .contact .phone {
+      font-size: clamp(26px, 6vw, 40px); font-weight: 800; color: var(--accent);
+      display: block; width: max-content; max-width: 100%; margin: 10px auto 0;
+    }
     footer { text-align: center; padding: 34px; color: var(--muted); font-size: 14px; }
   </style>
 </head>
@@ -159,7 +216,6 @@
     <p class="tagline">Груминг-ателье для собак. Стрижки, купание и укладки —
        твой пёс выйдет от нас настоящей звездой!</p>
     <div class="btns">
-      <a class="btn btn-main" href="#contact">📞 Позвонить и записаться</a>
       <button class="btn btn-ghost open-match">🐾 Подобрать грумера</button>
     </div>
   </header>
@@ -169,12 +225,30 @@
     <h2>Готовые причёски</h2>
     <p class="sub">Выбирай образ для своего питомца — сделаем точь-в-точь</p>
     <div class="grid">
-      <div class="card"><div class="emoji">🐩</div><h3>Классика</h3><p>Аккуратная ровная стрижка на каждый день.</p></div>
-      <div class="card"><div class="emoji">🧸</div><h3>Пёс-мишка</h3><p>Округлая пушистая стрижка «плюшевый медвежонок».</p></div>
-      <div class="card"><div class="emoji">☀️</div><h3>Летняя лёгкая</h3><p>Короткая стрижка, чтобы было не жарко.</p></div>
-      <div class="card"><div class="emoji">👑</div><h3>Пудель-шик</h3><p>Модельная стрижка для выставок и фото.</p></div>
-      <div class="card"><div class="emoji">🐾</div><h3>Лапки-сапожки</h3><p>Аккуратное оформление лап и мордочки.</p></div>
-      <div class="card"><div class="emoji">💛</div><h3>Мордочка-сердечко</h3><p>Милый образ для маленьких пород.</p></div>
+      <div class="card">
+        <img class="card-img" src="https://placedog.net/400/300?id=10" alt="Классика" loading="lazy" onerror="this.remove()">
+        <h3>Классика</h3><p>Аккуратная ровная стрижка на каждый день.</p><div class="price">от 800 ₽</div>
+      </div>
+      <div class="card">
+        <img class="card-img" src="https://placedog.net/400/300?id=20" alt="Пёс-мишка" loading="lazy" onerror="this.remove()">
+        <h3>Пёс-мишка</h3><p>Округлая пушистая стрижка «плюшевый медвежонок».</p><div class="price">от 1200 ₽</div>
+      </div>
+      <div class="card">
+        <img class="card-img" src="https://placedog.net/400/300?id=30" alt="Летняя лёгкая" loading="lazy" onerror="this.remove()">
+        <h3>Летняя лёгкая</h3><p>Короткая стрижка, чтобы было не жарко.</p><div class="price">от 600 ₽</div>
+      </div>
+      <div class="card">
+        <img class="card-img" src="https://placedog.net/400/300?id=50" alt="Пудель-шик" loading="lazy" onerror="this.remove()">
+        <h3>Пудель-шик</h3><p>Модельная стрижка для выставок и фото.</p><div class="price">от 1500 ₽</div>
+      </div>
+      <div class="card">
+        <img class="card-img" src="https://placedog.net/400/300?id=80" alt="Лапки-сапожки" loading="lazy" onerror="this.remove()">
+        <h3>Лапки-сапожки</h3><p>Аккуратное оформление лап и мордочки.</p><div class="price">от 400 ₽</div>
+      </div>
+      <div class="card">
+        <img class="card-img" src="https://placedog.net/400/300?id=100" alt="Мордочка-сердечко" loading="lazy" onerror="this.remove()">
+        <h3>Мордочка-сердечко</h3><p>Милый образ для маленьких пород.</p><div class="price">от 900 ₽</div>
+      </div>
     </div>
   </section>
 
@@ -182,10 +256,41 @@
   <section id="reviews">
     <h2>Отзывы хозяев</h2>
     <p class="sub">Что говорят о нас довольные клиенты</p>
-    <div class="grid">
+    <div class="grid" id="reviewsGrid">
       <div class="card"><div class="stars">★★★★★</div><p>«Постригли нашего Рекса — красавчик! Не узнать».</p><h3>Ольга и Рекс</h3></div>
       <div class="card"><div class="stars">★★★★★</div><p>«Записались за минуту, собака довольная и чистая».</p><h3>Игорь и Бэлла</h3></div>
       <div class="card"><div class="stars">★★★★★</div><p>«Лучшее груминг-ателье в городе, ходим только сюда».</p><h3>Настя и Марсик</h3></div>
+    </div>
+
+    <div class="review-actions">
+      <button class="add-review-btn" id="openReview">✍️ Написать отзыв</button>
+      <div class="review-form" id="reviewForm" hidden>
+        <input id="reviewName" type="text" placeholder="Как тебя зовут? (необязательно)">
+        <div class="review-row">
+          <textarea id="reviewText" placeholder="Напиши свой отзыв о нашем ателье..."></textarea>
+          <button class="send-btn" id="sendReview" aria-label="Отправить отзыв" title="Отправить">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 2 11 13"></path><path d="M22 2 15 22l-4-9-9-4 20-7z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ОПЛАТА И ЦЕНЫ -->
+  <section id="payment">
+    <h2>Оплата и цены</h2>
+    <p class="sub">Плати удобным способом</p>
+    <div class="grid">
+      <div class="card"><div class="emoji">💵</div><h3>Наличные</h3><p>Оплата в ателье после стрижки.</p></div>
+      <div class="card"><div class="emoji">💳</div><h3>Банковская карта</h3><p>Оплата картой прямо на месте.</p></div>
+      <div class="card"><div class="emoji">📱</div><h3>Перевод (СБП)</h3><p>Быстрый перевод по номеру телефона.</p></div>
+    </div>
+    <div class="price-note">
+      💰 <b>Как считается цена:</b> цена породы + цена стрижки.<br>
+      🐕 Породы: мелкие — <b>500 ₽</b>, средние — <b>1000 ₽</b>, крупные — <b>1600 ₽</b>.<br>
+      ✂️ Стрижки: от <b>400 ₽</b> до <b>1500 ₽</b>. Точную сумму покажем при записи.
     </div>
   </section>
 
@@ -198,21 +303,61 @@
 
   <footer>© 2026 · Лохматый Стиль · груминг-ателье для собак 🐾</footer>
 
-  <!-- МОДАЛКА ПОДБОРА -->
+  <!-- МОДАЛКА ЗАПИСИ -->
   <div class="modal-backdrop" id="matchModal" hidden>
     <div class="modal">
       <button class="close" id="modalClose" aria-label="Закрыть">✕</button>
-      <h3>🐾 Подбор грумера</h3>
-      <p class="sub">Выбери породу своей собаки</p>
-      <select id="breedSelect">
-        <option value="">— выбери породу —</option>
-      </select>
-      <div class="match-result" id="matchResult" hidden>
-        <div class="emoji" id="mEmoji">👩‍🎨</div>
-        <h4 id="mName">—</h4>
-        <div class="stars">★★★★★</div>
-        <p class="why" id="mWhy">—</p>
-        <a class="chat-btn" href="#" target="_blank">💬 Написать грумеру</a>
+
+      <!-- Шаг 1: порода -->
+      <div id="step-breed">
+        <h3>🐾 Запись на стрижку</h3>
+        <p class="sub">Шаг 1. Выбери породу собаки</p>
+        <select id="breedSelect">
+          <option value="">— выбери породу —</option>
+        </select>
+        <div class="match-result" id="matchResult" hidden>
+          <div class="emoji" id="mEmoji">👩‍🎨</div>
+          <h4 id="mName">—</h4>
+          <div class="stars">★★★★★</div>
+          <p class="why" id="mWhy">—</p>
+          <button class="modal-cta" id="pickGroomer">✅ Выбрать грумера</button>
+        </div>
+      </div>
+
+      <!-- Шаг 2: стрижка -->
+      <div id="step-style" hidden>
+        <h3>✂️ Выбор стрижки</h3>
+        <p class="sub">Шаг 2. Какую причёску сделать?</p>
+        <div id="styleList" class="choice-list"></div>
+      </div>
+
+      <!-- Шаг 3: время -->
+      <div id="step-time" hidden>
+        <h3>🕐 Выбор времени</h3>
+        <p class="sub">Шаг 3. Выбери удобное время</p>
+        <div class="note" id="timeNote"></div>
+        <div id="timeList" class="choice-list"></div>
+      </div>
+
+      <!-- Шаг 4: оплата -->
+      <div id="step-pay" hidden>
+        <h3>💳 Способ оплаты</h3>
+        <p class="sub">Шаг 4. Как удобно оплатить?</p>
+        <div id="payList" class="choice-list"></div>
+      </div>
+
+      <!-- Шаг 5: подтверждение -->
+      <div id="step-confirm" hidden>
+        <h3>📋 Проверь заявку</h3>
+        <div class="summary" id="summary"></div>
+        <input id="clientContact" class="contact-input" type="text" placeholder="Твой телефон или @ник в Telegram">
+        <button class="modal-cta" id="sendBooking">📨 Отправить заявку</button>
+      </div>
+
+      <!-- Готово -->
+      <div id="step-done" hidden>
+        <h3>✅ Заявка отправлена!</h3>
+        <p class="sub" id="doneText">Спасибо! 🐾</p>
       </div>
     </div>
   </div>
@@ -239,11 +384,12 @@
       if (!e.target.closest(".settings")) panel.hidden = true;
     });
 
-    /* ===== ДАННЫЕ ДЛЯ ПОДБОРА ===== */
+    /* ===== ДАННЫЕ ===== */
     const groomers = {
-      anya:  { name: "Аня",    emoji: "👩‍🎨", spec: "кудрявых и выставочных пород" },
-      maxim: { name: "Максим", emoji: "🧑‍🔧", spec: "крупных и активных пород" },
-      lera:  { name: "Лера",   emoji: "👩‍🦰", spec: "мелких и капризных пород" },
+      // busyUntil — до какого времени грумер занят (задано вручную для примера; позже возьмём из базы)
+      anya:  { name: "Аня",    emoji: "👩‍🎨", spec: "кудрявых и выставочных пород", busyUntil: "14:30" },
+      maxim: { name: "Максим", emoji: "🧑‍🔧", spec: "крупных и активных пород",   busyUntil: "12:00" },
+      lera:  { name: "Лера",   emoji: "👩‍🦰", spec: "мелких и капризных пород",    busyUntil: null },
     };
     const breeds = {
       "Немецкая овчарка": "maxim", "Лабрадор": "maxim", "Хаски": "maxim",
@@ -254,6 +400,35 @@
       "Той-терьер": "lera", "Мопс": "lera", "Такса": "lera",
     };
 
+    // 🔒 Адрес нашего сервера (Cloudflare Worker), который прячет токен бота.
+    // Вставим сюда ссылку после настройки сервера (см. уроки/урок-04/СЕРВЕР.md).
+    const WORKER_URL = "ВСТАВЬ_АДРЕС_СЕРВЕРА";
+
+    const styles = ["Классика","Пёс-мишка","Летняя лёгкая","Пудель-шик","Лапки-сапожки","Мордочка-сердечко"];
+    // ⏱ время каждой стрижки
+    const styleDuration = {
+      "Классика":"1 час", "Пёс-мишка":"2 часа", "Летняя лёгкая":"1 час",
+      "Пудель-шик":"2,5 часа", "Лапки-сапожки":"40 минут", "Мордочка-сердечко":"1,5 часа",
+    };
+    // 💰 цена каждой стрижки, ₽
+    const stylePrice = {
+      "Классика":800, "Пёс-мишка":1200, "Летняя лёгкая":600,
+      "Пудель-шик":1500, "Лапки-сапожки":400, "Мордочка-сердечко":900,
+    };
+    // 💰 цена каждой породы, ₽ (по размеру)
+    const breedPrice = {
+      "Немецкая овчарка":1600, "Лабрадор":1600, "Хаски":1600,
+      "Золотистый ретривер":1600, "Алабай":1600, "Ротвейлер":1600,
+      "Пудель":1000, "Кокер-спаниель":1000, "Керри-блю-терьер":1000,
+      "Той-пудель":500, "Мальтипу":500, "Бишон-фризе":500, "Мальтезе":500,
+      "Чихуахуа":500, "Йоркширский терьер":500, "Шпиц":500,
+      "Той-терьер":500, "Мопс":500, "Такса":500,
+    };
+    const payMethods = ["💵 Наличные", "💳 Банковская карта", "📱 Перевод (СБП)"];
+
+    const booking = { breed:"", groomer:"", style:"", time:"", pay:"", price:0 };
+    let currentGroomer = null;
+
     /* заполнить список пород */
     const select = document.getElementById("breedSelect");
     Object.keys(breeds).sort().forEach(breed => {
@@ -262,33 +437,198 @@
       select.appendChild(opt);
     });
 
-    /* показать грумера при выборе породы */
+    // показать один шаг, спрятать остальные
+    const steps = ["step-breed","step-style","step-time","step-pay","step-confirm","step-done"];
+    function showStep(id){ steps.forEach(s => document.getElementById(s).hidden = (s !== id)); }
+
     const result = document.getElementById("matchResult");
+
+    // Шаг 1: выбрали породу -> показать грумера
     select.addEventListener("change", () => {
       const breed = select.value;
       if (!breed) { result.hidden = true; return; }
-      const g = groomers[breeds[breed]];
-      document.getElementById("mEmoji").textContent = g.emoji;
-      document.getElementById("mName").textContent = g.name;
+      currentGroomer = groomers[breeds[breed]];
+      booking.breed = breed;
+      document.getElementById("mEmoji").textContent = currentGroomer.emoji;
+      document.getElementById("mName").textContent = currentGroomer.name;
       document.getElementById("mWhy").textContent =
-        "Для породы «" + breed + "» лучше всего подходит " + g.name +
-        " — специалист по стрижке " + g.spec + ".";
+        "Для породы «" + breed + "» лучше всего подходит " + currentGroomer.name +
+        " — специалист по стрижке " + currentGroomer.spec + ".";
       result.hidden = false;
     });
 
-    /* ===== МОДАЛКА ===== */
+    // Шаг 1 -> 2: выбрать грумера
+    document.getElementById("pickGroomer").addEventListener("click", () => {
+      if (!currentGroomer) return;
+      booking.groomer = currentGroomer.name;
+      buildStyleList();
+      showStep("step-style");
+    });
+
+    // Шаг 2: список стрижек (с ценами)
+    const styleList = document.getElementById("styleList");
+    function buildStyleList(){
+      styleList.innerHTML = "";
+      styles.forEach(name => {
+        const b = document.createElement("button");
+        b.textContent = "✂️ " + name + " · " + stylePrice[name] + " ₽";
+        b.addEventListener("click", () => {
+          booking.style = name;
+          buildTimeList();
+          showStep("step-time");
+        });
+        styleList.appendChild(b);
+      });
+    }
+
+    // Шаг 3: свободное время с учётом занятости грумера
+    const WORK_START = 10, WORK_END = 18;
+    function toMin(t){ const [h,m] = t.split(":").map(Number); return h*60 + m; }
+    function toTime(min){ return String(Math.floor(min/60)).padStart(2,"0") + ":" + String(min%60).padStart(2,"0"); }
+    const timeList = document.getElementById("timeList");
+    const timeNote = document.getElementById("timeNote");
+    function buildTimeList(){
+      timeList.innerHTML = "";
+      let start = WORK_START*60;
+      const busy = currentGroomer.busyUntil;
+      if (busy) {
+        start = Math.max(start, Math.ceil(toMin(busy)/60)*60);
+        timeNote.textContent = currentGroomer.name + " освободится в " + busy +
+          ", поэтому запись доступна с " + toTime(start) + ".";
+      } else {
+        timeNote.textContent = currentGroomer.name + " сейчас свободна — выбирай любое время.";
+      }
+      for (let t = start; t <= WORK_END*60; t += 60) {
+        const time = toTime(t);
+        const b = document.createElement("button");
+        b.textContent = "🕐 " + time;
+        b.addEventListener("click", () => {
+          booking.time = time;
+          buildPayList();
+          showStep("step-pay");
+        });
+        timeList.appendChild(b);
+      }
+    }
+
+    // Шаг 4: способ оплаты
+    const payList = document.getElementById("payList");
+    function buildPayList(){
+      payList.innerHTML = "";
+      payMethods.forEach(m => {
+        const b = document.createElement("button");
+        b.textContent = m;
+        b.addEventListener("click", () => {
+          booking.pay = m;
+          showSummary();
+          showStep("step-confirm");
+        });
+        payList.appendChild(b);
+      });
+    }
+
+    // цена = порода + стрижка
+    function currentPrice(){ return (breedPrice[booking.breed] || 0) + (stylePrice[booking.style] || 0); }
+
+    // Шаг 5: сводка заявки
+    function showSummary(){
+      const price = currentPrice();
+      booking.price = price;
+      const duration = styleDuration[booking.style] || "около 1,5 часа";
+      document.getElementById("summary").innerHTML =
+        "<div>🐶 Порода: <b>"+booking.breed+"</b></div>" +
+        "<div>💇 Грумер: <b>"+booking.groomer+"</b></div>" +
+        "<div>✂️ Стрижка: <b>"+booking.style+"</b></div>" +
+        "<div>🕐 Время: <b>"+booking.time+"</b></div>" +
+        "<div>💳 Оплата: <b>"+booking.pay+"</b></div>" +
+        "<div>⏱ Займёт: <b>"+duration+"</b></div>" +
+        "<div>💰 Цена: <b>"+price+" ₽</b></div>";
+    }
+
+    // Отправить заявку в Telegram-бот
+    document.getElementById("sendBooking").addEventListener("click", () => {
+      const contactEl = document.getElementById("clientContact");
+      const contact = contactEl.value.trim();
+      if (!contact) { contactEl.focus(); return; }   // без контакта не отправляем
+      const duration = styleDuration[booking.style] || "около 1,5 часа";
+      const price = currentPrice();
+      const text =
+        "🐶 Новая заявка на стрижку!\n\n" +
+        "Порода: " + booking.breed + "\n" +
+        "Грумер: " + booking.groomer + "\n" +
+        "Стрижка: " + booking.style + "\n" +
+        "Время записи: " + booking.time + "\n" +
+        "Оплата: " + booking.pay + "\n" +
+        "☎️ Контакт клиента: " + contact + "\n" +
+        "⏱ Займёт примерно: " + duration + "\n" +
+        "💰 Цена: " + price + " ₽";
+      // отправляем заявку на наш сервер — он уже сам шлёт её в Telegram
+      fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text })
+      }).catch(() => {}); // пока сервер не настроен — просто не падаем
+      document.getElementById("doneText").textContent =
+        "Готово! Заявка отправлена. ✂️ Стрижка займёт примерно " + duration +
+        " · Цена " + price + " ₽. До встречи! 🐾";
+      showStep("step-done");
+    });
+
+    /* ===== управление модалкой ===== */
     const modal = document.getElementById("matchModal");
     function openModal() {
-      select.value = "";        // сбросить выбор
-      result.hidden = true;     // спрятать прошлый результат
+      select.value = "";
+      result.hidden = true;
+      currentGroomer = null;
+      booking.breed = booking.groomer = booking.style = booking.time = booking.pay = "";
+      document.getElementById("clientContact").value = "";
+      showStep("step-breed");
       modal.hidden = false;
     }
     function closeModal() { modal.hidden = true; }
 
     document.querySelectorAll(".open-match").forEach(b => b.addEventListener("click", openModal));
     document.getElementById("modalClose").addEventListener("click", closeModal);
-    modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); }); // клик по фону
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+    /* ===== ОТЗЫВЫ ===== */
+    const reviewsGrid = document.getElementById("reviewsGrid");
+    const reviewForm = document.getElementById("reviewForm");
+    const reviewName = document.getElementById("reviewName");
+    const reviewText = document.getElementById("reviewText");
+
+    document.getElementById("openReview").addEventListener("click", () => {
+      reviewForm.hidden = !reviewForm.hidden;
+      if (!reviewForm.hidden) reviewText.focus();
+    });
+
+    function addReviewCard(name, text) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = '<div class="stars">★★★★★</div><p></p><h3></h3>';
+      card.querySelector("p").textContent = "«" + text + "»";
+      card.querySelector("h3").textContent = name;
+      reviewsGrid.appendChild(card);
+    }
+
+    const savedReviews = JSON.parse(localStorage.getItem("reviews") || "[]");
+    savedReviews.forEach(r => addReviewCard(r.name, r.text));
+
+    function sendReviewHandler() {
+      const text = reviewText.value.trim();
+      if (!text) { reviewText.focus(); return; }
+      const name = reviewName.value.trim() || "Гость";
+      addReviewCard(name, text);
+      savedReviews.push({ name, text });
+      localStorage.setItem("reviews", JSON.stringify(savedReviews));
+      reviewText.value = ""; reviewName.value = "";
+      reviewForm.hidden = true;
+    }
+    document.getElementById("sendReview").addEventListener("click", sendReviewHandler);
+    reviewText.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendReviewHandler(); }
+    });
   </script>
 
 </body>
