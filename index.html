@@ -132,6 +132,31 @@
     .match-result h4 { font-size: 22px; margin: 6px 0; color: var(--accent); }
     .match-result .why { color: var(--muted); margin: 6px 0 14px; font-size: 15px; }
 
+    /* ===== ШАГИ ЗАПИСИ ===== */
+    .modal-cta {
+      display: inline-block; margin-top: 8px; padding: 12px 24px;
+      background: var(--accent); color: var(--accent-text); border: none;
+      border-radius: 999px; font-weight: 700; font-size: 16px; cursor: pointer;
+    }
+    .modal-cta:hover { filter: brightness(1.05); }
+    .choice-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+    .choice-list button {
+      padding: 14px 18px; border-radius: 14px; border: 2px solid var(--card-border);
+      background: var(--card-bg); color: var(--text); font-size: 16px; font-weight: 600;
+      cursor: pointer; transition: border-color .15s, transform .1s;
+    }
+    .choice-list button:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .note {
+      font-size: 14px; color: var(--muted); background: var(--bg);
+      border-radius: 12px; padding: 10px 14px; margin-bottom: 12px;
+    }
+    .summary {
+      text-align: left; background: var(--bg); border-radius: 16px;
+      padding: 18px 20px; margin: 8px 0 18px;
+    }
+    .summary div { margin: 4px 0; font-size: 16px; }
+    .summary b { color: var(--accent); }
+
     /* ===== ФОРМА ОТЗЫВА ===== */
     .review-actions { text-align: center; margin-top: 30px; }
     .add-review-btn {
@@ -241,21 +266,54 @@
 
   <footer>© 2026 · Лохматый Стиль · груминг-ателье для собак 🐾</footer>
 
-  <!-- МОДАЛКА ПОДБОРА -->
+  <!-- МОДАЛКА ЗАПИСИ -->
   <div class="modal-backdrop" id="matchModal" hidden>
     <div class="modal">
       <button class="close" id="modalClose" aria-label="Закрыть">✕</button>
-      <h3>🐾 Подбор грумера</h3>
-      <p class="sub">Выбери породу своей собаки</p>
-      <select id="breedSelect">
-        <option value="">— выбери породу —</option>
-      </select>
-      <div class="match-result" id="matchResult" hidden>
-        <div class="emoji" id="mEmoji">👩‍🎨</div>
-        <h4 id="mName">—</h4>
-        <div class="stars">★★★★★</div>
-        <p class="why" id="mWhy">—</p>
-        <a class="chat-btn" href="#" target="_blank">💬 Написать грумеру</a>
+
+      <!-- Шаг 1: порода -->
+      <div id="step-breed">
+        <h3>🐾 Запись на стрижку</h3>
+        <p class="sub">Шаг 1. Выбери породу собаки</p>
+        <select id="breedSelect">
+          <option value="">— выбери породу —</option>
+        </select>
+        <div class="match-result" id="matchResult" hidden>
+          <div class="emoji" id="mEmoji">👩‍🎨</div>
+          <h4 id="mName">—</h4>
+          <div class="stars">★★★★★</div>
+          <p class="why" id="mWhy">—</p>
+          <button class="modal-cta" id="pickGroomer">✅ Выбрать грумера</button>
+        </div>
+      </div>
+
+      <!-- Шаг 2: стрижка -->
+      <div id="step-style" hidden>
+        <h3>✂️ Выбор стрижки</h3>
+        <p class="sub">Шаг 2. Какую причёску сделать?</p>
+        <div id="styleList" class="choice-list"></div>
+      </div>
+
+      <!-- Шаг 3: время -->
+      <div id="step-time" hidden>
+        <h3>🕐 Выбор времени</h3>
+        <p class="sub">Шаг 3. Выбери удобное время</p>
+        <div class="note" id="timeNote"></div>
+        <div id="timeList" class="choice-list"></div>
+      </div>
+
+      <!-- Шаг 4: подтверждение -->
+      <div id="step-confirm" hidden>
+        <h3>📋 Проверь заявку</h3>
+        <div class="summary" id="summary"></div>
+        <button class="modal-cta" id="sendBooking">📨 Отправить заявку</button>
+      </div>
+
+      <!-- Готово -->
+      <div id="step-done" hidden>
+        <h3>✅ Заявка готова!</h3>
+        <p class="sub">Открылась твоя почта с готовым письмом — нажми в ней «Отправить»,
+           и ателье свяжется с тобой. Спасибо! 🐾</p>
       </div>
     </div>
   </div>
@@ -284,9 +342,10 @@
 
     /* ===== ДАННЫЕ ДЛЯ ПОДБОРА ===== */
     const groomers = {
-      anya:  { name: "Аня",    emoji: "👩‍🎨", spec: "кудрявых и выставочных пород" },
-      maxim: { name: "Максим", emoji: "🧑‍🔧", spec: "крупных и активных пород" },
-      lera:  { name: "Лера",   emoji: "👩‍🦰", spec: "мелких и капризных пород" },
+      // busyUntil — до какого времени грумер занят (задано вручную для примера; позже возьмём из базы)
+      anya:  { name: "Аня",    emoji: "👩‍🎨", spec: "кудрявых и выставочных пород", busyUntil: "14:30" },
+      maxim: { name: "Максим", emoji: "🧑‍🔧", spec: "крупных и активных пород",   busyUntil: "12:00" },
+      lera:  { name: "Лера",   emoji: "👩‍🦰", spec: "мелких и капризных пород",    busyUntil: null },
     };
     const breeds = {
       "Немецкая овчарка": "maxim", "Лабрадор": "maxim", "Хаски": "maxim",
@@ -307,23 +366,116 @@
 
     /* показать грумера при выборе породы */
     const result = document.getElementById("matchResult");
+    const OWNER_EMAIL = "kadnikova0701@gmail.com"; // 📧 сюда придёт заявка (поменяй на свою почту)
+    const styles = ["Классика","Пёс-мишка","Летняя лёгкая","Пудель-шик","Лапки-сапожки","Мордочка-сердечко"];
+    const booking = { breed:"", groomer:"", style:"", time:"" };
+    let currentGroomer = null;
+
+    // показать один шаг, спрятать остальные
+    const steps = ["step-breed","step-style","step-time","step-confirm","step-done"];
+    function showStep(id){ steps.forEach(s => document.getElementById(s).hidden = (s !== id)); }
+
+    // Шаг 1: выбрали породу -> показать грумера
     select.addEventListener("change", () => {
       const breed = select.value;
       if (!breed) { result.hidden = true; return; }
-      const g = groomers[breeds[breed]];
-      document.getElementById("mEmoji").textContent = g.emoji;
-      document.getElementById("mName").textContent = g.name;
+      currentGroomer = groomers[breeds[breed]];
+      booking.breed = breed;
+      document.getElementById("mEmoji").textContent = currentGroomer.emoji;
+      document.getElementById("mName").textContent = currentGroomer.name;
       document.getElementById("mWhy").textContent =
-        "Для породы «" + breed + "» лучше всего подходит " + g.name +
-        " — специалист по стрижке " + g.spec + ".";
+        "Для породы «" + breed + "» лучше всего подходит " + currentGroomer.name +
+        " — специалист по стрижке " + currentGroomer.spec + ".";
       result.hidden = false;
     });
 
-    /* ===== МОДАЛКА ===== */
+    // Шаг 1 -> 2: выбрать грумера
+    document.getElementById("pickGroomer").addEventListener("click", () => {
+      if (!currentGroomer) return;
+      booking.groomer = currentGroomer.name;
+      buildStyleList();
+      showStep("step-style");
+    });
+
+    // Шаг 2: список стрижек
+    const styleList = document.getElementById("styleList");
+    function buildStyleList(){
+      styleList.innerHTML = "";
+      styles.forEach(name => {
+        const b = document.createElement("button");
+        b.textContent = "✂️ " + name;
+        b.addEventListener("click", () => {
+          booking.style = name;
+          buildTimeList();
+          showStep("step-time");
+        });
+        styleList.appendChild(b);
+      });
+    }
+
+    // Шаг 3: свободное время с учётом занятости грумера
+    const WORK_START = 10, WORK_END = 18; // часы работы ателье
+    function toMin(t){ const [h,m] = t.split(":").map(Number); return h*60 + m; }
+    function toTime(min){ return String(Math.floor(min/60)).padStart(2,"0") + ":" + String(min%60).padStart(2,"0"); }
+    const timeList = document.getElementById("timeList");
+    const timeNote = document.getElementById("timeNote");
+    function buildTimeList(){
+      timeList.innerHTML = "";
+      let start = WORK_START*60;
+      const busy = currentGroomer.busyUntil;
+      if (busy) {
+        start = Math.max(start, Math.ceil(toMin(busy)/60)*60); // округлить вверх до целого часа
+        timeNote.textContent = currentGroomer.name + " освободится в " + busy +
+          ", поэтому запись доступна с " + toTime(start) + ".";
+      } else {
+        timeNote.textContent = currentGroomer.name + " сейчас свободна — выбирай любое время.";
+      }
+      for (let t = start; t <= WORK_END*60; t += 60) {
+        const time = toTime(t);
+        const b = document.createElement("button");
+        b.textContent = "🕐 " + time;
+        b.addEventListener("click", () => {
+          booking.time = time;
+          showSummary();
+          showStep("step-confirm");
+        });
+        timeList.appendChild(b);
+      }
+    }
+
+    // Шаг 4: сводка заявки
+    function showSummary(){
+      document.getElementById("summary").innerHTML =
+        "<div>🐶 Порода: <b>"+booking.breed+"</b></div>" +
+        "<div>💇 Грумер: <b>"+booking.groomer+"</b></div>" +
+        "<div>✂️ Стрижка: <b>"+booking.style+"</b></div>" +
+        "<div>🕐 Время: <b>"+booking.time+"</b></div>";
+    }
+
+    // Отправить заявку через почту (mailto)
+    document.getElementById("sendBooking").addEventListener("click", () => {
+      const subject = "Запись в Лохматый Стиль";
+      const bodyText =
+        "Здравствуйте! Хочу записаться на стрижку собаки:\n\n" +
+        "Порода: " + booking.breed + "\n" +
+        "Грумер: " + booking.groomer + "\n" +
+        "Стрижка: " + booking.style + "\n" +
+        "Время: " + booking.time + "\n";
+      const url = "mailto:" + OWNER_EMAIL +
+        "?subject=" + encodeURIComponent(subject) +
+        "&body=" + encodeURIComponent(bodyText);
+      window.location.href = url;   // откроется почта с готовым письмом
+      showStep("step-done");
+    });
+
+    /* ===== управление модалкой ===== */
     const modal = document.getElementById("matchModal");
     function openModal() {
-      select.value = "";        // сбросить выбор
-      result.hidden = true;     // спрятать прошлый результат
+      select.value = "";
+      result.hidden = true;
+      currentGroomer = null;
+      booking.breed = booking.groomer = booking.style = booking.time = "";
+      showStep("step-breed");
       modal.hidden = false;
     }
     function closeModal() { modal.hidden = true; }
