@@ -11,24 +11,28 @@
       --accent: #ff7a3d; --accent-text: #fff;
       --card-bg: #ffffff; --card-border: #ffe3c7; --glow: #ffe3c7;
       --secondary: #2ec4b6; --panel: #fff3e6; --ghost-border: #ffca9e;
+      --hero-ink: #24130c; --hero-soft: #fff2e4;
     }
     body[data-theme="dark-purple"] {
       --bg: #12101f; --text: #ececf5; --muted: #a9a3c2;
       --accent: #a06bff; --accent-text: #fff;
       --card-bg: #1c1830; --card-border: #2c2748; --glow: #3a2f7a;
       --secondary: #2ec4b6; --panel: #1a1730; --ghost-border: #4a3f80;
+      --hero-ink: #ffffff; --hero-soft: #211b3b;
     }
     body[data-theme="dark-orange"] {
       --bg: #1a1310; --text: #f5ece6; --muted: #b7a498;
       --accent: #ff8c42; --accent-text: #201009;
       --card-bg: #241a14; --card-border: #3a2a1e; --glow: #4a2f1a;
       --secondary: #35c9ba; --panel: #241a14; --ghost-border: #6b4a30;
+      --hero-ink: #fff7ef; --hero-soft: #2b1c14;
     }
     body[data-theme="mint-light"] {
       --bg: #f0fbf9; --text: #22403c; --muted: #6f8a84;
       --accent: #17b7a6; --accent-text: #fff;
       --card-bg: #ffffff; --card-border: #cdeee9; --glow: #cdeee9;
       --secondary: #ff7a3d; --panel: #e6f7f4; --ghost-border: #9fe0d7;
+      --hero-ink: #15332f; --hero-soft: #ddf6f1;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -64,12 +68,36 @@
 
     /* ШАПКА */
     .hero {
-      text-align: center; padding: 80px 24px 60px;
-      background: radial-gradient(900px 500px at 50% -10%, var(--glow) 0%, var(--bg) 65%);
+      text-align: center; padding: 74px 24px 56px; position: relative; overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.82), rgba(255,255,255,.38)),
+        radial-gradient(850px 420px at 18% 12%, var(--hero-soft) 0%, transparent 58%),
+        radial-gradient(700px 360px at 84% 0%, rgba(46,196,182,.22) 0%, transparent 62%),
+        var(--bg);
     }
-    .hero .logo { font-size: 46px; }
-    .hero h1 { font-size: clamp(34px, 7vw, 60px); font-weight: 800; margin: 10px 0; color: var(--accent); }
-    .hero .tagline { font-size: clamp(16px, 3vw, 21px); color: var(--muted); max-width: 560px; margin: 0 auto; }
+    body[data-theme="dark-purple"] .hero,
+    body[data-theme="dark-orange"] .hero {
+      background:
+        radial-gradient(850px 420px at 18% 12%, var(--hero-soft) 0%, transparent 58%),
+        radial-gradient(700px 360px at 84% 0%, rgba(46,196,182,.2) 0%, transparent 62%),
+        var(--bg);
+    }
+    .brand-mark {
+      display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 999px; color: var(--muted); font-weight: 800; font-size: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+    .brand-mark .logo { font-size: 24px; line-height: 1; }
+    .hero h1 {
+      font-size: clamp(42px, 8vw, 78px); font-weight: 900; margin: 14px 0 10px;
+      color: var(--hero-ink); line-height: .98;
+    }
+    .hero h1 span {
+      display: inline-block; color: var(--accent);
+      text-shadow: 0 8px 26px rgba(255,122,61,.2);
+    }
+    .hero .tagline { font-size: clamp(16px, 3vw, 21px); color: var(--muted); max-width: 680px; margin: 0 auto; }
     .btns { margin-top: 28px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
     .btn { padding: 14px 26px; border-radius: 999px; font-weight: 700; font-size: 16px; transition: transform .15s; cursor: pointer; border: none; }
     .btn:hover { transform: translateY(-2px); }
@@ -91,6 +119,12 @@
     .card p { color: var(--muted); font-size: 15px; }
     .price { margin-top: 10px; font-weight: 800; color: var(--accent); font-size: 17px; }
     .stars { color: #ffb020; font-size: 17px; letter-spacing: 2px; }
+    .gallery-grid { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+    .breed-card { overflow: hidden; padding: 0; text-align: left; }
+    .breed-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
+    .breed-card .breed-body { padding: 18px 18px 20px; }
+    .breed-card h3 { margin: 0 0 6px; }
+    .breed-card p { margin: 0; }
 
     /* ===== ОПЛАТА ===== */
     .price-note {
@@ -99,6 +133,31 @@
       color: var(--text); font-size: 16px; line-height: 1.8;
     }
     .price-note b { color: var(--accent); }
+    .sbp-card {
+      position: relative; border-color: var(--secondary);
+      box-shadow: 0 10px 28px rgba(46,196,182,.12);
+    }
+    .sbp-badge {
+      display: inline-block; margin-bottom: 10px; padding: 5px 10px;
+      background: var(--secondary); color: #fff; border-radius: 999px;
+      font-size: 12px; font-weight: 900;
+    }
+    .sbp-box {
+      max-width: 760px; margin: 22px auto 0; padding: 20px;
+      display: grid; gap: 18px; grid-template-columns: 94px 1fr; align-items: center;
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 22px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    }
+    .qr-placeholder {
+      width: 94px; height: 94px; border-radius: 18px;
+      background:
+        linear-gradient(90deg, var(--text) 10px, transparent 10px 18px, var(--text) 18px 28px, transparent 28px),
+        linear-gradient(var(--text) 10px, transparent 10px 18px, var(--text) 18px 28px, transparent 28px),
+        var(--bg);
+      background-size: 36px 36px; opacity: .88;
+    }
+    .sbp-box h3 { margin: 0 0 4px; font-size: 20px; }
+    .sbp-box p { color: var(--muted); margin: 0; }
 
     /* ===== МОДАЛКА ===== */
     .modal-backdrop {
@@ -127,6 +186,10 @@
     .match-result .emoji { font-size: 48px; }
     .match-result h4 { font-size: 22px; margin: 6px 0; color: var(--accent); }
     .match-result .why { color: var(--muted); margin: 6px 0 14px; font-size: 15px; }
+    .breed-preview {
+      width: 100%; height: 150px; object-fit: cover; border-radius: 18px;
+      display: block; margin-bottom: 14px; border: 1px solid var(--card-border);
+    }
 
     /* шаги записи */
     .modal-cta {
@@ -142,6 +205,16 @@
       cursor: pointer; transition: border-color .15s, transform .1s;
     }
     .choice-list button:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .choice-list.style-options button {
+      display: grid; grid-template-columns: 82px 1fr; gap: 12px; align-items: center;
+      text-align: left; padding: 10px;
+    }
+    .style-thumb {
+      width: 82px; height: 70px; object-fit: cover; border-radius: 12px; display: block;
+    }
+    .style-title { display: block; font-weight: 900; }
+    .style-meta { display: block; color: var(--muted); font-size: 14px; margin-top: 2px; }
+    .pay-choice.sbp-choice { border-color: var(--secondary); }
     .note {
       font-size: 14px; color: var(--muted); background: var(--bg);
       border-radius: 12px; padding: 10px 14px; margin-bottom: 12px;
@@ -156,6 +229,17 @@
       width: 100%; padding: 13px 16px; margin-bottom: 14px; font-size: 15px;
       border: 2px solid var(--card-border); border-radius: 14px;
       background: var(--card-bg); color: var(--text);
+    }
+    .field-label {
+      display: block; text-align: left; margin: 0 0 7px 2px;
+      font-size: 14px; font-weight: 800; color: var(--muted);
+    }
+    .input-error {
+      text-align: left; color: #d93636; font-size: 14px; margin: -8px 0 12px;
+    }
+    .sbp-hint {
+      text-align: left; background: var(--panel); border: 1px solid var(--card-border);
+      border-radius: 16px; padding: 14px 16px; margin: 0 0 14px; color: var(--text);
     }
 
     /* ===== ФОРМА ОТЗЫВА ===== */
@@ -190,7 +274,15 @@
     .contact { text-align: center; background: var(--panel); border-radius: 28px; margin: 40px 24px; padding: 56px 24px; }
     .contact .phone {
       font-size: clamp(26px, 6vw, 40px); font-weight: 800; color: var(--accent);
-      display: block; width: max-content; max-width: 100%; margin: 10px auto 0;
+      display: inline-block; max-width: 100%; margin: 10px auto 0;
+      white-space: nowrap; overflow-wrap: normal; line-height: 1.15;
+    }
+    @media (max-width: 520px) {
+      .contact .phone { font-size: 28px; }
+      .sbp-box { grid-template-columns: 1fr; text-align: center; }
+      .qr-placeholder { margin: 0 auto; }
+      .choice-list.style-options button { grid-template-columns: 76px 1fr; }
+      .style-thumb { width: 76px; height: 64px; }
     }
     footer { text-align: center; padding: 34px; color: var(--muted); font-size: 14px; }
   </style>
@@ -211,12 +303,14 @@
 
   <!-- ШАПКА -->
   <header class="hero">
-    <div class="logo">🐶✨</div>
-    <h1>Лохматый Стиль</h1>
+    <div class="brand-mark"><span class="logo">🐶✂️</span><span>груминг-ателье для собак</span></div>
+    <h1>Лохматый<br><span>Стиль</span></h1>
     <p class="tagline">Груминг-ателье для собак. Стрижки, купание и укладки —
        твой пёс выйдет от нас настоящей звездой!</p>
     <div class="btns">
+      <button class="btn btn-main open-match">Записаться на стрижку</button>
       <button class="btn btn-ghost open-match">🐾 Подобрать грумера</button>
+      <a class="btn btn-ghost" href="#payment">Оплата СБП</a>
     </div>
   </header>
 
@@ -226,28 +320,60 @@
     <p class="sub">Выбирай образ для своего питомца — сделаем точь-в-точь</p>
     <div class="grid">
       <div class="card">
-        <img class="card-img" src="https://placedog.net/400/300?id=10" alt="Классика" loading="lazy" onerror="this.remove()">
+        <img class="card-img" src="https://loremflickr.com/420/300/dog,grooming,classic?lock=10" alt="Классика" loading="lazy" onerror="this.remove()">
         <h3>Классика</h3><p>Аккуратная ровная стрижка на каждый день.</p><div class="price">от 800 ₽</div>
       </div>
       <div class="card">
-        <img class="card-img" src="https://placedog.net/400/300?id=20" alt="Пёс-мишка" loading="lazy" onerror="this.remove()">
+        <img class="card-img" src="https://loremflickr.com/420/300/fluffy,dog,grooming?lock=20" alt="Пёс-мишка" loading="lazy" onerror="this.remove()">
         <h3>Пёс-мишка</h3><p>Округлая пушистая стрижка «плюшевый медвежонок».</p><div class="price">от 1200 ₽</div>
       </div>
       <div class="card">
-        <img class="card-img" src="https://placedog.net/400/300?id=30" alt="Летняя лёгкая" loading="lazy" onerror="this.remove()">
+        <img class="card-img" src="https://loremflickr.com/420/300/short-haired,dog,grooming?lock=30" alt="Летняя лёгкая" loading="lazy" onerror="this.remove()">
         <h3>Летняя лёгкая</h3><p>Короткая стрижка, чтобы было не жарко.</p><div class="price">от 600 ₽</div>
       </div>
       <div class="card">
-        <img class="card-img" src="https://placedog.net/400/300?id=50" alt="Пудель-шик" loading="lazy" onerror="this.remove()">
+        <img class="card-img" src="https://loremflickr.com/420/300/poodle,grooming?lock=50" alt="Пудель-шик" loading="lazy" onerror="this.remove()">
         <h3>Пудель-шик</h3><p>Модельная стрижка для выставок и фото.</p><div class="price">от 1500 ₽</div>
       </div>
       <div class="card">
-        <img class="card-img" src="https://placedog.net/400/300?id=80" alt="Лапки-сапожки" loading="lazy" onerror="this.remove()">
+        <img class="card-img" src="https://loremflickr.com/420/300/dog,paws,grooming?lock=80" alt="Лапки-сапожки" loading="lazy" onerror="this.remove()">
         <h3>Лапки-сапожки</h3><p>Аккуратное оформление лап и мордочки.</p><div class="price">от 400 ₽</div>
       </div>
       <div class="card">
-        <img class="card-img" src="https://placedog.net/400/300?id=100" alt="Мордочка-сердечко" loading="lazy" onerror="this.remove()">
+        <img class="card-img" src="https://loremflickr.com/420/300/small,dog,grooming?lock=100" alt="Мордочка-сердечко" loading="lazy" onerror="this.remove()">
         <h3>Мордочка-сердечко</h3><p>Милый образ для маленьких пород.</p><div class="price">от 900 ₽</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ФОТО ПО ПОРОДАМ -->
+  <section id="breed-gallery">
+    <h2>Фото стрижек по породам</h2>
+    <p class="sub">В заявке фото подбираются под выбранную породу и тип стрижки</p>
+    <div class="grid gallery-grid">
+      <div class="card breed-card">
+        <img src="https://loremflickr.com/520/360/poodle,dog,grooming?lock=114" alt="Пудель — пудель-шик" loading="lazy">
+        <div class="breed-body"><h3>Пудель</h3><p>Фигурная стрижка, объём на лапах и аккуратная мордочка.</p></div>
+      </div>
+      <div class="card breed-card">
+        <img src="https://loremflickr.com/520/360/yorkshire-terrier,dog,grooming?lock=124" alt="Йоркширский терьер — классика" loading="lazy">
+        <div class="breed-body"><h3>Йоркширский терьер</h3><p>Ровный силуэт, чистые лапки и ухоженная шерсть.</p></div>
+      </div>
+      <div class="card breed-card">
+        <img src="https://loremflickr.com/520/360/pomeranian,dog,grooming?lock=136" alt="Шпиц — пёс-мишка" loading="lazy">
+        <div class="breed-body"><h3>Шпиц</h3><p>Пушистый образ «мишка» с мягким контуром.</p></div>
+      </div>
+      <div class="card breed-card">
+        <img src="https://loremflickr.com/520/360/maltipoo,dog,grooming?lock=148" alt="Мальтипу — мордочка-сердечко" loading="lazy">
+        <div class="breed-body"><h3>Мальтипу</h3><p>Милая круглая мордочка и лёгкая укладка.</p></div>
+      </div>
+      <div class="card breed-card">
+        <img src="https://loremflickr.com/520/360/husky,dog,grooming?lock=158" alt="Хаски — летняя лёгкая" loading="lazy">
+        <div class="breed-body"><h3>Хаски</h3><p>Лёгкий уход, вычёсывание и комфорт в жаркую погоду.</p></div>
+      </div>
+      <div class="card breed-card">
+        <img src="https://loremflickr.com/520/360/cocker-spaniel,dog,grooming?lock=168" alt="Кокер-спаниель — лапки-сапожки" loading="lazy">
+        <div class="breed-body"><h3>Кокер-спаниель</h3><p>Акцент на ушах, лапах и аккуратной форме корпуса.</p></div>
       </div>
     </div>
   </section>
@@ -285,7 +411,18 @@
     <div class="grid">
       <div class="card"><div class="emoji">💵</div><h3>Наличные</h3><p>Оплата в ателье после стрижки.</p></div>
       <div class="card"><div class="emoji">💳</div><h3>Банковская карта</h3><p>Оплата картой прямо на месте.</p></div>
-      <div class="card"><div class="emoji">📱</div><h3>Перевод (СБП)</h3><p>Быстрый перевод по номеру телефона.</p></div>
+      <div class="card sbp-card">
+        <span class="sbp-badge">СБП</span>
+        <div class="emoji">📱</div><h3>Перевод по номеру</h3>
+        <p>Быстрый перевод через СБП на <b>+7 911 159 53 39</b>.</p>
+      </div>
+    </div>
+    <div class="sbp-box">
+      <div class="qr-placeholder" aria-hidden="true"></div>
+      <div>
+        <h3>СБП подключим в заявке</h3>
+        <p>Клиент выбирает СБП при записи, а после отправки заявки видит номер для перевода. Приём денег и настоящий QR добавим следующим шагом.</p>
+      </div>
     </div>
     <div class="price-note">
       💰 <b>Как считается цена:</b> цена породы + цена стрижки.<br>
@@ -298,7 +435,7 @@
   <section id="contact" class="contact">
     <h2>Записаться на стрижку</h2>
     <p class="sub">Позвони администратору — подберём время и грумера</p>
-    <a class="phone" href="tel:+79001234567">+7 (900) 123-45-67</a>
+    <a class="phone" href="tel:+79111595339">+7 911 159 53 39</a>
   </section>
 
   <footer>© 2026 · Лохматый Стиль · груминг-ателье для собак 🐾</footer>
@@ -316,6 +453,7 @@
           <option value="">— выбери породу —</option>
         </select>
         <div class="match-result" id="matchResult" hidden>
+          <img class="breed-preview" id="breedPreview" src="" alt="" hidden>
           <div class="emoji" id="mEmoji">👩‍🎨</div>
           <h4 id="mName">—</h4>
           <div class="stars">★★★★★</div>
@@ -350,7 +488,12 @@
       <div id="step-confirm" hidden>
         <h3>📋 Проверь заявку</h3>
         <div class="summary" id="summary"></div>
-        <input id="clientContact" class="contact-input" type="text" placeholder="Твой телефон или @ник в Telegram">
+        <div class="sbp-hint" id="sbpHint" hidden>
+          Для СБП используем номер <b>+7 911 159 53 39</b>. Настоящее получение денег подключим позже, а пока способ оплаты сохранится в заявке.
+        </div>
+        <label class="field-label" for="clientPhone">Телефон клиента</label>
+        <input id="clientPhone" class="contact-input" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 900 000 00 00">
+        <div class="input-error" id="phoneError" hidden>Впиши номер телефона, чтобы мы могли связаться с клиентом.</div>
         <button class="modal-cta" id="sendBooking">📨 Отправить заявку</button>
       </div>
 
@@ -415,6 +558,14 @@
       "Классика":800, "Пёс-мишка":1200, "Летняя лёгкая":600,
       "Пудель-шик":1500, "Лапки-сапожки":400, "Мордочка-сердечко":900,
     };
+    const styleDescription = {
+      "Классика":"ровный ухоженный силуэт",
+      "Пёс-мишка":"круглая мордочка и мягкий объём",
+      "Летняя лёгкая":"коротко, аккуратно и не жарко",
+      "Пудель-шик":"фигурная модельная форма",
+      "Лапки-сапожки":"акцент на лапах и мордочке",
+      "Мордочка-сердечко":"милый образ для фото",
+    };
     // 💰 цена каждой породы, ₽ (по размеру)
     const breedPrice = {
       "Немецкая овчарка":1600, "Лабрадор":1600, "Хаски":1600,
@@ -424,10 +575,36 @@
       "Чихуахуа":500, "Йоркширский терьер":500, "Шпиц":500,
       "Той-терьер":500, "Мопс":500, "Такса":500,
     };
-    const payMethods = ["💵 Наличные", "💳 Банковская карта", "📱 Перевод (СБП)"];
+    const payMethods = ["💵 Наличные", "💳 Банковская карта", "📱 СБП по номеру +7 911 159 53 39"];
 
-    const booking = { breed:"", groomer:"", style:"", time:"", pay:"", price:0 };
+    const booking = { breed:"", groomer:"", style:"", time:"", pay:"", phone:"", price:0 };
     let currentGroomer = null;
+
+    const breedPhotoSeed = {
+      "Немецкая овчарка":210, "Лабрадор":220, "Хаски":230,
+      "Золотистый ретривер":240, "Алабай":250, "Ротвейлер":260,
+      "Пудель":110, "Той-пудель":112, "Мальтипу":114,
+      "Бишон-фризе":116, "Кокер-спаниель":118, "Мальтезе":120, "Керри-блю-терьер":122,
+      "Чихуахуа":130, "Йоркширский терьер":132, "Шпиц":134,
+      "Той-терьер":136, "Мопс":138, "Такса":140,
+    };
+    const breedPhotoQuery = {
+      "Немецкая овчарка":"german-shepherd", "Лабрадор":"labrador", "Хаски":"husky",
+      "Золотистый ретривер":"golden-retriever", "Алабай":"central-asian-shepherd", "Ротвейлер":"rottweiler",
+      "Пудель":"poodle", "Той-пудель":"toy-poodle", "Мальтипу":"maltipoo",
+      "Бишон-фризе":"bichon-frise", "Кокер-спаниель":"cocker-spaniel", "Мальтезе":"maltese-dog", "Керри-блю-терьер":"kerry-blue-terrier",
+      "Чихуахуа":"chihuahua", "Йоркширский терьер":"yorkshire-terrier", "Шпиц":"pomeranian",
+      "Той-терьер":"toy-terrier", "Мопс":"pug", "Такса":"dachshund",
+    };
+    const stylePhotoOffset = {
+      "Классика":1, "Пёс-мишка":2, "Летняя лёгкая":3,
+      "Пудель-шик":4, "Лапки-сапожки":5, "Мордочка-сердечко":6,
+    };
+    function dogPhotoUrl(breed, style){
+      const seed = (breedPhotoSeed[breed] || 100) + (stylePhotoOffset[style] || 0);
+      const query = breedPhotoQuery[breed] || "dog";
+      return "https://loremflickr.com/420/300/" + query + ",dog,grooming?lock=" + seed;
+    }
 
     /* заполнить список пород */
     const select = document.getElementById("breedSelect");
@@ -449,6 +626,10 @@
       if (!breed) { result.hidden = true; return; }
       currentGroomer = groomers[breeds[breed]];
       booking.breed = breed;
+      const preview = document.getElementById("breedPreview");
+      preview.src = dogPhotoUrl(breed, "Классика");
+      preview.alt = breed + " — пример стрижки";
+      preview.hidden = false;
       document.getElementById("mEmoji").textContent = currentGroomer.emoji;
       document.getElementById("mName").textContent = currentGroomer.name;
       document.getElementById("mWhy").textContent =
@@ -469,9 +650,24 @@
     const styleList = document.getElementById("styleList");
     function buildStyleList(){
       styleList.innerHTML = "";
+      styleList.classList.add("style-options");
       styles.forEach(name => {
         const b = document.createElement("button");
-        b.textContent = "✂️ " + name + " · " + stylePrice[name] + " ₽";
+        const img = document.createElement("img");
+        img.className = "style-thumb";
+        img.src = dogPhotoUrl(booking.breed, name);
+        img.alt = booking.breed + " — " + name;
+        img.loading = "lazy";
+
+        const text = document.createElement("span");
+        const title = document.createElement("span");
+        title.className = "style-title";
+        title.textContent = name + " · " + stylePrice[name] + " ₽";
+        const meta = document.createElement("span");
+        meta.className = "style-meta";
+        meta.textContent = styleDescription[name] || "подходит для выбранной породы";
+        text.append(title, meta);
+        b.append(img, text);
         b.addEventListener("click", () => {
           booking.style = name;
           buildTimeList();
@@ -517,6 +713,8 @@
       payList.innerHTML = "";
       payMethods.forEach(m => {
         const b = document.createElement("button");
+        b.className = "pay-choice";
+        if (m.includes("СБП")) b.classList.add("sbp-choice");
         b.textContent = m;
         b.addEventListener("click", () => {
           booking.pay = m;
@@ -543,13 +741,22 @@
         "<div>💳 Оплата: <b>"+booking.pay+"</b></div>" +
         "<div>⏱ Займёт: <b>"+duration+"</b></div>" +
         "<div>💰 Цена: <b>"+price+" ₽</b></div>";
+      document.getElementById("sbpHint").hidden = !booking.pay.includes("СБП");
     }
 
     // Отправить заявку в Telegram-бот
     document.getElementById("sendBooking").addEventListener("click", () => {
-      const contactEl = document.getElementById("clientContact");
-      const contact = contactEl.value.trim();
-      if (!contact) { contactEl.focus(); return; }   // без контакта не отправляем
+      const phoneEl = document.getElementById("clientPhone");
+      const phoneError = document.getElementById("phoneError");
+      const phone = phoneEl.value.trim();
+      const digits = phone.replace(/\D/g, "");
+      if (digits.length < 10) {
+        phoneError.hidden = false;
+        phoneEl.focus();
+        return;
+      }
+      phoneError.hidden = true;
+      booking.phone = phone;
       const duration = styleDuration[booking.style] || "около 1,5 часа";
       const price = currentPrice();
       const text =
@@ -559,7 +766,7 @@
         "Стрижка: " + booking.style + "\n" +
         "Время записи: " + booking.time + "\n" +
         "Оплата: " + booking.pay + "\n" +
-        "☎️ Контакт клиента: " + contact + "\n" +
+        "☎️ Телефон клиента: " + phone + "\n" +
         "⏱ Займёт примерно: " + duration + "\n" +
         "💰 Цена: " + price + " ₽";
       // отправляем заявку на наш сервер — он уже сам шлёт её в Telegram
@@ -570,7 +777,7 @@
       }).catch(() => {}); // пока сервер не настроен — просто не падаем
       document.getElementById("doneText").textContent =
         "Готово! Заявка отправлена. ✂️ Стрижка займёт примерно " + duration +
-        " · Цена " + price + " ₽. До встречи! 🐾";
+        " · Цена " + price + " ₽. Мы свяжемся по номеру " + phone + ".";
       showStep("step-done");
     });
 
@@ -579,9 +786,11 @@
     function openModal() {
       select.value = "";
       result.hidden = true;
+      document.getElementById("breedPreview").hidden = true;
       currentGroomer = null;
-      booking.breed = booking.groomer = booking.style = booking.time = booking.pay = "";
-      document.getElementById("clientContact").value = "";
+      booking.breed = booking.groomer = booking.style = booking.time = booking.pay = booking.phone = "";
+      document.getElementById("clientPhone").value = "";
+      document.getElementById("phoneError").hidden = true;
       showStep("step-breed");
       modal.hidden = false;
     }
