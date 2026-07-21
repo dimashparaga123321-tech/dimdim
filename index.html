@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Создаю сайты и Telegram-ботов</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: #f5f5f7;
+      background: #0f1020;
+      line-height: 1.6;
+    }
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 24px;
+      background: radial-gradient(1200px 600px at 50% -10%, #3a2fbd 0%, #0f1020 60%);
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border: 1px solid #6c63ff;
+      border-radius: 999px;
+      font-size: 14px;
+      color: #b3aeff;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 7vw, 64px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      background: linear-gradient(90deg, #fff, #b3aeff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p { font-size: clamp(16px, 3vw, 20px); color: #c7c7d1; max-width: 620px; }
+    .cta {
+      margin-top: 28px;
+      display: inline-block;
+      padding: 14px 28px;
+      background: #6c63ff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: transform .15s, background .15s;
+    }
+    .cta:hover { transform: translateY(-2px); background: #7d75ff; }
+
+    section { max-width: 900px; margin: 0 auto; padding: 72px 24px; }
+    h2 { font-size: clamp(26px, 5vw, 40px); margin-bottom: 32px; text-align: center; }
+
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+    .card {
+      background: #181a33;
+      border: 1px solid #262a52;
+      border-radius: 18px;
+      padding: 28px;
+    }
+    .card .icon { font-size: 34px; margin-bottom: 12px; }
+    .card h3 { font-size: 20px; margin-bottom: 8px; }
+    .card p { color: #b6b6c4; font-size: 15px; }
+
+    .contact { text-align: center; }
+    .contact a {
+      color: #b3aeff;
+      font-size: 20px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    footer { text-align: center; padding: 32px; color: #6b6b80; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <!-- ГЛАВНЫЙ ЭКРАН -->
+  <div class="hero">
+    <span class="badge">✨ Делаю быстро и недорого</span>
+    <h1>Создаю сайты<br>и Telegram-ботов</h1>
+    <p>Привет! Меня зовут <strong>Дима</strong>. Помогаю бизнесу и людям
+       выйти в интернет: делаю сайты-визитки и настраиваю ботов, которые
+       сами общаются с клиентами.</p>
+    <a class="cta" href="https://t.me/sushipokebowl" target="_blank" rel="noopener">Написать мне в Telegram →</a>
+  </div>
+
+  <!-- ЧТО Я ДЕЛАЮ -->
+  <section>
+    <h2>Что я делаю</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="icon">🌐</div>
+        <h3>Сайты-визитки</h3>
+        <p>Красивая страница о тебе или бизнесе с контактами и услугами. За пару дней.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🤖</div>
+        <h3>Telegram-боты</h3>
+        <p>Бот, который отвечает клиентам, принимает заявки и записывает — без тебя.</p>
+      </div>
+      <div class="card">
+        <div class="icon">⚡</div>
+        <h3>Быстро и понятно</h3>
+        <p>Объясняю всё простым языком и делаю точно так, как ты хочешь.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- КОНТАКТЫ -->
+  <section id="contact" class="contact">
+    <h2>Связаться со мной</h2>
+    <p>Напиши мне в Telegram — обсудим твою задачу:</p>
+    <p style="margin-top:16px;"><a href="https://t.me/sushipokebowl" target="_blank">@sushipokebowl</a></p>
+  </section>
+
+  <footer>© 2026 · Сделано с любовью к делу</footer>
+
+</body>
+</html>
