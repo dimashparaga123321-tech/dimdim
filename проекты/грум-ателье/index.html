@@ -529,7 +529,7 @@
       border-radius: 50%; background: var(--secondary); border: 3px solid var(--bg);
     }
     .chat-panel {
-      position: fixed; left: 50%; right: auto; bottom: 84px; transform: translateX(-50%);
+      position: fixed; left: auto; right: 18px; bottom: 84px; transform: none;
       width: min(360px, calc(100dvw - 28px));
       height: min(460px, calc(100dvh - 120px)); max-height: calc(100dvh - 120px);
       min-width: min(280px, calc(100dvw - 28px)); min-height: min(330px, calc(100dvh - 120px));
@@ -538,7 +538,7 @@
       border: 1px solid var(--card-border); border-radius: 22px; overflow: hidden;
       box-shadow: 0 22px 60px rgba(0,0,0,.28);
       display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
-      transform-origin: 50% 100%;
+      transform-origin: 100% 100%;
     }
     .chat-panel.is-open { animation: chat-pop .22s ease-out; }
     .chat-panel.is-positioned.is-open { animation-name: chat-pop-positioned; }
@@ -550,16 +550,16 @@
       transition: none; user-select: none;
     }
     @keyframes chat-pop {
-      from { opacity: 0; transform: translateX(-50%) translateY(18px) scale(.94); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+      from { opacity: 0; transform: translateY(18px) scale(.94); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
     @keyframes chat-pop-positioned {
       from { opacity: 0; transform: translateY(18px) scale(.96); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
     @keyframes chat-hide {
-      from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-      to { opacity: 0; transform: translateX(-50%) translateY(18px) scale(.94); }
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(18px) scale(.94); }
     }
     @keyframes chat-hide-positioned {
       from { opacity: 1; transform: translateY(0) scale(1); }
@@ -2198,7 +2198,7 @@
       placeChatPanel(rect.left, rect.top, rect.width, rect.height);
     }
 
-    function openChat() {
+    function openChat(shouldFocus = true) {
       window.clearTimeout(chatCloseTimer);
       chatPanel.hidden = false;
       chatToggle.setAttribute("aria-expanded", "true");
@@ -2215,7 +2215,7 @@
           { label:"Задать вопрос", action: () => { botSay("Напишите вопрос — я отвечу и предложу подходящий следующий шаг."); chatInput.focus(); } },
         ]);
       }
-      chatInput.focus();
+      if (shouldFocus) chatInput.focus();
     }
 
     function closeChat() {
@@ -2508,6 +2508,7 @@
       await handleChatMessage(text);
     });
     renderQuickReplies();
+    openChat(false);
 
     /* ===== ОТЗЫВЫ ===== */
     const reviewsGrid = document.getElementById("reviewsGrid");
