@@ -353,8 +353,9 @@
     }
     .breed-trigger-icon {
       width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px;
-      background: var(--panel); color: var(--accent); font-size: 23px; border: 1px solid var(--card-border);
+      background: var(--panel); color: var(--accent); font-size: 23px; border: 1px solid var(--card-border); overflow: hidden;
     }
+    .breed-trigger-icon img { width: 40px; height: 40px; object-fit: cover; border-radius: 12px; }
     .breed-trigger-copy { min-width: 0; }
     .breed-trigger-copy small { display: block; color: var(--muted); font-size: 12px; font-weight: 800; }
     .breed-trigger-copy strong {
@@ -387,8 +388,9 @@
     .breed-option.selected { border-color: var(--accent); background: var(--panel); }
     .breed-option-icon {
       width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center;
-      color: var(--accent); background: var(--bg); font-size: 17px; font-weight: 900;
+      color: var(--accent); background: var(--bg); font-size: 17px; font-weight: 900; overflow: hidden;
     }
+    .breed-option-icon img { width: 32px; height: 32px; object-fit: cover; border-radius: 9px; display: block; }
     .breed-option-name { min-width: 0; font-size: 13px; font-weight: 800; line-height: 1.2; }
     .breed-empty { padding: 16px 8px; color: var(--muted); text-align: center; font-size: 14px; }
     .match-result {
@@ -628,6 +630,15 @@
       margin: 8px 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       padding: 8px 10px; border-radius: 10px; background: var(--bg); color: var(--text);
     }
+    .chat-shop { display: grid; gap: 9px; }
+    .chat-shop label { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .chat-shop select {
+      width: 100%; margin-top: 4px; padding: 9px 10px; border: 1px solid var(--card-border); border-radius: 8px;
+      background: var(--bg); color: var(--text); font: inherit;
+    }
+    .chat-shop-total {
+      padding: 10px; border-radius: 8px; background: var(--panel); color: var(--text); font-size: 13px;
+    }
     .chat-resize {
       position: absolute; right: 0; bottom: 0; width: 12px; height: 12px;
       cursor: nwse-resize; touch-action: none; z-index: 3;
@@ -795,6 +806,9 @@
       <div class="card"><div class="stars">★★★★★</div><p>«Постригли нашего Рекса — красавчик! Не узнать».</p><h3>Ольга и Рекс</h3></div>
       <div class="card"><div class="stars">★★★★★</div><p>«Записались за минуту, собака довольная и чистая».</p><h3>Игорь и Бэлла</h3></div>
       <div class="card"><div class="stars">★★★★★</div><p>«Лучшее груминг-ателье в городе, ходим только сюда».</p><h3>Настя и Марсик</h3></div>
+      <div class="card"><div class="stars">★★★★☆</div><p>«Стрижка аккуратная, но пришлось немного подождать начала приёма».</p><h3>Людмила и Бакс</h3></div>
+      <div class="card"><div class="stars">★★★☆☆</div><p>«В целом хорошо, только мордочку хотелось оставить чуть более пушистой».</p><h3>Роман и Плюш</h3></div>
+      <div class="card"><div class="stars">★★★★★</div><p>«Щенок впервые не боялся груминга, спасибо за терпение».</p><h3>Нина и Чип</h3></div>
     </div>
 
     <div class="review-actions">
@@ -889,7 +903,7 @@
         <p class="sub">Шаг 1. Выбери породу собаки</p>
         <div class="breed-picker" id="breedPicker">
           <button class="breed-trigger" id="breedTrigger" type="button" aria-expanded="false" aria-controls="breedMenu">
-            <span class="breed-trigger-icon">🐕</span>
+            <span class="breed-trigger-icon"><span id="breedTriggerEmoji">🐕</span><img id="breedTriggerImage" alt="" hidden></span>
             <span class="breed-trigger-copy">
               <small>Порода собаки</small>
               <strong id="breedPickerValue">Выберите породу</strong>
@@ -1044,12 +1058,12 @@
 
     /* ===== ДАННЫЕ ===== */
     const groomers = {
-      anya:   { name: "Аня",    emoji: "👩‍🎨", spec: "кудрявых и выставочных пород", rating: "4.9", reviews: 128, stars: "★★★★★" },
-      maxim:  { name: "Максим", emoji: "🧑‍🔧", spec: "крупных и активных пород", rating: "4.7", reviews: 96, stars: "★★★★☆" },
-      lera:   { name: "Лера",   emoji: "👩‍🦰", spec: "мелких пород и мягких форм", rating: "4.8", reviews: 112, stars: "★★★★★" },
-      karina: { name: "Карина", emoji: "👩‍💼", spec: "спаниелей, терьеров и аккуратных лапок", rating: "4.6", reviews: 74, stars: "★★★★☆" },
-      timur:  { name: "Тимур",  emoji: "🧑‍🎨", spec: "плотной шерсти, линьки и летнего ухода", rating: "4.5", reviews: 58, stars: "★★★★☆" },
-      sofia:  { name: "София",  emoji: "👩‍⚕️", spec: "щенков и деликатного первого ухода", rating: "5.0", reviews: 41, stars: "★★★★★" },
+      anya:   { name: "Аня",    gender:"f", emoji: "👩‍🎨", spec: "кудрявых и выставочных пород", rating: "4.9", reviews: 128, stars: "★★★★★" },
+      maxim:  { name: "Максим", gender:"m", emoji: "🧑‍🔧", spec: "крупных и активных пород", rating: "4.7", reviews: 96, stars: "★★★★☆" },
+      lera:   { name: "Лера",   gender:"f", emoji: "👩‍🦰", spec: "мелких пород и мягких форм", rating: "4.8", reviews: 112, stars: "★★★★★" },
+      karina: { name: "Карина", gender:"f", emoji: "👩‍💼", spec: "спаниелей, терьеров и аккуратных лапок", rating: "4.6", reviews: 74, stars: "★★★★☆" },
+      timur:  { name: "Тимур",  gender:"m", emoji: "🧑‍🎨", spec: "плотной шерсти, линьки и летнего ухода", rating: "4.5", reviews: 58, stars: "★★★★☆" },
+      sofia:  { name: "София",  gender:"f", emoji: "👩‍⚕️", spec: "щенков и деликатного первого ухода", rating: "5.0", reviews: 41, stars: "★★★★★" },
     };
     const groomerProfiles = {
       anya: {
@@ -1059,6 +1073,8 @@
         reviews: [
           { authorName:"Марина и Тедди", rating:5, reviewText:"Форма держалась долго, а Тедди вышел спокойным и довольным." },
           { authorName:"Елена", rating:5, reviewText:"Аня подробно уточнила пожелания и аккуратно оформила мордочку." },
+          { authorName:"Людмила", rating:4, reviewText:"Стрижка понравилась, но приём начался примерно на десять минут позже." },
+          { authorName:"Роман и Плюш", rating:3, reviewText:"Работа аккуратная, хотя хотелось оставить шерсть на корпусе немного длиннее." },
         ],
       },
       maxim: {
@@ -1068,6 +1084,8 @@
         reviews: [
           { authorName:"Сергей и Рэй", rating:5, reviewText:"С хаски справился отлично, шерсти дома стало заметно меньше." },
           { authorName:"Анна", rating:4, reviewText:"Хорошая работа с большим псом, всё объяснили по домашнему уходу." },
+          { authorName:"Михаил", rating:5, reviewText:"Максим уверенно справился с активным лабрадором и сделал всё без спешки." },
+          { authorName:"Оксана", rating:3, reviewText:"Результат хороший, но сушка заняла дольше, чем я рассчитывала." },
         ],
       },
       lera: {
@@ -1077,6 +1095,8 @@
         reviews: [
           { authorName:"Катя и Боня", rating:5, reviewText:"Боня обычно волнуется, но у Леры спокойно перенесла всю стрижку." },
           { authorName:"Ирина", rating:5, reviewText:"Очень аккуратные лапки и красивая круглая мордочка." },
+          { authorName:"Татьяна", rating:4, reviewText:"Понравилось бережное отношение, только запись пришлось ждать несколько дней." },
+          { authorName:"Светлана и Ричи", rating:3, reviewText:"Мордочка получилась симпатичной, но уши хотелось бы оформить короче." },
         ],
       },
       karina: {
@@ -1086,6 +1106,8 @@
         reviews: [
           { authorName:"Олег и Джесси", rating:5, reviewText:"Лапы и уши оформили очень чисто, всё выглядит естественно." },
           { authorName:"Вера", rating:4, reviewText:"Результат понравился, мастер внимательно выслушала пожелания." },
+          { authorName:"Дарья", rating:5, reviewText:"Карина отлично оформила лапы и сохранила естественную длину шерсти." },
+          { authorName:"Николай", rating:3, reviewText:"В целом неплохо, но пришлось дополнительно уточнить форму хвоста." },
         ],
       },
       timur: {
@@ -1095,6 +1117,8 @@
         reviews: [
           { authorName:"Денис и Норд", rating:5, reviewText:"После вычёсывания шерсть стала легче, без проплешин и спешки." },
           { authorName:"Алёна", rating:4, reviewText:"Хорошо справился с плотным подшёрстком нашей овчарки." },
+          { authorName:"Павел", rating:5, reviewText:"После антилиньки дома действительно стало меньше шерсти." },
+          { authorName:"Инна", rating:3, reviewText:"Эффект хороший, но процедура оказалась довольно долгой для нашей собаки." },
         ],
       },
       sofia: {
@@ -1104,6 +1128,8 @@
         reviews: [
           { authorName:"Нина и Чип", rating:5, reviewText:"Первая стрижка прошла очень спокойно, щенок быстро привык." },
           { authorName:"Полина", rating:5, reviewText:"София терпеливая и внимательная, обязательно вернёмся." },
+          { authorName:"Мария", rating:4, reviewText:"Очень бережно, хотя хотелось получить чуть более короткую форму лап." },
+          { authorName:"Алексей и Лаки", rating:3, reviewText:"Щенок не испугался, но визит занял больше времени, чем ожидали." },
         ],
       },
     };
@@ -1122,6 +1148,27 @@
       "Той-пудель": "small", "Мальтипу": "small", "Бишон-фризе": "small", "Мальтезе": "small",
       "Чихуахуа": "small", "Йоркширский терьер": "small", "Шпиц": "small",
       "Той-терьер": "small", "Мопс": "small", "Такса": "small",
+    };
+    const breedImages = {
+      "Немецкая овчарка":"assets/breeds/german-shepherd.png",
+      "Лабрадор":"assets/breeds/labrador.png",
+      "Хаски":"assets/breeds/husky.png",
+      "Золотистый ретривер":"assets/breeds/golden-retriever.png",
+      "Алабай":"assets/breeds/alabai.png",
+      "Ротвейлер":"assets/breeds/rottweiler.png",
+      "Пудель":"assets/breeds/poodle.png",
+      "Кокер-спаниель":"assets/breeds/cocker-spaniel.png",
+      "Керри-блю-терьер":"assets/breeds/kerry-blue-terrier.png",
+      "Той-пудель":"assets/breeds/toy-poodle.png",
+      "Мальтипу":"assets/breeds/maltipoo.png",
+      "Бишон-фризе":"assets/breeds/bichon-frise.png",
+      "Мальтезе":"assets/breeds/maltese.png",
+      "Чихуахуа":"assets/breeds/chihuahua.png",
+      "Йоркширский терьер":"assets/breeds/yorkshire-terrier.png",
+      "Шпиц":"assets/breeds/pomeranian.png",
+      "Той-терьер":"assets/breeds/toy-terrier.png",
+      "Мопс":"assets/breeds/pug.png",
+      "Такса":"assets/breeds/dachshund.png",
     };
     const groomersBySize = {
       small: ["lera", "sofia", "karina", "anya"],
@@ -1202,6 +1249,8 @@
     const breedSearch = document.getElementById("breedSearch");
     const breedOptions = document.getElementById("breedOptions");
     const breedPickerValue = document.getElementById("breedPickerValue");
+    const breedTriggerImage = document.getElementById("breedTriggerImage");
+    const breedTriggerEmoji = document.getElementById("breedTriggerEmoji");
     Object.keys(breedSize).sort().forEach(breed => {
       const opt = document.createElement("option");
       opt.value = breed; opt.textContent = breed;
@@ -1215,6 +1264,19 @@
         breedSearch.value = "";
         renderBreedOptions();
         window.setTimeout(() => breedSearch.focus(), 0);
+      }
+    }
+
+    function setBreedArtwork(breed = "") {
+      const image = breedImages[breed];
+      breedTriggerImage.hidden = !image;
+      breedTriggerEmoji.hidden = Boolean(image);
+      if (image) {
+        breedTriggerImage.src = image;
+        breedTriggerImage.alt = breed;
+      } else {
+        breedTriggerImage.removeAttribute("src");
+        breedTriggerImage.alt = "";
       }
     }
 
@@ -1240,9 +1302,18 @@
           const button = document.createElement("button");
           button.type = "button";
           button.className = "breed-option" + (booking.breed === breed ? " selected" : "");
-          button.innerHTML =
-            "<span class='breed-option-icon'>" + group.icon + "</span>" +
-            "<span class='breed-option-name'>" + breed + "</span>";
+          const icon = document.createElement("span");
+          icon.className = "breed-option-icon";
+          const image = document.createElement("img");
+          image.src = breedImages[breed];
+          image.alt = "";
+          image.loading = "lazy";
+          image.addEventListener("error", () => { icon.textContent = group.icon; }, { once:true });
+          const name = document.createElement("span");
+          name.className = "breed-option-name";
+          name.textContent = breed;
+          icon.appendChild(image);
+          button.append(icon, name);
           button.addEventListener("click", () => {
             select.value = breed;
             breedPickerValue.textContent = breed;
@@ -1346,8 +1417,9 @@
 
     function availabilityLabel(groomerId) {
       const ranges = busyRanges(groomerId);
-      if (!ranges.length) return "Сегодня свободен весь день";
-      return "Занят: " + ranges.map(range => toTime(range.startMin) + "–" + toTime(range.endMin)).join(", ");
+      const female = groomers[groomerId]?.gender === "f";
+      if (!ranges.length) return "Сегодня " + (female ? "свободна" : "свободен") + " весь день";
+      return (female ? "Занята" : "Занят") + ": " + ranges.map(range => toTime(range.startMin) + "–" + toTime(range.endMin)).join(", ");
     }
 
     function freeRanges(groomerId) {
@@ -1366,6 +1438,16 @@
     function starsText(rating) {
       const count = Math.max(1, Math.min(5, Math.round(Number(rating) || 5)));
       return "★".repeat(count) + "☆".repeat(5 - count);
+    }
+
+    function reviewCountLabel(count) {
+      const value = Number(count) || 0;
+      const lastTwo = value % 100;
+      const last = value % 10;
+      if (lastTwo >= 11 && lastTwo <= 14) return value + " отзывов";
+      if (last === 1) return value + " отзыв";
+      if (last >= 2 && last <= 4) return value + " отзыва";
+      return value + " отзывов";
     }
 
     const profileModal = document.getElementById("groomerProfile");
@@ -1435,7 +1517,7 @@
       document.getElementById("profileAvatar").textContent = groomer.name.slice(0, 1);
       document.getElementById("profileName").textContent = groomer.name;
       document.getElementById("profileSpecialty").textContent = profile.title;
-      document.getElementById("profileRating").textContent = groomer.stars + "  " + groomer.rating + " · " + groomer.reviews + " отзывов";
+      document.getElementById("profileRating").textContent = groomer.stars + "  " + groomer.rating + " · " + reviewCountLabel(groomer.reviews);
       document.getElementById("profileBio").textContent = profile.bio;
       const metrics = document.getElementById("profileMetrics");
       metrics.innerHTML = "";
@@ -1639,6 +1721,7 @@
     function handleBreedSelection(breed) {
       if (!breed) { result.hidden = true; return; }
       booking.breed = breed;
+      setBreedArtwork(breed);
       booking.size = breedSize[breed] || "small";
       currentGroomer = null;
       booking.groomer = "";
@@ -1669,7 +1752,7 @@
         selectButton.className = "groomer-choice-main";
         selectButton.innerHTML =
           "<span class='style-title'>" + groomer.emoji + " " + groomer.name +
-          " · " + groomer.rating + " · " + groomer.reviews + " отзывов" +
+          " · " + groomer.rating + " · " + reviewCountLabel(groomer.reviews) +
           (id === preferredGroomerId ? " · выбран вами" : "") + "</span>" +
           "<span class='style-meta'>" + groomer.stars + " · " + groomer.spec + "</span>" +
           "<span class='groomer-availability'>" + availabilityLabel(id) + "</span>";
@@ -1805,7 +1888,7 @@
       const totalDuration = currentDurationMin();
       const occupied = busyRanges(booking.groomerId);
       if (occupied.length) {
-        timeNote.textContent = currentGroomer.name + " сегодня занят: " +
+        timeNote.textContent = currentGroomer.name + " сегодня " + (currentGroomer.gender === "f" ? "занята" : "занят") + ": " +
           occupied.map(range => toTime(range.startMin) + "–" + toTime(range.endMin)).join(", ") +
           ". Выбранные услуги займут " + formatDuration(totalDuration) + ".";
       } else {
@@ -1971,11 +2054,12 @@
     /* ===== управление модалкой ===== */
     const modal = document.getElementById("matchModal");
     let modalCloseTimer = null;
-    function openModal(groomerId = "") {
+    function openModal(groomerId = "", presetBreed = "") {
       window.clearTimeout(modalCloseTimer);
       preferredGroomerId = typeof groomerId === "string" ? groomerId : "";
       select.value = "";
       breedPickerValue.textContent = "Выберите породу";
+      setBreedArtwork();
       setBreedMenu(false);
       result.hidden = true;
       currentGroomer = null;
@@ -1998,6 +2082,11 @@
       void modal.offsetWidth;
       modal.classList.add("is-opening");
       modal.addEventListener("animationend", () => modal.classList.remove("is-opening"), { once: true });
+      if (breedSize[presetBreed]) {
+        select.value = presetBreed;
+        breedPickerValue.textContent = presetBreed;
+        handleBreedSelection(presetBreed);
+      }
     }
     function closeModal() {
       if (modal.hidden || modal.classList.contains("is-closing")) return;
@@ -2045,13 +2134,30 @@
     let chatHistory = [];
 
     const quickReplies = [
-      { label:"Записаться", value:"записаться" },
+      { label:"Подобрать и оплатить", action:() => renderChatShop() },
       { label:"Цены", value:"цены" },
-      { label:"Оплата онлайн", value:"оплата онлайн" },
       { label:"Спецуслуги", value:"спецуслуги" },
       { label:"Грумеры", value:"грумеры" },
-      { label:"Позвать админа", value:"администратор" },
+      { label:"Оплата онлайн", action:() => renderChatShop() },
+      { label:"Записаться", action:() => renderChatShop() },
     ];
+    const chatSaleCatalog = {
+      hygiene: {
+        name:"Гигиенический уход",
+        small:{ price:1000, durationMin:50, description:"гигиеническая мини-стрижка" },
+        large:{ price:2800, durationMin:90, description:"гигиеническая стрижка крупной собаки" },
+      },
+      full: {
+        name:"Полный груминг",
+        small:{ price:2300, durationMin:130, description:"стрижка, SPA-купание и укладка" },
+        large:{ price:4500, durationMin:220, description:"вычёсывание, контур, SPA и сушка" },
+      },
+      shedding: {
+        name:"Уход против линьки",
+        small:{ price:2000, durationMin:105, description:"купание и вычёсывание" },
+        large:{ price:3500, durationMin:150, description:"глубокая антилинька для крупной собаки" },
+      },
+    };
 
     function clamp(value, min, max) {
       return Math.min(Math.max(value, min), max);
@@ -2103,11 +2209,10 @@
       chatPanel.classList.add("is-open");
       if (!chatStarted) {
         chatStarted = true;
-        botSay("Привет! Я бесплатный AI-консультант на Cloudflare. Спроси меня о стрижках, ценах, грумерах, спецуслугах или записи.");
+        botSay("Привет! Я помогу подобрать уход для собаки, сразу посчитаю сумму и подготовлю оплату. Начнём с породы и желаемого результата.");
         renderChatActions([
-          { label:"Записаться на стрижку", action: () => { botSay("Открываю запись. Выбери породу, мастера, стрижку и удобное время."); openModal(); } },
-          { label:"Посчитать оплату", action: () => showPaymentDemo(1900) },
-          { label:"Задать вопрос админу", action: () => botSay("Напиши вопрос в чат, а я передам его администратору в Telegram.") },
+          { label:"Подобрать и оплатить", action: renderChatShop },
+          { label:"Задать вопрос", action: () => { botSay("Напишите вопрос — я отвечу и предложу подходящий следующий шаг."); chatInput.focus(); } },
         ]);
       }
       chatInput.focus();
@@ -2161,7 +2266,7 @@
         btn.type = "button";
         btn.className = "chat-chip";
         btn.textContent = reply.label;
-        btn.addEventListener("click", () => handleChatMessage(reply.value));
+        btn.addEventListener("click", reply.action || (() => handleChatMessage(reply.value)));
         chatQuick.appendChild(btn);
       });
     }
@@ -2181,7 +2286,63 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function showPaymentDemo(amount) {
+    function renderChatShop() {
+      const card = document.createElement("div");
+      card.className = "chat-message bot chat-shop";
+      const title = document.createElement("strong");
+      title.textContent = "Подбор услуги";
+      const breedLabel = document.createElement("label");
+      breedLabel.textContent = "Порода собаки";
+      const breedSelect = document.createElement("select");
+      Object.keys(breedSize).sort().forEach(breed => {
+        const option = document.createElement("option");
+        option.value = breed;
+        option.textContent = breed;
+        breedSelect.appendChild(option);
+      });
+      breedLabel.appendChild(breedSelect);
+      const packageLabel = document.createElement("label");
+      packageLabel.textContent = "Пакет ухода";
+      const packageSelect = document.createElement("select");
+      Object.entries(chatSaleCatalog).forEach(([id, item]) => {
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = item.name;
+        packageSelect.appendChild(option);
+      });
+      packageLabel.appendChild(packageSelect);
+      const total = document.createElement("div");
+      total.className = "chat-shop-total";
+      const pay = document.createElement("button");
+      pay.type = "button";
+      pay.className = "chat-chip";
+      pay.textContent = "Оформить оплату";
+
+      function selectedSale() {
+        const breed = breedSelect.value;
+        const size = breedSize[breed] || "small";
+        const packageId = packageSelect.value;
+        const item = chatSaleCatalog[packageId];
+        return { breed, size, packageId, name:item.name, ...item[size] };
+      }
+      function updateTotal() {
+        const sale = selectedSale();
+        total.textContent = sale.description + " · " + formatDuration(sale.durationMin) + " · " + sale.price + " ₽";
+      }
+      breedSelect.addEventListener("change", updateTotal);
+      packageSelect.addEventListener("change", updateTotal);
+      pay.addEventListener("click", () => {
+        const sale = selectedSale();
+        botSay("Подготовил " + sale.name.toLowerCase() + " для породы «" + sale.breed + "». Итоговая демо-сумма: " + sale.price + " ₽.");
+        showPaymentDemo(sale.price, sale);
+      });
+      card.append(title, breedLabel, packageLabel, total, pay);
+      chatMessages.appendChild(card);
+      updateTotal();
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showPaymentDemo(amount, sale = {}) {
       const orderId = "LS-" + Math.floor(100000 + Math.random() * 900000);
       const box = document.createElement("div");
       box.className = "chat-message bot";
@@ -2191,13 +2352,13 @@
         "<b>Демо-счёт на оплату</b><br>" +
         "Сумма: <b>" + amount + " ₽</b><br>" +
         "<div class='chat-payment-code'>" + orderId + "</div>" +
-        "Это демо: деньги не списываются. Настоящую оплату потом подключим через банк или платёжный сервис.";
+        "Это демо: деньги не списываются. После подключения эквайринга здесь появится настоящий QR или форма банка.";
       const actions = document.createElement("div");
       actions.className = "chat-actions";
       [
-        { label:"СБП демо", text:"Показываю демо-СБП. Для реального списания нужен настоящий QR/эквайринг." },
-        { label:"Картой демо", text:"Показываю демо-оплату картой. Реальные карты здесь не вводим." },
-        { label:"Отправить счёт админу", text:"Передал демо-счёт администратору. Он сможет связаться с клиентом и подтвердить оплату." },
+        { label:"Оплатить через СБП", text:"СБП выбран. Сейчас это демонстрация, поэтому деньги не списаны." },
+        { label:"Оплатить картой", text:"Карта выбрана. Сейчас это демонстрация, поэтому данные карты вводить не нужно." },
+        { label:"Продолжить оформление", text:"Сохранил выбранную породу и открываю оформление записи.", action:() => { closeChat(); openModal("", sale.breed || ""); } },
       ].forEach(item => {
         const btn = document.createElement("button");
         btn.type = "button";
@@ -2205,9 +2366,7 @@
         btn.textContent = item.label;
         btn.addEventListener("click", () => {
           botSay(item.text);
-          if (item.label.includes("админу")) {
-            sendChatToTelegram("💳 Демо-счёт из чат-бота\nНомер: " + orderId + "\nСумма: " + amount + " ₽");
-          }
+          if (item.action) item.action();
         });
         actions.appendChild(btn);
       });
@@ -2263,6 +2422,9 @@
         chatHistory.push({ role: "assistant", content: data.reply });
         chatHistory = chatHistory.slice(-10);
         botSay(data.reply);
+        if (data.intent !== "unsupported-pet") {
+          renderChatActions([{ label:"Подобрать и оплатить", action:renderChatShop }]);
+        }
       } catch (error) {
         thinking.remove();
         chatHistory = chatHistory.slice(0, -1);
