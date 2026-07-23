@@ -535,8 +535,9 @@
       min-width: min(280px, calc(100dvw - 28px)); min-height: min(330px, calc(100dvh - 120px));
       max-width: calc(100dvw - 24px);
       background: var(--card-bg);
-      border: 1px solid var(--card-border); border-radius: 22px; overflow: hidden;
-      box-shadow: 0 22px 60px rgba(0,0,0,.28);
+      border: 2px solid color-mix(in srgb, var(--accent) 60%, var(--card-border));
+      border-radius: 22px; overflow: hidden;
+      box-shadow: 0 26px 72px rgba(0,0,0,.46), 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
       display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
       transform-origin: 100% 100%;
     }
@@ -567,17 +568,16 @@
     }
     .chat-head {
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
-      padding: 12px; background: var(--panel); border-bottom: 1px solid var(--card-border);
+      min-height: 44px; padding: 6px 8px 6px 14px;
+      background: var(--panel); border-bottom: 1px solid var(--card-border);
       cursor: grab; touch-action: none;
     }
     .chat-panel.is-dragging .chat-head { cursor: grabbing; }
-    .chat-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .chat-avatar {
-      width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center;
-      background: var(--accent); color: var(--accent-text); font-size: 20px; flex: 0 0 auto;
+    .chat-grip {
+      width: 44px; height: 5px; border-radius: 999px;
+      background: color-mix(in srgb, var(--muted) 55%, transparent);
+      margin-left: auto;
     }
-    .chat-title strong, .chat-title span { display: block; line-height: 1.2; }
-    .chat-title span { color: var(--muted); font-size: 13px; }
     .chat-close {
       width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--card-border);
       background: var(--card-bg); color: var(--muted); cursor: pointer; font-size: 18px;
@@ -606,11 +606,6 @@
     .chat-foot {
       border-top: 1px solid var(--card-border); padding: 10px; background: var(--card-bg);
     }
-    .chat-quick {
-      display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr));
-      padding-bottom: 10px;
-    }
-    .chat-quick .chat-chip { width: 100%; }
     .chat-form { display: grid; grid-template-columns: 1fr 44px; gap: 8px; }
     .chat-input {
       min-width: 0; border: 2px solid var(--card-border); border-radius: 999px;
@@ -630,15 +625,42 @@
       margin: 8px 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       padding: 8px 10px; border-radius: 10px; background: var(--bg); color: var(--text);
     }
-    .chat-shop { display: grid; gap: 9px; }
-    .chat-shop label { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .chat-shop { width: 100%; display: grid; gap: 8px; }
+    .chat-shop-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .chat-shop-title span { color: var(--muted); font-size: 11px; font-weight: 800; }
+    .chat-shop-field {
+      display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 9px; align-items: center;
+      padding: 7px; border: 1px solid var(--card-border); border-radius: 8px; background: var(--card-bg);
+    }
+    .chat-shop-icon {
+      width: 36px; height: 36px; display: grid; place-items: center; overflow: hidden;
+      border-radius: 8px; background: var(--panel); color: var(--accent); font-size: 18px;
+    }
+    .chat-shop-icon img { width: 34px; height: 34px; object-fit: cover; border-radius: 7px; }
+    .chat-shop-field label { display: block; min-width: 0; color: var(--muted); font-size: 11px; font-weight: 900; line-height: 1.15; }
     .chat-shop select {
-      width: 100%; margin-top: 4px; padding: 9px 10px; border: 1px solid var(--card-border); border-radius: 8px;
-      background: var(--bg); color: var(--text); font: inherit;
+      width: 100%; min-width: 0; margin-top: 2px; padding: 5px 22px 5px 0; border: 0;
+      background: transparent; color: var(--text); font: inherit; font-size: 12px; font-weight: 800; outline: none;
     }
     .chat-shop-total {
-      padding: 10px; border-radius: 8px; background: var(--panel); color: var(--text); font-size: 13px;
+      padding: 10px; border-radius: 8px; background: var(--panel); color: var(--text); font-size: 12px; line-height: 1.45;
     }
+    .chat-shop-total strong { color: var(--accent); font-size: 15px; }
+    .chat-shop-submit {
+      width: 100%; padding: 9px 12px; border: 0; border-radius: 8px; cursor: pointer;
+      background: var(--accent); color: var(--accent-text); font: inherit; font-size: 12px; font-weight: 900;
+    }
+    .chat-shop-submit:disabled { cursor: not-allowed; opacity: .55; }
+    .chat-checkout { display: grid; gap: 8px; margin-top: 10px; }
+    .chat-checkout label {
+      display: grid; gap: 5px; color: var(--muted); font-size: 11px; font-weight: 900;
+    }
+    .chat-checkout input {
+      width: 100%; min-width: 0; border: 2px solid var(--card-border); border-radius: 8px;
+      background: var(--bg); color: var(--text); padding: 9px 10px; font: inherit; font-size: 13px;
+    }
+    .chat-checkout-status { min-height: 16px; color: var(--muted); font-size: 11px; }
+    .chat-checkout-status.error { color: #c94747; }
     .chat-resize {
       position: absolute; right: 0; bottom: 0; width: 12px; height: 12px;
       cursor: nwse-resize; touch-action: none; z-index: 3;
@@ -662,8 +684,25 @@
       .groomer-options .groomer-inspect { width: 112px; padding: 8px; }
       .chatbot { right: 12px; bottom: 12px; }
       .chat-panel {
-        left: 10px; right: 10px; bottom: 90px; transform: none; width: auto;
-        height: min(430px, calc(100dvh - 92px)); max-height: calc(100dvh - 92px);
+        left: auto; right: 12px; bottom: 82px; transform: none;
+        width: min(330px, calc(100dvw - 32px));
+        height: min(360px, calc(100dvh - 170px));
+        min-width: 0; min-height: min(270px, calc(100dvh - 170px));
+        max-width: calc(100dvw - 32px); max-height: calc(100dvh - 170px);
+        border-radius: 16px;
+      }
+      .chat-head { min-height: 38px; padding: 4px 6px 4px 12px; }
+      .chat-close { width: 30px; height: 30px; }
+      .chat-messages { padding: 9px; gap: 7px; }
+      .chat-message { padding: 9px 10px; font-size: 12px; }
+      .chat-foot { padding: 8px; }
+      .chat-form { grid-template-columns: minmax(0, 1fr) 40px; gap: 6px; }
+      .chat-input { padding: 8px 10px; font-size: 16px; }
+      .chat-send { width: 40px; height: 40px; }
+      .chat-resize { display: none; }
+      .chat-panel.keyboard-open {
+        min-height: 0; max-width: none; max-height: none;
+        border-radius: 14px;
       }
       .chat-panel.is-open { animation-name: chat-pop-mobile; }
       .chat-panel.is-closing { animation-name: chat-hide-mobile; }
@@ -871,18 +910,11 @@
     </button>
     <div class="chat-panel" id="chatPanel" hidden>
       <div class="chat-head">
-        <div class="chat-title">
-          <div class="chat-avatar">🐶</div>
-          <div>
-            <strong>Лохматый AI</strong>
-            <span>бесплатный AI-консультант</span>
-          </div>
-        </div>
+        <span class="chat-grip" aria-hidden="true"></span>
         <button class="chat-close" id="chatClose" aria-label="Закрыть чат">×</button>
       </div>
       <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
       <div class="chat-foot">
-        <div class="chat-quick" id="chatQuick"></div>
         <form class="chat-form" id="chatForm">
           <input class="chat-input" id="chatInput" type="text" autocomplete="off" placeholder="Напиши вопрос...">
           <button class="chat-send" aria-label="Отправить сообщение">→</button>
@@ -900,7 +932,7 @@
       <!-- Шаг 1: порода -->
       <div id="step-breed">
         <h3>🐾 Запись на стрижку</h3>
-        <p class="sub">Шаг 1. Выбери породу собаки</p>
+        <p class="sub" id="breedStepSub">Шаг 1. Выбери породу собаки</p>
         <div class="breed-picker" id="breedPicker">
           <button class="breed-trigger" id="breedTrigger" type="button" aria-expanded="false" aria-controls="breedMenu">
             <span class="breed-trigger-icon"><span id="breedTriggerEmoji">🐕</span><img id="breedTriggerImage" alt="" hidden></span>
@@ -1174,6 +1206,14 @@
       small: ["lera", "sofia", "karina", "anya"],
       large: ["maxim", "timur", "anya", "karina"],
     };
+    const groomerBreeds = {
+      anya: ["Пудель", "Той-пудель", "Мальтипу", "Бишон-фризе", "Керри-блю-терьер"],
+      maxim: ["Немецкая овчарка", "Лабрадор", "Алабай", "Ротвейлер", "Золотистый ретривер"],
+      lera: ["Мальтезе", "Чихуахуа", "Йоркширский терьер", "Шпиц", "Той-терьер", "Мальтипу"],
+      karina: ["Кокер-спаниель", "Керри-блю-терьер", "Такса", "Пудель", "Йоркширский терьер"],
+      timur: ["Хаски", "Немецкая овчарка", "Золотистый ретривер", "Лабрадор", "Ротвейлер"],
+      sofia: ["Той-пудель", "Мальтипу", "Бишон-фризе", "Мальтезе", "Мопс", "Чихуахуа"],
+    };
 
     // 🔒 Адрес нашего сервера (Cloudflare Worker), который прячет токен бота.
     const WORKER_URL = "https://groom-bot.andrejsparaga607.workers.dev";
@@ -1240,6 +1280,7 @@
     let currentGroomer = null;
     let availabilityCache = null;
     let preferredGroomerId = "";
+    let lockedGroomerId = "";
 
     /* заполнить список пород */
     const select = document.getElementById("breedSelect");
@@ -1289,6 +1330,7 @@
         { size:"large", title:"Средние и крупные", icon:"🐕‍🦺" },
       ].forEach(group => {
         const breeds = Object.keys(breedSize)
+          .filter(breed => !lockedGroomerId || (groomerBreeds[lockedGroomerId] || []).includes(breed))
           .filter(breed => breedSize[breed] === group.size && breed.toLocaleLowerCase("ru").includes(normalized))
           .sort();
         if (!breeds.length) return;
@@ -1565,7 +1607,7 @@
     document.getElementById("profileBook").addEventListener("click", () => {
       const groomerId = activeProfileId;
       closeGroomerProfile();
-      window.setTimeout(() => openModal(groomerId), 210);
+      window.setTimeout(() => openModal(groomerId, "", true), 210);
     });
     document.getElementById("profileReviewOpen").addEventListener("click", () => {
       profileReviewForm.hidden = !profileReviewForm.hidden;
@@ -1723,6 +1765,15 @@
       booking.breed = breed;
       setBreedArtwork(breed);
       booking.size = breedSize[breed] || "small";
+      if (lockedGroomerId && groomers[lockedGroomerId]) {
+        currentGroomer = groomers[lockedGroomerId];
+        booking.groomer = currentGroomer.name;
+        booking.groomerId = lockedGroomerId;
+        result.hidden = true;
+        buildStyleList();
+        showStep("step-style");
+        return;
+      }
       currentGroomer = null;
       booking.groomer = "";
       booking.groomerId = "";
@@ -2054,9 +2105,13 @@
     /* ===== управление модалкой ===== */
     const modal = document.getElementById("matchModal");
     let modalCloseTimer = null;
-    function openModal(groomerId = "", presetBreed = "") {
+    function openModal(groomerId = "", presetBreed = "", lockGroomer = false) {
       window.clearTimeout(modalCloseTimer);
       preferredGroomerId = typeof groomerId === "string" ? groomerId : "";
+      lockedGroomerId = lockGroomer && groomers[preferredGroomerId] ? preferredGroomerId : "";
+      document.getElementById("breedStepSub").textContent = lockedGroomerId
+        ? "Выбери породу из специализации мастера " + groomers[lockedGroomerId].name
+        : "Шаг 1. Выбери породу собаки";
       select.value = "";
       breedPickerValue.textContent = "Выберите породу";
       setBreedArtwork();
@@ -2075,6 +2130,7 @@
       styleActions.hidden = true;
       document.getElementById("clientPhone").value = "";
       document.getElementById("phoneError").hidden = true;
+      renderBreedOptions();
       showStep("step-breed", false);
       modal.hidden = false;
       document.body.style.overflow = "hidden";
@@ -2120,7 +2176,6 @@
     const chatToggle = document.getElementById("chatToggle");
     const chatClose = document.getElementById("chatClose");
     const chatMessages = document.getElementById("chatMessages");
-    const chatQuick = document.getElementById("chatQuick");
     const chatForm = document.getElementById("chatForm");
     const chatInput = document.getElementById("chatInput");
     const chatSend = chatForm.querySelector(".chat-send");
@@ -2132,33 +2187,10 @@
     let chatCloseTimer = null;
     let chatBusy = false;
     let chatHistory = [];
-
-    const quickReplies = [
-      { label:"Подобрать и оплатить", action:() => renderChatShop() },
-      { label:"Цены", value:"цены" },
-      { label:"Спецуслуги", value:"спецуслуги" },
-      { label:"Грумеры", value:"грумеры" },
-      { label:"Оплата онлайн", action:() => renderChatShop() },
-      { label:"Записаться", action:() => renderChatShop() },
-    ];
-    const chatSaleCatalog = {
-      hygiene: {
-        name:"Гигиенический уход",
-        small:{ price:1000, durationMin:50, description:"гигиеническая мини-стрижка" },
-        large:{ price:2800, durationMin:90, description:"гигиеническая стрижка крупной собаки" },
-      },
-      full: {
-        name:"Полный груминг",
-        small:{ price:2300, durationMin:130, description:"стрижка, SPA-купание и укладка" },
-        large:{ price:4500, durationMin:220, description:"вычёсывание, контур, SPA и сушка" },
-      },
-      shedding: {
-        name:"Уход против линьки",
-        small:{ price:2000, durationMin:105, description:"купание и вычёсывание" },
-        large:{ price:3500, durationMin:150, description:"глубокая антилинька для крупной собаки" },
-      },
-    };
-
+    let chatKnownBreed = "";
+    let chatAutoOpenTimer = null;
+    let chatAudioContext = null;
+    let chatKeyboardAdjusted = false;
     function clamp(value, min, max) {
       return Math.min(Math.max(value, min), max);
     }
@@ -2200,6 +2232,7 @@
 
     function openChat(shouldFocus = true) {
       window.clearTimeout(chatCloseTimer);
+      window.clearTimeout(chatAutoOpenTimer);
       chatPanel.hidden = false;
       chatToggle.setAttribute("aria-expanded", "true");
       chatToggle.querySelector(".chat-badge").hidden = true;
@@ -2209,10 +2242,11 @@
       chatPanel.classList.add("is-open");
       if (!chatStarted) {
         chatStarted = true;
-        botSay("Привет! Я помогу подобрать уход для собаки, сразу посчитаю сумму и подготовлю оплату. Начнём с породы и желаемого результата.");
+        const welcome = "Помогу подобрать стрижку, свободного мастера и время, затем оформлю демо-оплату. Какая у вас порода собаки?";
+        botSay(welcome);
+        chatHistory.push({ role:"assistant", content:welcome });
         renderChatActions([
-          { label:"Подобрать и оплатить", action: renderChatShop },
-          { label:"Задать вопрос", action: () => { botSay("Напишите вопрос — я отвечу и предложу подходящий следующий шаг."); chatInput.focus(); } },
+          { label:"Выбрать породу", action: () => renderChatShop() },
         ]);
       }
       if (shouldFocus) chatInput.focus();
@@ -2228,6 +2262,7 @@
         if (!chatPanel.classList.contains("is-closing")) return;
         chatPanel.hidden = true;
         chatPanel.classList.remove("is-closing");
+        resetMobileChatPosition();
       };
 
       chatPanel.addEventListener("animationend", finishClosing, { once: true });
@@ -2236,7 +2271,7 @@
 
     function toggleChat() {
       if (chatPanel.hidden) {
-        openChat();
+        openChat(window.innerWidth > 520);
       } else {
         closeChat();
       }
@@ -2259,16 +2294,24 @@
       return appendChatMessage(text, "user");
     }
 
-    function renderQuickReplies() {
-      chatQuick.innerHTML = "";
-      quickReplies.forEach(reply => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "chat-chip";
-        btn.textContent = reply.label;
-        btn.addEventListener("click", reply.action || (() => handleChatMessage(reply.value)));
-        chatQuick.appendChild(btn);
-      });
+    function normalizeBreedName(value) {
+      return String(value || "")
+        .toLocaleLowerCase("ru")
+        .replace(/ё/g, "е")
+        .replace(/[^\p{L}\p{N}]+/gu, " ")
+        .trim();
+    }
+
+    function detectBreedInMessage(message) {
+      const normalizedMessage = normalizeBreedName(message);
+      return Object.keys(breedSize).find(breed => normalizedMessage.includes(normalizeBreedName(breed))) || "";
+    }
+
+    function trimRepeatedGreeting(text) {
+      if (!chatHistory.some(message => message.role === "assistant")) return text;
+      return text
+        .replace(/^(?:здравствуйте|добрый (?:день|вечер|утро)|привет)[!,.:\s-]*/iu, "")
+        .trim();
     }
 
     function renderChatActions(actions) {
@@ -2286,13 +2329,34 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function renderChatShop() {
+    async function renderChatShop(presetBreed = "") {
       const card = document.createElement("div");
       card.className = "chat-message bot chat-shop";
-      const title = document.createElement("strong");
-      title.textContent = "Подбор услуги";
-      const breedLabel = document.createElement("label");
-      breedLabel.textContent = "Порода собаки";
+      const title = document.createElement("div");
+      title.className = "chat-shop-title";
+      title.innerHTML = "<strong>Оформление записи</strong><span>на сегодня</span>";
+      const loading = document.createElement("div");
+      loading.className = "chat-shop-total";
+      loading.textContent = "Проверяю расписание мастеров...";
+      card.append(title, loading);
+      chatMessages.appendChild(card);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      await loadAvailability();
+
+      function createField(labelText, iconContent, select) {
+        const field = document.createElement("div");
+        field.className = "chat-shop-field";
+        const icon = document.createElement("div");
+        icon.className = "chat-shop-icon";
+        if (typeof iconContent === "string") icon.textContent = iconContent;
+        else icon.appendChild(iconContent);
+        const label = document.createElement("label");
+        label.textContent = labelText;
+        label.appendChild(select);
+        field.append(icon, label);
+        return { field, icon };
+      }
+
       const breedSelect = document.createElement("select");
       Object.keys(breedSize).sort().forEach(breed => {
         const option = document.createElement("option");
@@ -2300,46 +2364,238 @@
         option.textContent = breed;
         breedSelect.appendChild(option);
       });
-      breedLabel.appendChild(breedSelect);
-      const packageLabel = document.createElement("label");
-      packageLabel.textContent = "Пакет ухода";
-      const packageSelect = document.createElement("select");
-      Object.entries(chatSaleCatalog).forEach(([id, item]) => {
-        const option = document.createElement("option");
-        option.value = id;
-        option.textContent = item.name;
-        packageSelect.appendChild(option);
-      });
-      packageLabel.appendChild(packageSelect);
+      if (breedSize[presetBreed]) breedSelect.value = presetBreed;
+      const breedImage = document.createElement("img");
+      breedImage.alt = "";
+      const breedField = createField("Порода собаки", breedImage, breedSelect);
+      const styleSelect = document.createElement("select");
+      const styleField = createField("Стрижка", "✂", styleSelect);
+      const specialSelect = document.createElement("select");
+      const specialField = createField("Спецуслуга", "+", specialSelect);
+      const groomerSelect = document.createElement("select");
+      const groomerField = createField("Грумер", "●", groomerSelect);
+      const timeSelect = document.createElement("select");
+      const timeField = createField("Свободное время", "◷", timeSelect);
       const total = document.createElement("div");
       total.className = "chat-shop-total";
       const pay = document.createElement("button");
       pay.type = "button";
-      pay.className = "chat-chip";
+      pay.className = "chat-shop-submit";
       pay.textContent = "Оформить оплату";
 
       function selectedSale() {
         const breed = breedSelect.value;
         const size = breedSize[breed] || "small";
-        const packageId = packageSelect.value;
-        const item = chatSaleCatalog[packageId];
-        return { breed, size, packageId, name:item.name, ...item[size] };
+        const style = (stylesBySize[size] || [])[Number(styleSelect.value)] || stylesBySize[size][0];
+        const special = specialServices.find(item => item.id === specialSelect.value);
+        const specialData = special ? (special[size] || special.small) : { price:0, durationMin:0 };
+        const groomerId = groomerSelect.value;
+        const durationMin = style.durationMin + specialData.durationMin;
+        const price = (breedPrice[breed] || 0) + style.price + specialData.price;
+        const time = timeSelect.value;
+        return {
+          breed, size, groomerId, groomerName:groomers[groomerId]?.name || "",
+          styleName:style.name, stylePrice:style.price, styleDurationMin:style.durationMin,
+          specialId:special?.id || "", specialName:special?.name || "без спецуслуги",
+          durationMin, price, time, endTime:time ? toTime(toMin(time) + durationMin) : "",
+        };
       }
+
+      function fillStyles(size) {
+        styleSelect.innerHTML = "";
+        (stylesBySize[size] || []).forEach((style, index) => {
+          const option = document.createElement("option");
+          option.value = String(index);
+          option.textContent = style.name + " · " + style.price + " ₽";
+          styleSelect.appendChild(option);
+        });
+      }
+
+      function fillSpecials(size) {
+        specialSelect.innerHTML = "";
+        const none = document.createElement("option");
+        none.value = "";
+        none.textContent = "Без спецуслуги";
+        specialSelect.appendChild(none);
+        specialServices.forEach(service => {
+          const meta = service[size] || service.small;
+          const option = document.createElement("option");
+          option.value = service.id;
+          option.textContent = service.name + " · +" + meta.price + " ₽";
+          specialSelect.appendChild(option);
+        });
+      }
+
+      function fillGroomers(size) {
+        groomerSelect.innerHTML = "";
+        (groomersBySize[size] || []).forEach(groomerId => {
+          const groomer = groomers[groomerId];
+          const option = document.createElement("option");
+          option.value = groomerId;
+          option.textContent = groomer.name + " · " + groomer.rating + " ★";
+          groomerSelect.appendChild(option);
+        });
+      }
+
+      function fillTimes() {
+        const previous = timeSelect.value;
+        const sale = selectedSale();
+        const occupied = busyRanges(sale.groomerId);
+        const lastStart = 1080 - sale.durationMin;
+        timeSelect.innerHTML = "";
+        for (let start = 600; start <= lastStart; start += 60) {
+          const end = start + sale.durationMin;
+          const conflict = occupied.some(range => start < range.endMin && end > range.startMin);
+          if (conflict) continue;
+          const option = document.createElement("option");
+          option.value = toTime(start);
+          option.textContent = toTime(start) + "–" + toTime(end);
+          timeSelect.appendChild(option);
+        }
+        if (!timeSelect.options.length) {
+          const option = document.createElement("option");
+          option.value = "";
+          option.textContent = "Нет свободного окна";
+          timeSelect.appendChild(option);
+        } else if ([...timeSelect.options].some(option => option.value === previous)) {
+          timeSelect.value = previous;
+        }
+      }
+
       function updateTotal() {
         const sale = selectedSale();
-        total.textContent = sale.description + " · " + formatDuration(sale.durationMin) + " · " + sale.price + " ₽";
+        total.innerHTML =
+          sale.groomerName + (sale.time ? " · " + sale.time + "–" + sale.endTime : " · нет свободного окна") + "<br>" +
+          sale.styleName + " · " + sale.specialName + "<br>" +
+          formatDuration(sale.durationMin) + " · <strong>" + sale.price + " ₽</strong>";
+        pay.disabled = !sale.time;
       }
-      breedSelect.addEventListener("change", updateTotal);
-      packageSelect.addEventListener("change", updateTotal);
+
+      function refreshTimeAndTotal() {
+        groomerField.icon.textContent = groomers[groomerSelect.value]?.emoji || "●";
+        fillTimes();
+        updateTotal();
+      }
+
+      function refreshBreed() {
+        const breed = breedSelect.value;
+        const size = breedSize[breed] || "small";
+        breedImage.src = breedImages[breed];
+        fillStyles(size);
+        fillSpecials(size);
+        fillGroomers(size);
+        refreshTimeAndTotal();
+      }
+
+      breedSelect.addEventListener("change", refreshBreed);
+      styleSelect.addEventListener("change", refreshTimeAndTotal);
+      specialSelect.addEventListener("change", refreshTimeAndTotal);
+      groomerSelect.addEventListener("change", refreshTimeAndTotal);
+      timeSelect.addEventListener("change", updateTotal);
       pay.addEventListener("click", () => {
         const sale = selectedSale();
-        botSay("Подготовил " + sale.name.toLowerCase() + " для породы «" + sale.breed + "». Итоговая демо-сумма: " + sale.price + " ₽.");
+        if (!sale.time) return;
+        botSay("Готово: " + sale.groomerName + ", " + sale.time + "–" + sale.endTime + ". Итоговая демо-сумма: " + sale.price + " ₽.");
         showPaymentDemo(sale.price, sale);
       });
-      card.append(title, breedLabel, packageLabel, total, pay);
-      chatMessages.appendChild(card);
-      updateTotal();
+
+      loading.remove();
+      card.append(breedField.field, styleField.field, specialField.field, groomerField.field, timeField.field, total, pay);
+      refreshBreed();
+      window.setTimeout(() => {
+        chatMessages.scrollTop = Math.max(0, card.offsetTop - chatMessages.offsetTop - 8);
+      }, 0);
+    }
+
+    function renderChatCheckout(sale) {
+      const box = document.createElement("div");
+      box.className = "chat-message bot";
+      const checkout = document.createElement("form");
+      checkout.className = "chat-checkout";
+      checkout.innerHTML =
+        "<strong>Подтверждение записи</strong>" +
+        "<span>" + sale.breed + " · " + sale.styleName + "<br>" +
+        sale.groomerName + " · " + sale.time + "–" + sale.endTime + "<br>" +
+        sale.pay + " · <b>" + sale.price + " ₽</b></span>";
+      const label = document.createElement("label");
+      label.textContent = "Телефон для подтверждения";
+      const phone = document.createElement("input");
+      phone.type = "tel";
+      phone.inputMode = "tel";
+      phone.autocomplete = "tel";
+      phone.placeholder = "+7 900 123 45 67";
+      const submit = document.createElement("button");
+      submit.type = "submit";
+      submit.className = "chat-shop-submit";
+      submit.textContent = "Подтвердить запись";
+      const status = document.createElement("div");
+      status.className = "chat-checkout-status";
+      label.appendChild(phone);
+      checkout.append(label, submit, status);
+      box.appendChild(checkout);
+      chatMessages.appendChild(box);
       chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      checkout.addEventListener("submit", async event => {
+        event.preventDefault();
+        const clientPhone = phone.value.trim();
+        if (clientPhone.replace(/\D/g, "").length < 10) {
+          status.textContent = "Введите номер телефона полностью.";
+          status.classList.add("error");
+          phone.focus();
+          return;
+        }
+        status.classList.remove("error");
+        status.textContent = "Подтверждаю свободное время...";
+        submit.disabled = true;
+        const text =
+          "🐶 Новая заявка на стрижку!\n\n" +
+          "Порода: " + sale.breed + "\n" +
+          "Размер: " + sizeLabel(sale.size) + "\n" +
+          "Грумер: " + sale.groomerName + "\n" +
+          "Стрижка: " + sale.styleName + "\n" +
+          "Спецуслуги: " + sale.specialName + "\n" +
+          "Время записи: " + sale.time + "–" + sale.endTime + "\n" +
+          "Оплата: " + sale.pay + "\n" +
+          "☎️ Телефон клиента: " + clientPhone + "\n" +
+          "⏱ Займёт примерно: " + formatDuration(sale.durationMin) + "\n" +
+          "💰 Цена: " + sale.price + " ₽";
+        try {
+          const response = await fetch(WORKER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "booking",
+              text,
+              booking: {
+                groomerId: sale.groomerId,
+                date: todayKey(),
+                startMin: toMin(sale.time),
+                durationMin: sale.durationMin,
+              },
+            }),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || data.ok === false) {
+            const requestError = new Error(data.error || "Не удалось подтвердить запись");
+            requestError.code = data.code || "";
+            throw requestError;
+          }
+          availabilityCache = null;
+          checkout.remove();
+          botSay("Запись подтверждена: " + sale.groomerName + ", " + sale.time + "–" + sale.endTime + ". Мы свяжемся по номеру " + clientPhone + ".");
+        } catch (error) {
+          submit.disabled = false;
+          status.classList.add("error");
+          if (error.code === "TIME_UNAVAILABLE") {
+            availabilityCache = null;
+            status.textContent = "Это время уже заняли. Выберите новое свободное окно.";
+            renderChatActions([{ label:"Выбрать другое время", action:() => renderChatShop(sale.breed) }]);
+          } else {
+            status.textContent = "Не удалось отправить заявку. Попробуйте ещё раз.";
+          }
+        }
+      });
     }
 
     function showPaymentDemo(amount, sale = {}) {
@@ -2350,15 +2606,16 @@
       payment.className = "chat-payment";
       payment.innerHTML =
         "<b>Демо-счёт на оплату</b><br>" +
+        sale.breed + " · " + sale.styleName + "<br>" +
+        sale.groomerName + " · " + sale.time + "–" + sale.endTime + "<br>" +
         "Сумма: <b>" + amount + " ₽</b><br>" +
         "<div class='chat-payment-code'>" + orderId + "</div>" +
         "Это демо: деньги не списываются. После подключения эквайринга здесь появится настоящий QR или форма банка.";
       const actions = document.createElement("div");
       actions.className = "chat-actions";
       [
-        { label:"Оплатить через СБП", text:"СБП выбран. Сейчас это демонстрация, поэтому деньги не списаны." },
-        { label:"Оплатить картой", text:"Карта выбрана. Сейчас это демонстрация, поэтому данные карты вводить не нужно." },
-        { label:"Продолжить оформление", text:"Сохранил выбранную породу и открываю оформление записи.", action:() => { closeChat(); openModal("", sale.breed || ""); } },
+        { label:"Оплатить через СБП", pay:"📱 СБП по номеру +7 900 555 35 35", text:"СБП выбран. Сейчас это демонстрация, поэтому деньги не списаны." },
+        { label:"Оплатить картой", pay:"💳 Банковская карта", text:"Карта выбрана. Сейчас это демонстрация, поэтому данные карты вводить не нужно." },
       ].forEach(item => {
         const btn = document.createElement("button");
         btn.type = "button";
@@ -2366,7 +2623,9 @@
         btn.textContent = item.label;
         btn.addEventListener("click", () => {
           botSay(item.text);
-          if (item.action) item.action();
+          sale.pay = item.pay;
+          actions.querySelectorAll("button").forEach(button => { button.disabled = true; });
+          renderChatCheckout(sale);
         });
         actions.appendChild(btn);
       });
@@ -2419,11 +2678,12 @@
           throw error;
         }
         thinking.remove();
-        chatHistory.push({ role: "assistant", content: data.reply });
+        const reply = trimRepeatedGreeting(data.reply) || "Какая у вас порода собаки?";
+        chatHistory.push({ role: "assistant", content: reply });
         chatHistory = chatHistory.slice(-10);
-        botSay(data.reply);
-        if (data.intent !== "unsupported-pet") {
-          renderChatActions([{ label:"Подобрать и оплатить", action:renderChatShop }]);
+        botSay(reply);
+        if (data.intent !== "unsupported-pet" && chatKnownBreed) {
+          renderChatActions([{ label:"Выбрать стрижку", action:() => renderChatShop(chatKnownBreed) }]);
         }
       } catch (error) {
         thinking.remove();
@@ -2442,8 +2702,66 @@
     async function handleChatMessage(message) {
       const text = message.trim();
       if (!text || chatBusy) return;
+      chatKnownBreed = detectBreedInMessage(text) || chatKnownBreed;
       userSay(text);
       await askCloudflareAI(text);
+    }
+
+    function prepareChatSound() {
+      if (chatAudioContext) {
+        if (chatAudioContext.state === "suspended") chatAudioContext.resume().catch(() => {});
+        return;
+      }
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      chatAudioContext = new AudioContext();
+    }
+
+    function playChatChime() {
+      prepareChatSound();
+      if (!chatAudioContext || chatAudioContext.state !== "running") return;
+      const now = chatAudioContext.currentTime;
+      [523.25, 659.25].forEach((frequency, index) => {
+        const oscillator = chatAudioContext.createOscillator();
+        const gain = chatAudioContext.createGain();
+        oscillator.type = "sine";
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(0.0001, now + index * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.08, now + index * 0.12 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.12 + 0.18);
+        oscillator.connect(gain);
+        gain.connect(chatAudioContext.destination);
+        oscillator.start(now + index * 0.12);
+        oscillator.stop(now + index * 0.12 + 0.2);
+      });
+    }
+
+    function resetMobileChatPosition() {
+      if (!chatKeyboardAdjusted) return;
+      chatKeyboardAdjusted = false;
+      chatPanel.classList.remove("keyboard-open", "is-positioned");
+      ["left", "top", "right", "bottom", "width", "height", "maxHeight"].forEach(property => {
+        chatPanel.style[property] = "";
+      });
+    }
+
+    function syncChatWithKeyboard() {
+      if (!window.visualViewport || window.innerWidth > 520 || chatPanel.hidden) return;
+      const viewport = window.visualViewport;
+      const keyboardOpen = viewport.height < window.innerHeight - 120;
+      if (!keyboardOpen) {
+        resetMobileChatPosition();
+        return;
+      }
+      chatKeyboardAdjusted = true;
+      chatPanel.classList.add("keyboard-open", "is-positioned");
+      chatPanel.style.left = "auto";
+      chatPanel.style.top = (viewport.offsetTop + 8) + "px";
+      chatPanel.style.right = "10px";
+      chatPanel.style.bottom = "auto";
+      chatPanel.style.width = Math.min(330, viewport.width - 20) + "px";
+      chatPanel.style.height = Math.max(220, viewport.height - 16) + "px";
+      chatPanel.style.maxHeight = Math.max(220, viewport.height - 16) + "px";
     }
 
     chatToggle.addEventListener("click", toggleChat);
@@ -2499,7 +2817,16 @@
       chatSizing = null;
       chatPanel.classList.remove("is-dragging", "is-resizing");
     });
-    window.addEventListener("resize", keepChatInsideScreen);
+    window.addEventListener("resize", () => {
+      if (window.innerWidth <= 520) syncChatWithKeyboard();
+      else keepChatInsideScreen();
+    });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", syncChatWithKeyboard);
+      window.visualViewport.addEventListener("scroll", syncChatWithKeyboard);
+    }
+    chatInput.addEventListener("focus", () => window.setTimeout(syncChatWithKeyboard, 80));
+    chatInput.addEventListener("blur", () => window.setTimeout(syncChatWithKeyboard, 160));
     chatForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const text = chatInput.value.trim();
@@ -2507,8 +2834,13 @@
       chatInput.value = "";
       await handleChatMessage(text);
     });
-    renderQuickReplies();
-    openChat(false);
+    document.addEventListener("pointerdown", prepareChatSound, { once:true });
+    chatAutoOpenTimer = window.setTimeout(() => {
+      if (!chatStarted && chatPanel.hidden) {
+        playChatChime();
+        openChat(false);
+      }
+    }, 20000);
 
     /* ===== ОТЗЫВЫ ===== */
     const reviewsGrid = document.getElementById("reviewsGrid");
