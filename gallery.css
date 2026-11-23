@@ -6,6 +6,9 @@ button {cursor:pointer}
 header,footer {display:flex;align-items:center;padding:14px 5vw;z-index:2}
 header {justify-content:space-between;font-size:13px}
 header a {text-decoration:none}
+.back-home {display:inline-flex;align-items:center;gap:9px;min-height:44px;white-space:nowrap}
+.back-home span {font:22px/1 Arial,sans-serif;transition:transform .2s}
+.back-home:hover span {transform:translateX(-4px)}
 footer {justify-content:center;gap:22px;background:#e7e1d6;font-variant-numeric:tabular-nums}
 footer button,#detail button {border:1px solid #ada69b;background:transparent;padding:8px 18px;border-radius:2px}
 footer button:disabled {opacity:.3}
@@ -46,7 +49,7 @@ footer button {font-size:30px}
 .frame img {max-height:48svh;max-width:65vw}
 .plate {color:#292824}
 #note {z-index:6;color:#302d28}
-@media(max-width:820px){header{align-items:flex-start}#tabs{top:54px} .bay{padding-top:42px}.frame img{max-width:77vw;max-height:42svh}}
+@media(max-width:820px){header{align-items:flex-start}.back-home{font-size:15px}#tabs{top:54px} .bay{padding-top:42px}.frame img{max-width:77vw;max-height:42svh}}
 @media(max-height:480px){.frame img{max-height:40svh}.plate{padding:2px 10px}}
 @media(prefers-reduced-motion:reduce){*,*::before{transition:none!important;animation:none!important}}
 #editor {border:0;background:#faf8f1;color:#292824;width:min(92vw,440px);max-height:90svh;padding:24px}
