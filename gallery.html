@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Галерея</title>
+<link rel="stylesheet" href="gallery.css">
+<main class="museum">
+  <header><a href="index.html">Галерея</a><nav id="tabs" aria-label="Картины"></nav><button id="play">Пауза</button></header>
+  <section id="scene" aria-label="Галерея. Листайте пальцем или стрелками">
+    <div id="wall"></div>
+  </section>
+  <aside id="note" hidden><button id="closeNote" aria-label="Закрыть описание">×</button><h2></h2><p></p><a target="_blank" rel="noreferrer">Музейная коллекция ↗</a></aside>
+  <footer><button id="prev" aria-label="Предыдущая работа">←</button><output id="count" aria-live="polite"></output><button id="addWork">Добавить картину</button><button id="next" aria-label="Следующая работа">→</button></footer>
+</main>
+<div id="camera-tools" hidden><button id="far" aria-label="Отдалить">−</button><button id="back">Назад в зал</button><button id="near" aria-label="Приблизить">+</button></div>
+<script src="demo-works.js"></script>
+<template id="moulding"><img><i class="moulding outer" aria-hidden="true"></i><i class="moulding ridge" aria-hidden="true"></i><i class="moulding inner" aria-hidden="true"></i></template>
+<dialog id="editor" aria-labelledby="editor-title"><div class="studio">
+<section class="preview-wall" aria-label="Предпросмотр картины"><h3 id="preview-title">Без названия</h3><div class="frame sample" id="preview-frame"></div><p id="preview-caption">Выберите фотографию</p><small id="resolution"></small></section>
+<form id="upload"><h2 id="editor-title">Новая работа</h2><p>Сохраняется в этом браузере. Первая работа заменит пробную подборку.</p>
+<label>Фотография<input required type="file" accept="image/*" name="photo"></label>
+<fieldset class="frame-picker"><legend>Рама</legend><div>
+<label><input type="radio" name="frameStyle" value="gilded" checked><span class="frame-swatch frame-gilded"><i></i></span><b>Французское золото</b></label>
+<label><input type="radio" name="frameStyle" value="ebony"><span class="frame-swatch frame-ebony"><i></i></span><b>Голландский эбен</b></label>
+<label><input type="radio" name="frameStyle" value="walnut"><span class="frame-swatch frame-walnut"><i></i></span><b>Итальянский орех</b></label>
+<label><input type="radio" name="frameStyle" value="ivory"><span class="frame-swatch frame-ivory"><i></i></span><b>Неоклассика</b></label>
+<label><input type="radio" name="frameStyle" value="bronze"><span class="frame-swatch frame-bronze"><i></i></span><b>Тёмная бронза</b></label>
+</div></fieldset>
+<label>Название<input maxlength="100" name="title"></label>
+<label>Техника и размер<input name="medium"></label>
+<label>Описание и вдохновение<textarea name="story"></textarea></label>
+<label>Цена, ₽ (по желанию)<input type="number" min="0" name="price"></label>
+<p role="status" id="message"></p><button>Добавить</button> <button type="button" id="cancel">Отмена</button></form></div></dialog>
+<dialog id="caption-editor"><form><h2>Подпись картины</h2><label>Название<input name="title" maxlength="100"></label><label>Описание<textarea name="story" rows="5"></textarea></label><output></output><button>Сохранить</button> <button type="button" onclick="this.closest('dialog').close()">Отмена</button></form></dialog>
+<script src="collection.js"></script>
+<script src="camera.js"></script>
+<script src="gallery.js"></script>
+</html>

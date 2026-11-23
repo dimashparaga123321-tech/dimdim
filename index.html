@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Даша — художница. История, галерея и работы в наличии." />
+  <title>Даша — художница</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Prata&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="На главную">Даша <span>художница</span></a>
+    <button class="menu-button" type="button" aria-expanded="false" aria-controls="menu">Меню</button>
+    <nav id="menu" class="menu" aria-label="Основная навигация">
+      <a href="#story">История</a><a href="gallery.html">Галерея</a><a href="#available">В наличии</a><a href="#contacts">Контакты</a>
+    </nav>
+    <a class="header-contact" href="#contacts">Связаться</a>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="kicker">Художница</p>
+        <h1 id="hero-title">Даша</h1>
+        <p class="hero-intro">Яркие работы, личные истории и живопись, которую хочется рассматривать вблизи.</p>
+        <a class="primary-link" href="gallery.html">Смотреть галерею</a>
+      </div>
+      <div class="portrait" role="img" aria-label="Здесь будет фотография Даши">
+        <div class="portrait-placeholder"><span>Фотография Даши</span><small>добавим оригинал позже</small></div>
+      </div>
+      <p class="hero-caption">Живопись · оригинальные работы</p>
+    </section>
+
+    <section id="story" class="story section">
+      <div class="section-label">01 · История</div>
+      <div class="story-copy">
+        <h2>О Даше</h2>
+        <p class="story-lead">Даша — художница, которая говорит со зрителем через цвет, настроение и детали.</p>
+        <p>На главной будет короткая версия её истории: как она пришла к живописи, что её вдохновляет и почему она создаёт именно такие работы.</p>
+        <div id="storyMore" class="story-more" hidden><p>Здесь продолжится личный рассказ Даши. Мы заменим этот текст её настоящей историей, сохранив лёгкую подачу и не перегружая страницу.</p></div>
+        <button id="storyToggle" class="text-button" type="button" aria-expanded="false" aria-controls="storyMore">Больше истории</button>
+      </div>
+    </section>
+
+    <section class="socials section" aria-labelledby="socials-title">
+      <div><p class="section-label">02 · Соцсети</p><h2 id="socials-title">Следить за Дашей</h2></div>
+      <div class="social-list">
+        <a href="#contacts" data-pending>Instagram <span>Личные публикации</span></a>
+        <a href="#contacts" data-pending>Telegram <span>Написать Даше</span></a>
+        <a href="#contacts" data-pending>Telegram-канал <span>Новости и процесс</span></a>
+      </div>
+    </section>
+
+    <section class="gallery-preview">
+      <div class="gallery-image"><img src="met-45434.jpg" alt="Пробная картина в демо-галерее" /></div>
+      <div class="gallery-copy">
+        <p class="section-label">03 · Галерея</p>
+        <h2>Картины<br />в пространстве</h2>
+        <p>Пробная интерактивная галерея. Позже здесь будут только работы Даши — с рамкой, описанием, ценой и статусом.</p>
+        <a class="primary-link primary-link--light" href="gallery.html">Открыть галерею</a>
+      </div>
+    </section>
+
+    <section id="available" class="available section">
+      <div class="section-label">04 · В наличии</div>
+      <div class="available-main">
+        <h2>Работы, которые<br />можно приобрести</h2>
+        <div class="empty-state">
+          <span>Сейчас раздел пуст</span>
+          <p>Когда Даша добавит картину со статусом «В наличии», она автоматически появится здесь с ценой и кнопкой связи.</p>
+          <a class="secondary-link" href="#contacts">Заказать картину</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacts" class="contacts section">
+      <p class="section-label">05 · Контакты</p>
+      <div class="contact-copy">
+        <h2>Обсудить картину</h2>
+        <p>Покупка готовой работы, индивидуальный заказ или вопрос о картине — всё можно обсудить напрямую с Дашей.</p>
+        <a class="telegram-link" href="#contacts" data-pending>Написать в Telegram</a>
+        <p id="contactStatus" class="contact-status" aria-live="polite">Ссылка на Telegram появится здесь, когда Даша пришлёт свой аккаунт.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>© 2026 Даша</span><a href="#top">Наверх</a></footer>
+  <script src="script.js"></script>
+</body>
+</html>
