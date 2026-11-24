@@ -2,92 +2,131 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Даша — художница. История, галерея и работы в наличии." />
-  <title>Даша — художница</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fbf8f6" />
+  <meta name="description" content="Дарья — художница. История, галерея и оригинальные работы." />
+  <title>Дарья — художница</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Prata&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="#top" aria-label="На главную">Даша <span>художница</span></a>
+    <a class="brand" href="#top" aria-label="На главную"><b>Дарья</b><span>художница</span></a>
     <button class="menu-button" type="button" aria-expanded="false" aria-controls="menu">Меню</button>
     <nav id="menu" class="menu" aria-label="Основная навигация">
-      <a href="#story">История</a><a href="gallery.html">Галерея</a><a href="#available">В наличии</a><a href="#contacts">Контакты</a>
+      <a href="#story">История</a>
+      <a href="gallery.html">Галерея</a>
+      <a href="#available">В наличии</a>
+      <a href="#contacts">Контакты</a>
     </nav>
     <a class="header-contact" href="#contacts">Связаться</a>
   </header>
 
   <main id="top">
     <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-orbit" aria-hidden="true"></div>
       <div class="hero-copy">
-        <p class="kicker">Художница</p>
-        <h1 id="hero-title">Даша</h1>
-        <p class="hero-intro">Яркие работы, личные истории и живопись, которую хочется рассматривать вблизи.</p>
-        <a class="primary-link" href="gallery.html">Смотреть галерею</a>
+        <p class="eyebrow">Современная живопись</p>
+        <h1 id="hero-title"><span>Дарья</span><em>художница</em></h1>
+        <p class="hero-intro">Цвет, тишина и личные истории, которые остаются с вами дольше первого взгляда.</p>
+        <div class="hero-actions">
+          <a class="button button--dark" href="gallery.html">Смотреть галерею</a>
+          <a class="quiet-link" href="#story">Познакомиться с Дарьей</a>
+        </div>
       </div>
-      <div class="portrait" role="img" aria-label="Здесь будет фотография Даши">
-        <div class="portrait-placeholder"><span>Фотография Даши</span><small>добавим оригинал позже</small></div>
+      <div class="portrait" role="img" aria-label="Здесь будет фотография Дарьи">
+        <div class="portrait-placeholder">
+          <span class="portrait-halo" aria-hidden="true"></span>
+          <div class="portrait-label"><strong>Фотография Дарьи</strong><small>заменим на оригинал</small></div>
+        </div>
+        <p>Портрет художницы · 2026</p>
       </div>
-      <p class="hero-caption">Живопись · оригинальные работы</p>
+      <a class="hero-work" href="gallery.html" aria-label="Открыть пробную галерею">
+        <img src="met-437984.jpg" alt="Фрагмент пробной картины" />
+        <span>Войти в пространство галереи</span>
+      </a>
     </section>
 
     <section id="story" class="story section">
-      <div class="section-label">01 · История</div>
+      <p class="section-label">История художницы</p>
       <div class="story-copy">
-        <h2>О Даше</h2>
-        <p class="story-lead">Даша — художница, которая говорит со зрителем через цвет, настроение и детали.</p>
-        <p>На главной будет короткая версия её истории: как она пришла к живописи, что её вдохновляет и почему она создаёт именно такие работы.</p>
-        <div id="storyMore" class="story-more" hidden><p>Здесь продолжится личный рассказ Даши. Мы заменим этот текст её настоящей историей, сохранив лёгкую подачу и не перегружая страницу.</p></div>
-        <button id="storyToggle" class="text-button" type="button" aria-expanded="false" aria-controls="storyMore">Больше истории</button>
-      </div>
-    </section>
-
-    <section class="socials section" aria-labelledby="socials-title">
-      <div><p class="section-label">02 · Соцсети</p><h2 id="socials-title">Следить за Дашей</h2></div>
-      <div class="social-list">
-        <a href="#contacts" data-pending>Instagram <span>Личные публикации</span></a>
-        <a href="#contacts" data-pending>Telegram <span>Написать Даше</span></a>
-        <a href="#contacts" data-pending>Telegram-канал <span>Новости и процесс</span></a>
-      </div>
-    </section>
-
-    <section class="gallery-preview">
-      <div class="gallery-image"><img src="met-45434.jpg" alt="Пробная картина в демо-галерее" /></div>
-      <div class="gallery-copy">
-        <p class="section-label">03 · Галерея</p>
-        <h2>Картины<br />в пространстве</h2>
-        <p>Пробная интерактивная галерея. Позже здесь будут только работы Даши — с рамкой, описанием, ценой и статусом.</p>
-        <a class="primary-link primary-link--light" href="gallery.html">Открыть галерею</a>
-      </div>
-    </section>
-
-    <section id="available" class="available section">
-      <div class="section-label">04 · В наличии</div>
-      <div class="available-main">
-        <h2>Работы, которые<br />можно приобрести</h2>
-        <div class="empty-state">
-          <span>Сейчас раздел пуст</span>
-          <p>Когда Даша добавит картину со статусом «В наличии», она автоматически появится здесь с ценой и кнопкой связи.</p>
-          <a class="secondary-link" href="#contacts">Заказать картину</a>
+        <h2>Искусство начинается<br />с личного чувства.</h2>
+        <div class="story-columns">
+          <p class="story-lead">Дарья создаёт яркие работы, в которых цвет становится способом сохранить настроение, воспоминание или внутренний диалог.</p>
+          <div>
+            <p>Здесь будет короткая настоящая история Дарьи: как она пришла к живописи, что её вдохновляет и что она хочет передать зрителю.</p>
+            <div id="storyMore" class="story-more" hidden><p>Когда Дарья пришлёт текст, мы превратим этот блок в живой авторский рассказ — без сухой биографии и лишних формальностей.</p></div>
+            <button id="storyToggle" class="quiet-button" type="button" aria-expanded="false" aria-controls="storyMore">Больше истории</button>
+          </div>
         </div>
       </div>
     </section>
 
+    <section class="gallery-preview">
+      <div class="gallery-stage">
+        <span class="gallery-glow" aria-hidden="true"></span>
+        <figure><img src="met-45434.jpg" alt="Пробная картина в галерее" /><figcaption>Пробная экспозиция · 3 работы</figcaption></figure>
+      </div>
+      <div class="gallery-copy">
+        <p class="section-label">Интерактивная галерея</p>
+        <h2>Не просто смотреть.<br /><em>Оказаться рядом.</em></h2>
+        <p>Картины находятся в собственном пространстве: их можно листать, приближать и рассматривать в музейных рамах. Позже демо‑работы заменятся картинами Дарьи.</p>
+        <a class="button button--light" href="gallery.html">Открыть галерею</a>
+      </div>
+    </section>
+
+    <section id="available" class="available section">
+      <div class="available-showcase" aria-live="polite">
+        <div class="art-window">
+          <div class="art-frame"><img id="availableImage" src="met-45434.jpg" alt="Большая волна в Канагаве" /></div>
+          <span class="availability">Демо · в наличии</span>
+        </div>
+        <div class="art-meta">
+          <div><h3 id="availableTitle">Большая волна в Канагаве</h3><p id="availableDetails">Пробная работа · цена по запросу</p></div>
+          <span id="availableCount">1 / 3</span>
+        </div>
+        <div class="art-controls">
+          <button id="availablePrev" type="button" aria-label="Предыдущая картина">Назад</button>
+          <button id="availableNext" type="button" aria-label="Следующая картина">Дальше</button>
+        </div>
+        <button id="selectArtwork" class="button select-button" type="button">Выбрать работу</button>
+      </div>
+      <div class="available-copy">
+        <p class="section-label">Работы в наличии</p>
+        <h2>Выбрать картину<br />для своего пространства</h2>
+        <p>Листайте доступные работы, выберите понравившуюся и переходите к обсуждению заказа. В финальной версии здесь будут только картины, которые Дарья отметит как доступные.</p>
+        <ul>
+          <li>Оригинальная работа</li>
+          <li>Размер и техника в карточке</li>
+          <li>Заказ напрямую у художницы</li>
+        </ul>
+        <p class="demo-note">Сейчас в витрине используются пробные картины из галереи.</p>
+      </div>
+    </section>
+
+    <section class="socials section" aria-labelledby="socials-title">
+      <div><p class="section-label">Соцсети</p><h2 id="socials-title">Следить за процессом</h2></div>
+      <div class="social-list">
+        <a href="#contacts" data-pending><span>Instagram</span><small>Работы и личные публикации</small></a>
+        <a href="#contacts" data-pending><span>Telegram</span><small>Написать Дарье</small></a>
+        <a href="#contacts" data-pending><span>Telegram-канал</span><small>Новости и процесс</small></a>
+      </div>
+    </section>
+
     <section id="contacts" class="contacts section">
-      <p class="section-label">05 · Контакты</p>
+      <p class="section-label">Личный контакт</p>
       <div class="contact-copy">
-        <h2>Обсудить картину</h2>
-        <p>Покупка готовой работы, индивидуальный заказ или вопрос о картине — всё можно обсудить напрямую с Дашей.</p>
-        <a class="telegram-link" href="#contacts" data-pending>Написать в Telegram</a>
-        <p id="contactStatus" class="contact-status" aria-live="polite">Ссылка на Telegram появится здесь, когда Даша пришлёт свой аккаунт.</p>
+        <h2>Обсудить<br /><em>свою картину</em></h2>
+        <p>Готовая работа, индивидуальный заказ или вопрос о картине — всё можно обсудить напрямую с Дарьей.</p>
+        <a class="button button--dark telegram-link" href="#contacts" data-pending>Написать в Telegram</a>
+        <p id="contactStatus" class="contact-status" aria-live="polite">Добавим прямую ссылку, когда Дарья пришлёт свой Telegram.</p>
       </div>
     </section>
   </main>
 
-  <footer><span>© 2026 Даша</span><a href="#top">Наверх</a></footer>
+  <footer><span>© 2026 Дарья</span><span>Живопись и оригинальные работы</span><a href="#top">Наверх</a></footer>
   <script src="script.js"></script>
 </body>
 </html>

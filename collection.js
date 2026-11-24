@@ -8,7 +8,7 @@ const collectionReady = new Promise(resolve => {
     const store = db.transaction('works').objectStore('works');
     const keys = store.getAllKeys();
     const records = store.getAll();
-    records.onsuccess = () => resolve(records.result.map((item,i) => [null,item.title,'Даша',item.medium,item.story,URL.createObjectURL(item.photo), keys.result[i], item.frameStyle || 'gilded']));
+    records.onsuccess = () => resolve(records.result.map((item,i) => [null,item.title,'Дарья',item.medium,item.story,URL.createObjectURL(item.photo), keys.result[i], item.frameStyle || 'gilded']));
     window.editCaption = key => {
       const row = records.result[keys.result.indexOf(key)];
       if (!row) return;
@@ -61,7 +61,7 @@ function refreshPreview() {
   const frameStyle = fields.frameStyle.value || 'gilded';
   preview.className = 'frame frame-'+frameStyle+(previewUrl ? '' : ' sample');
   document.querySelector('#preview-title').textContent = fields.title.value.trim() || 'Без названия';
-  document.querySelector('#preview-caption').textContent = [fields.medium.value, fields.story.value, fields.price.value && fields.price.value+' ₽'].filter(Boolean).join(' · ') || (previewUrl ? 'Даша' : 'Выберите фотографию');
+  document.querySelector('#preview-caption').textContent = [fields.medium.value, fields.story.value, fields.price.value && fields.price.value+' ₽'].filter(Boolean).join(' · ') || (previewUrl ? 'Дарья' : 'Выберите фотографию');
 }
 upload.addEventListener('input',refreshPreview);
 upload.elements.photo.addEventListener('change',() => {
