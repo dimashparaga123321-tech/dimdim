@@ -1,132 +1,145 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#fbf8f6" />
-  <meta name="description" content="Дарья — художница. История, галерея и оригинальные работы." />
-  <title>Дарья — художница</title>
+  <meta name="theme-color" content="#f4f1ec" />
+  <meta name="description" content="Дарья Нинькова — авторская живопись, портфолио и работы в наличии." />
+  <title>Дарья Нинькова — живопись</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261124-2" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&family=Unbounded:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20261124-6" />
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="#top" aria-label="На главную"><b>Дарья</b><span>художница</span></a>
-    <button class="menu-button" type="button" aria-expanded="false" aria-controls="menu">Меню</button>
-    <nav id="menu" class="menu" aria-label="Основная навигация">
-      <a href="#story">История</a>
-      <a href="gallery.html">Галерея</a>
+    <a class="brand" href="#top" aria-label="В начало страницы">ДН</a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
+    <nav id="site-nav" class="site-nav" aria-label="Основная навигация">
+      <a href="#top">Главная</a>
+      <a href="#about">Обо мне</a>
+      <a href="#portfolio">Портфолио</a>
       <a href="#available">В наличии</a>
       <a href="#contacts">Контакты</a>
     </nav>
-    <a class="header-contact" href="#contacts">Связаться</a>
+    <div class="header-side">
+      <a href="#contacts">Telegram</a>
+      <span>Ru</span>
+    </div>
   </header>
 
-  <main id="top">
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-orbit" aria-hidden="true"></div>
+  <main>
+    <section id="top" class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <p class="eyebrow">Современная живопись</p>
-        <h1 id="hero-title"><span>Дарья</span><em>художница</em></h1>
-        <p class="hero-intro">Цвет, тишина и личные истории, которые остаются с вами дольше первого взгляда.</p>
-        <div class="hero-actions">
-          <a class="button button--dark" href="gallery.html">Смотреть галерею</a>
-          <a class="quiet-link" href="#story">Познакомиться с Дарьей</a>
-        </div>
+        <p class="kicker">Современная живопись</p>
+        <h1 id="hero-title"><span>Дарья</span><span>Нинькова</span></h1>
+        <a class="circle-link" href="#contacts">Связаться</a>
       </div>
-      <div class="portrait" role="img" aria-label="Здесь будет фотография Дарьи">
-        <div class="portrait-placeholder">
-          <span class="portrait-halo" aria-hidden="true"></span>
-          <div class="portrait-label"><strong>Фотография Дарьи</strong><small>заменим на оригинал</small></div>
+
+      <figure class="portrait">
+        <div class="portrait-art" role="img" aria-label="Место для фотографии Дарьи Ниньковой">
+          <span class="portrait-light" aria-hidden="true"></span>
+          <span class="portrait-shape" aria-hidden="true"></span>
+          <span class="portrait-note">Фотография Дарьи<br />заменим на оригинал</span>
         </div>
-        <p>Портрет художницы · 2026</p>
-      </div>
-      <a class="hero-work" href="gallery.html" aria-label="Открыть пробную галерею">
-        <img src="met-437984.jpg" alt="Фрагмент пробной картины" />
-        <span>Войти в пространство галереи</span>
-      </a>
+      </figure>
+
+      <svg class="hero-lines" viewBox="0 0 1600 440" preserveAspectRatio="none" aria-hidden="true">
+        <path class="line line-blue" d="M-80 90 C240 330 540 20 900 180 C1180 305 1390 360 1690 270" />
+        <path class="line line-rose" d="M-100 350 C250 470 470 -80 850 90 C1200 245 1250 500 1710 390" />
+      </svg>
+      <a class="scroll-cue" href="#about">Листайте вниз <span>↓</span></a>
     </section>
 
-    <section id="story" class="story section">
-      <p class="section-label">История художницы</p>
-      <div class="story-copy">
-        <h2>Искусство начинается<br />с личного чувства.</h2>
-        <div class="story-columns">
-          <p class="story-lead">Дарья создаёт яркие работы, в которых цвет становится способом сохранить настроение, воспоминание или внутренний диалог.</p>
-          <div>
-            <p>Здесь будет короткая настоящая история Дарьи: как она пришла к живописи, что её вдохновляет и что она хочет передать зрителю.</p>
-            <div id="storyMore" class="story-more" hidden><p>Когда Дарья пришлёт текст, мы превратим этот блок в живой авторский рассказ — без сухой биографии и лишних формальностей.</p></div>
-            <button id="storyToggle" class="quiet-button" type="button" aria-expanded="false" aria-controls="storyMore">Больше истории</button>
-          </div>
+    <section id="about" class="about section-pad">
+      <p class="section-index">01 / Обо мне</p>
+      <div class="about-visual" aria-label="Место для фотографий Дарьи">
+        <div class="photo-card photo-card-main">
+          <span>Фото Дарьи</span>
         </div>
+        <img class="about-art" src="detail-437984.jpg" alt="Фрагмент пробной работы" />
       </div>
-    </section>
-
-    <section id="gallery-preview" class="gallery-preview">
-      <div class="gallery-stage">
-        <span class="gallery-glow" aria-hidden="true"></span>
-        <figure><img src="met-45434.jpg" alt="Пробная картина в галерее" /><figcaption>Пробная экспозиция · 3 работы</figcaption></figure>
-      </div>
-      <div class="gallery-copy">
-        <p class="section-label">Интерактивная галерея</p>
-        <h2>Не просто смотреть.<br /><em>Оказаться рядом.</em></h2>
-        <p>Картины находятся в собственном пространстве: их можно листать, приближать и рассматривать в музейных рамах. Позже демо‑работы заменятся картинами Дарьи.</p>
-        <a class="button button--light" href="gallery.html">Открыть галерею</a>
+      <div class="about-copy">
+        <h2>Картины как способ сохранить <em>чувство.</em></h2>
+        <p class="lead">Меня зовут Дарья Нинькова. Я создаю яркие работы, в которых цвет становится способом сохранить настроение, воспоминание или внутренний диалог.</p>
+        <p>Здесь будет личная история Дарьи: как она пришла к живописи, что её вдохновляет и какие темы она раскрывает в своих работах.</p>
+        <a class="text-link" href="#contacts">Узнать больше</a>
       </div>
     </section>
 
-    <section id="available" class="available section">
-      <div class="available-showcase" aria-live="polite">
-        <div class="art-window">
-          <div class="art-frame"><img id="availableImage" src="met-45434.jpg" alt="Большая волна в Канагаве" /></div>
-          <span class="availability">Демо · в наличии</span>
-        </div>
-        <div class="art-meta">
-          <div><h3 id="availableTitle">Большая волна в Канагаве</h3><p id="availableDetails">Пробная работа · цена по запросу</p></div>
-          <span id="availableCount">1 / 3</span>
-        </div>
-        <div class="art-controls">
-          <button id="availablePrev" type="button" aria-label="Предыдущая картина">Назад</button>
-          <button id="availableNext" type="button" aria-label="Следующая картина">Дальше</button>
-        </div>
-        <button id="selectArtwork" class="button select-button" type="button">Выбрать работу</button>
+    <section id="portfolio" class="portfolio section-pad">
+      <div class="section-heading">
+        <p class="section-index">02 / Портфолио</p>
+        <h2>Портфолио</h2>
       </div>
+      <div class="scroll-orbit orbit-portfolio" data-scroll-speed="0.08" aria-hidden="true"><span></span></div>
+      <div class="project-list">
+        <article class="project">
+          <div class="project-image"><img src="met-45434.jpg" alt="Большая волна в Канагаве — демонстрационная работа" /></div>
+          <div class="project-meta"><h3>Вода и движение</h3><p>2026 год</p><a class="project-link" href="#contacts">Перейти</a></div>
+        </article>
+        <article class="project">
+          <div class="project-image"><img src="met-437984.jpg" alt="Демонстрационная работа из музейной коллекции" /></div>
+          <div class="project-meta"><h3>Личные истории</h3><p>2026 год</p><a class="project-link" href="#contacts">Перейти</a></div>
+        </article>
+        <article class="project">
+          <div class="project-image"><img src="met-436121.jpg" alt="Демонстрационная работа из музейной коллекции" /></div>
+          <div class="project-meta"><h3>Тишина и цвет</h3><p>2026 год</p><a class="project-link" href="#contacts">Перейти</a></div>
+        </article>
+        <article class="project">
+          <div class="project-image"><img src="detail-45434.jpg" alt="Деталь демонстрационной работы" /></div>
+          <div class="project-meta"><h3>Детали</h3><p>2026 год</p><a class="project-link" href="#contacts">Перейти</a></div>
+        </article>
+        <article class="project">
+          <div class="project-image"><img src="wave.jpg" alt="Демонстрационная работа с волной" /></div>
+          <div class="project-meta"><h3>Ранние работы</h3><p>2024–2026</p><a class="project-link" href="#contacts">Перейти</a></div>
+        </article>
+      </div>
+      <p class="demo-caption">Пока используются демонстрационные изображения. Позже здесь появятся работы Дарьи.</p>
+    </section>
+
+    <section id="available" class="available section-pad">
+      <div class="scroll-orbit orbit-available" data-scroll-speed="-0.12" aria-hidden="true"><span></span></div>
       <div class="available-copy">
-        <p class="section-label">Работы в наличии</p>
-        <h2>Выбрать картину<br />для своего пространства</h2>
-        <p>Листайте доступные работы, выберите понравившуюся и переходите к обсуждению заказа. В финальной версии здесь будут только картины, которые Дарья отметит как доступные.</p>
-        <ul>
-          <li>Оригинальная работа</li>
-          <li>Размер и техника в карточке</li>
-          <li>Заказ напрямую у художницы</li>
-        </ul>
-        <p class="demo-note">Сейчас в витрине используются пробные картины из галереи.</p>
+        <p class="section-index">03 / В наличии</p>
+        <h2>Работы, которые можно приобрести</h2>
+        <p>Этот раздел будет пополняться Дарьей. У каждой картины появятся название, размер, техника, стоимость и короткая история.</p>
+        <a class="outline-link" href="#contacts">Обсудить работу</a>
+      </div>
+      <div class="available-frame">
+        <img id="available-image" src="met-45434.jpg" alt="Демонстрационная работа в наличии" />
+        <div class="available-meta">
+          <div><span>Демо-работа</span><strong id="available-title">Волна</strong></div>
+          <span id="available-count">01 / 03</span>
+        </div>
+        <div class="available-controls">
+          <button id="prev-work" type="button" aria-label="Предыдущая работа">Назад</button>
+          <button id="next-work" type="button" aria-label="Следующая работа">Дальше</button>
+        </div>
       </div>
     </section>
 
-    <section class="socials section" aria-labelledby="socials-title">
-      <div><p class="section-label">Соцсети</p><h2 id="socials-title">Следить за процессом</h2></div>
-      <div class="social-list">
-        <a href="#contacts" data-pending><span>Instagram</span><small>Работы и личные публикации</small></a>
-        <a href="#contacts" data-pending><span>Telegram</span><small>Написать Дарье</small></a>
-        <a href="#contacts" data-pending><span>Telegram-канал</span><small>Новости и процесс</small></a>
-      </div>
-    </section>
-
-    <section id="contacts" class="contacts section">
-      <p class="section-label">Личный контакт</p>
-      <div class="contact-copy">
-        <h2>Обсудить<br /><em>свою картину</em></h2>
-        <p>Готовая работа, индивидуальный заказ или вопрос о картине — всё можно обсудить напрямую с Дарьей.</p>
-        <a class="button button--dark telegram-link" href="#contacts" data-pending>Написать в Telegram</a>
-        <p id="contactStatus" class="contact-status" aria-live="polite">Добавим прямую ссылку, когда Дарья пришлёт свой Telegram.</p>
+    <section id="contacts" class="contacts section-pad">
+      <div class="scroll-orbit orbit-contacts" data-scroll-speed="0.16" aria-hidden="true"><span></span></div>
+      <p class="section-index">04 / Контакты</p>
+      <h2>Давайте обсудим<br /><em>вашу картину.</em></h2>
+      <div class="contact-grid">
+        <p>Готовая работа, индивидуальный заказ или вопрос — всё можно обсудить напрямую с Дарьей.</p>
+        <div class="contact-links">
+          <a href="#contacts"><span>Telegram</span><small>Написать Дарье</small></a>
+          <a href="#contacts"><span>Instagram</span><small>Смотреть работы</small></a>
+          <a href="#contacts"><span>Telegram-канал</span><small>Процесс и новости</small></a>
+        </div>
       </div>
     </section>
   </main>
 
-  <footer><span>© 2026 Дарья</span><span>Живопись и оригинальные работы</span><a href="#top">Наверх</a></footer>
-  <script src="script.js?v=20261124-2"></script>
+  <footer>
+    <span>© 2026 Дарья Нинькова</span>
+    <span>Живопись и оригинальные работы</span>
+    <a href="#top">Наверх</a>
+  </footer>
+
+  <script src="script.js?v=20261124-6"></script>
 </body>
 </html>
