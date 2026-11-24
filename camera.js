@@ -4,13 +4,22 @@ function createCamera(scene) {
   const museum = scene.closest('.museum');
   let frame = null;
   let scale = 1, panX = 0, panY = 0;
+  let drawRequest = 0;
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-  function draw() {
+  function paint() {
+    drawRequest = 0;
+    if (!frame) return;
     const maxX = Math.max(0, (frame.offsetWidth * scale - scene.clientWidth * .75) / 2);
     const maxY = Math.max(0, (frame.offsetHeight * scale - scene.clientHeight * .65) / 2);
     panX = clamp(panX, -maxX, maxX);
     panY = clamp(panY, -maxY, maxY);
-    frame.style.transform = 'translate3d('+panX+'px,'+panY+'px,80px) scale('+scale+')';
+    const x = Math.round(panX * 10) / 10;
+    const y = Math.round(panY * 10) / 10;
+    const zoom = Math.round(scale * 1000) / 1000;
+    frame.style.transform = 'translate3d('+x+'px,'+y+'px,0) scale('+zoom+')';
+  }
+  function draw() {
+    if (!drawRequest) drawRequest = requestAnimationFrame(paint);
   }
   function zoom(ratio) {
     scale = clamp(scale * ratio, 1, 4);
@@ -28,7 +37,7 @@ function createCamera(scene) {
         delete image.dataset.original;
       }).catch(() => {});
     }
-    scale = Math.min(1.65, scene.clientWidth * .94 / frame.offsetWidth, scene.clientHeight * .77 / frame.offsetHeight);
+    scale = Math.min(1.55, scene.clientWidth * .94 / frame.offsetWidth, scene.clientHeight * .76 / frame.offsetHeight);
     panX = panY = 0;
     museum.classList.add('inspecting');
     tools.hidden = false;
@@ -38,6 +47,8 @@ function createCamera(scene) {
   function leave() {
     if (!frame) return;
     const target = frame;
+    if (drawRequest) cancelAnimationFrame(drawRequest);
+    drawRequest = 0;
     pointers.clear();
     target.classList.remove('dragging');
     target.style.transform = '';

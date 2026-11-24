@@ -28,18 +28,27 @@ const availableWorks = [
 ];
 let availableIndex = 0;
 let selectedIndex = null;
+let availabilityBusy = false;
 const availableImage = document.querySelector('#availableImage');
+const availableFrame = document.querySelector('.art-frame');
 const availableTitle = document.querySelector('#availableTitle');
 const availableDetails = document.querySelector('#availableDetails');
 const availableCount = document.querySelector('#availableCount');
 const selectArtwork = document.querySelector('#selectArtwork');
 
-function renderAvailable(direction = 1) {
+async function renderAvailable(direction = 1, animate = true) {
   const work = availableWorks[availableIndex];
-  availableImage.animate?.([
-    {opacity:0, transform:`translateX(${direction * 22}px) scale(.985)`},
-    {opacity:1, transform:'translateX(0) scale(1)'}
-  ], {duration:420, easing:'cubic-bezier(.22,.72,.2,1)'});
+  if (availabilityBusy) return;
+  availabilityBusy = true;
+  const preload = new Image();
+  preload.src = work.image;
+  try { await preload.decode(); } catch {}
+  if (animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    await availableFrame.animate([
+      {opacity:1, transform:'translate3d(0,0,0) scale(1)'},
+      {opacity:0, transform:`translate3d(${-direction * 18}px,0,0) scale(.985)`}
+    ], {duration:210, easing:'cubic-bezier(.4,0,1,1)', fill:'forwards'}).finished;
+  }
   availableImage.src = work.image;
   availableImage.alt = work.title;
   availableTitle.textContent = work.title;
@@ -48,22 +57,33 @@ function renderAvailable(direction = 1) {
   const selected = selectedIndex === availableIndex;
   selectArtwork.classList.toggle('is-selected', selected);
   selectArtwork.textContent = selected ? 'Заказать картину' : 'Выбрать работу';
+  if (animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    await availableFrame.animate([
+      {opacity:0, transform:`translate3d(${direction * 18}px,0,0) scale(.985)`},
+      {opacity:1, transform:'translate3d(0,0,0) scale(1)'}
+    ], {duration:430, easing:'cubic-bezier(.16,.74,.24,1)', fill:'forwards'}).finished;
+  }
+  availableFrame.style.opacity = '';
+  availableFrame.style.transform = '';
+  availabilityBusy = false;
 }
 
-document.querySelector('#availablePrev')?.addEventListener('click', () => {
+document.querySelector('#availablePrev')?.addEventListener('click', async () => {
+  if (availabilityBusy) return;
   availableIndex = (availableIndex - 1 + availableWorks.length) % availableWorks.length;
-  renderAvailable(-1);
+  await renderAvailable(-1);
 });
 
-document.querySelector('#availableNext')?.addEventListener('click', () => {
+document.querySelector('#availableNext')?.addEventListener('click', async () => {
+  if (availabilityBusy) return;
   availableIndex = (availableIndex + 1) % availableWorks.length;
-  renderAvailable(1);
+  await renderAvailable(1);
 });
 
 selectArtwork?.addEventListener('click', () => {
   if (selectedIndex !== availableIndex) {
     selectedIndex = availableIndex;
-    renderAvailable();
+    renderAvailable(1, false);
     return;
   }
   document.querySelector('#contacts')?.scrollIntoView({behavior:'smooth'});

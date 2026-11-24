@@ -12,19 +12,6 @@ let busy = false;
 let lastAction = Date.now();
 let paused = false;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-const stops = [[0,0],[.031,.006],[.134,.012],[.206,.023],[.278,.047],[.34,.07],[.412,.105],[.485,.158],[.546,.246],[.583,.55],[.62,.825],[.69,.9],[.79,.94],[.85,.956],[.93,.975],[1,1]];
-function coverage(t) {
-  const i = stops.findIndex(([time]) => time >= t);
-  if (i <= 0) return i === 0 ? 0 : 1;
-  const [a,x] = stops[i-1], [b,y] = stops[i];
-  const k = (t-a)/(b-a);
-  return x+(y-x)*k*k*(3-2*k);
-}
-function moveSlide(bay, offset, arriving) {
-  bay.querySelectorAll('[data-depth]').forEach(layer => {
-    layer.style.translate = (offset * (arriving ? Number(layer.dataset.depth) : .14)) + 'vw 0';
-  });
-}
 function hideNote() {
   note.hidden = true;
   document.querySelector('.museum').classList.remove('reading');
@@ -34,7 +21,7 @@ function select(index, manual = true) {
   if (busy || camera.active) return;
   const target = (index + works.length) % works.length;
   const incoming = wall.children[target], outgoing = wall.children[active];
-  const direction = Math.sign(index-active);
+  const direction = Math.sign(index-active) || 1;
   hideNote();
   active = target;
   const tabs = [...el('tabs').children];
@@ -46,29 +33,29 @@ function select(index, manual = true) {
     [...wall.children].forEach(bay => {
       bay.hidden = bay !== incoming;
       bay.inert = bay.hidden;
-      bay.style.clipPath = '';
       bay.style.zIndex = '';
-      moveSlide(bay,0,true);
+      bay.style.opacity = '';
+      bay.style.transform = '';
     });
     busy = false;
   }
   if (incoming === outgoing || reduced.matches) return finish();
   busy = true;
   incoming.hidden = false;
-  incoming.style.zIndex = '1';
-  outgoing.style.zIndex = '2';
+  incoming.inert = false;
+  incoming.style.zIndex = '2';
+  outgoing.style.zIndex = '1';
   outgoing.inert = true;
-  const start = performance.now();
-  function tick(now) {
-    const t = Math.min(1,(now-start)/1300);
-    const c = t*t*(3-2*t);
-    outgoing.style.clipPath = direction>0 ? 'inset(0 '+c*100+'% 0 0)' : 'inset(0 0 0 '+c*100+'%)';
-    moveSlide(outgoing,-direction*c*100,false);
-    const k = Math.min(1,Math.max(0,(t-.12)/.88));
-    moveSlide(incoming,direction*100*(1-k)**2,true);
-    if(t<1) requestAnimationFrame(tick); else finish();
-  }
-  tick(start);
+  const timing = {duration:760,easing:'cubic-bezier(.16,.72,.2,1)',fill:'both'};
+  const entering = incoming.animate([
+    {opacity:0,transform:`translate3d(${direction * 7}%,0,0) scale(1.012)`},
+    {opacity:1,transform:'translate3d(0,0,0) scale(1)'}
+  ],timing);
+  const leaving = outgoing.animate([
+    {opacity:1,transform:'translate3d(0,0,0) scale(1)'},
+    {opacity:0,transform:`translate3d(${-direction * 4}%,0,0) scale(.992)`}
+  ],timing);
+  Promise.all([entering.finished,leaving.finished]).then(finish,finish);
 }
 for (const [id, rawTitle, artist, year, description, customImage, key, savedFrameStyle] of works) {
   const title = rawTitle?.trim() || 'Без названия';
@@ -95,7 +82,7 @@ for (const [id, rawTitle, artist, year, description, customImage, key, savedFram
   plate.onclick = () => {
     if (performance.now() < suppressClickUntil) return;
     note.querySelector('h2').textContent = title;
-    note.querySelector('p').textContent = description;
+    note.querySelector('p:not(.note-label)').textContent = description;
     note.querySelector('.edit-caption')?.remove();
     if (key !== undefined) {
       const edit = document.createElement('button');
