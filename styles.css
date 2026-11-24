@@ -7,8 +7,8 @@
   --rose: #e2a0b6;
   --rose-dark: #c9829b;
   --line: rgba(57, 58, 60, 0.24);
-  --serif: Unbounded, Arial, sans-serif;
-  --sans: Manrope, Arial, sans-serif;
+  --serif: Philosopher, Arial, sans-serif;
+  --sans: Philosopher, Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
