@@ -27,7 +27,7 @@ output { display:block; min-height:24px; margin-top:14px; color:#a23e61; }
 .prototype-note { margin:42px 0 70px; padding:18px 22px; background:var(--blue); border-left:3px solid #b4cdf4; }
 .library-head { display:flex; justify-content:space-between; gap:24px; align-items:baseline; padding-bottom:18px; border-bottom:1px solid var(--ink); }
 .library-head h2 { margin:0; font-size:1.5rem; font-weight:300; }
-.library-head span { color:var(--muted); font-size:.8rem; }
+.library-head span { flex:0 0 auto; color:var(--muted); font-size:.8rem; white-space:nowrap; }
 .work-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:48px 24px; padding-top:30px; }
 .admin-work img { width:100%; aspect-ratio:4/5; object-fit:cover; background:#eee7e2; }
 .admin-work-copy { display:grid; grid-template-columns:1fr auto; gap:16px; padding-top:12px; }
