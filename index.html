@@ -16,7 +16,7 @@
     <a class="brand" href="#top" aria-label="В начало страницы">ДН</a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
     <nav id="site-nav" class="site-nav" aria-label="Основная навигация">
-      <a href="#about">Обо мне</a><a href="#portfolio">Портфолио</a><a href="#commissions">Заказы</a><a href="#pricing">Стоимость</a><a href="#contacts">Контакты</a>
+      <a href="#about">Обо мне</a><a href="#portfolio">Портфолио</a><a href="#sold">Проданные картины</a><a href="#pricing">Стоимость</a><a href="#contacts">Контакты</a>
     </nav>
     <a class="header-contact" href="#contacts">Связаться</a>
   </header>
@@ -91,18 +91,13 @@
         </a>
       </template>
     </section>
-    <section class="section-pad" id="sold">
+    <section class="commissions section-pad" id="sold">
       <div class="section-title centered"><h2>Проданные картины</h2></div>
-      <div id="sold-grid" class="art-grid"></div>
-    </section>
-
-    <section id="commissions" class="commissions section-pad">
-      <div class="section-title"><h2>От эскиза к картине:<br />Мои выполненные заказы</h2></div>
-      <div class="art-grid compact" aria-label="Выполненные заказы Дарьи">
-        <button class="art-card" type="button" data-work="stories"><img loading="lazy" decoding="async" src="met-437984-preview.webp" alt="Демонстрационный выполненный заказ" /><span class="art-card-copy"><strong>Картина для интерьера</strong><small>Индивидуальный заказ</small></span></button>
-        <button class="art-card" type="button" data-work="wave"><img loading="lazy" decoding="async" src="detail-45434-preview.webp" alt="Деталь демонстрационного выполненного заказа" /><span class="art-card-copy"><strong>Работа по личной истории</strong><small>Индивидуальный заказ</small></span></button>
-        <button class="art-card" type="button" data-work="silence"><img loading="lazy" decoding="async" src="detail-436121-preview.webp" alt="Деталь демонстрационной картины" /><span class="art-card-copy"><strong>Авторская композиция</strong><small>Индивидуальный заказ</small></span></button>
-        <button class="art-card" type="button" data-work="detail"><img loading="lazy" decoding="async" src="detail-437984-preview.webp" alt="Деталь демонстрационной работы" /><span class="art-card-copy"><strong>Особенный подарок</strong><small>Индивидуальный заказ</small></span></button>
+      <div id="sold-grid" class="art-grid" aria-label="Проданные картины">
+        <button class="art-card" type="button" data-work="stories"><img loading="lazy" decoding="async" src="met-437984-preview.webp" alt="Демонстрационный выполненный заказ" /><span class="art-card-copy"><strong>Картина для интерьера</strong><small>Пример заказа</small></span></button>
+        <button class="art-card" type="button" data-work="wave"><img loading="lazy" decoding="async" src="detail-45434-preview.webp" alt="Деталь демонстрационного выполненного заказа" /><span class="art-card-copy"><strong>Работа по личной истории</strong><small>Пример заказа</small></span></button>
+        <button class="art-card" type="button" data-work="silence"><img loading="lazy" decoding="async" src="detail-436121-preview.webp" alt="Деталь демонстрационной картины" /><span class="art-card-copy"><strong>Авторская композиция</strong><small>Пример заказа</small></span></button>
+        <button class="art-card" type="button" data-work="detail"><img loading="lazy" decoding="async" src="detail-437984-preview.webp" alt="Деталь демонстрационной работы" /><span class="art-card-copy"><strong>Особенный подарок</strong><small>Пример заказа</small></span></button>
       </div>
     </section>
 
@@ -168,6 +163,6 @@
   </dialog>
 
   <dialog id="portfolio-artwork" class="work-dialog" aria-label="Картина"></dialog>
-  <script src="script.js?v=20261125-12"></script>
+  <script src="script.js?v=20261126-1"></script>
 </body>
 </html>

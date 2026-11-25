@@ -145,7 +145,13 @@ function renderProject() {
   const sold = entries.filter(([, work]) => work.status === 'Продана');
   const available = entries.filter(([key, work]) => key.startsWith('local-') && work.status !== 'Продана');
   projectGrid.replaceChildren(document.querySelector('#featured-work').content.cloneNode(true), ...available.map(([key, work]) => createProjectCard(key, work)));
-  document.querySelector('#sold-grid').replaceChildren(...sold.map(([key, work]) => createProjectCard(key, work)));
+  const soldGrid = document.querySelector('#sold-grid');
+  soldGrid.querySelectorAll('[data-sold-record]').forEach(card => card.remove());
+  soldGrid.prepend(...sold.map(([key, work]) => {
+    const card = createProjectCard(key, work);
+    card.dataset.soldRecord = '';
+    return card;
+  }));
 }
 
 function loadLocalArtworks() {
@@ -246,7 +252,7 @@ function showWork(workKey, { commission = false } = {}) {
 
 document.querySelectorAll('[data-work]').forEach((card) => {
   card.addEventListener('click', () => showWork(card.dataset.work, {
-    commission: Boolean(card.closest('#commissions'))
+    commission: Boolean(card.closest('#sold'))
   }));
 });
 
@@ -351,7 +357,7 @@ carouselButton.onclick = () => {
 new IntersectionObserver(([entry]) => { carouselVisible = entry.isIntersecting; }).observe(carousel);
 setInterval(async () => {
   if (paused || !carouselVisible || document.hidden) return;
-  const images = [...document.querySelectorAll('#project-grid img, #sold-grid img')]
+  const images = [...document.querySelectorAll('#project-grid img, #sold-grid [data-sold-record] img')]
     .filter(image => image.src !== carouselImage.src);
   if (!images.length) return;
   const next = images[Math.floor(Math.random() * images.length)];
