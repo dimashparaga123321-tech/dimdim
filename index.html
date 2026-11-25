@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261125-12" />
+  <link rel="stylesheet" href="styles.css?v=20261125-13" />
 </head>
 <body>
   <header class="site-header">
@@ -108,19 +108,22 @@
     <button class="dialog-close" type="button" aria-label="Закрыть">Закрыть</button>
     <div class="dialog-layout">
       <div class="dialog-gallery">
-        <button class="gallery-arrow prev" type="button" aria-label="Предыдущее фото">Назад</button>
         <img id="dialog-image" src="met-45434.jpg" alt="" />
-        <button class="gallery-arrow next" type="button" aria-label="Следующее фото">Дальше</button>
-        <div id="dialog-thumbs" class="dialog-thumbs" aria-label="Другие ракурсы"></div>
+        <div class="gallery-controls">
+          <button class="gallery-arrow prev" type="button" aria-label="Предыдущее фото">←</button>
+          <div id="dialog-thumbs" class="dialog-thumbs" aria-label="Другие ракурсы"></div>
+          <button class="gallery-arrow next" type="button" aria-label="Следующее фото">→</button>
+        </div>
       </div>
       <div class="dialog-copy">
         <p id="dialog-kicker">Авторская работа</p><h2 id="dialog-title">Название картины</h2><p id="dialog-price"></p><p id="dialog-description"></p>
+        <details id="description-more" hidden><summary>Далее <span aria-hidden="true">↓</span></summary><div class="description-reveal"><p id="description-rest"></p></div></details>
         <dl><div><dt>Год</dt><dd id="dialog-year">2026</dd></div><div><dt>Материалы</dt><dd id="dialog-materials">Холст, акрил</dd></div></dl>
-        <a class="dialog-contact" href="#contacts">Обсудить похожую работу</a>
+        <a class="dialog-contact" href="#order">Заказать</a>
       </div>
     </div>
   </dialog>
 
-  <script src="script.js?v=20261125-5"></script>
+  <script src="script.js?v=20261125-6"></script>
 </body>
 </html>
