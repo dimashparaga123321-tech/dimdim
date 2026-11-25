@@ -135,7 +135,7 @@ function renderProject() {
   const entries = Object.entries(works).sort(([, a], [, b]) => (b.createdAt || 0) - (a.createdAt || 0));
   const sold = entries.filter(([, work]) => work.status === 'Продана');
   const available = entries.filter(([, work]) => work.status !== 'Продана');
-  projectGrid.replaceChildren(...available.map(([key, work]) => createProjectCard(key, work)));
+  projectGrid.replaceChildren(document.querySelector('#featured-work').content.cloneNode(true), ...available.map(([key, work]) => createProjectCard(key, work)));
   document.querySelector('#sold-grid').replaceChildren(...sold.map(([key, work]) => createProjectCard(key, work)));
   document.querySelector('#sold-empty').hidden = sold.length > 0;
 }

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261125-14" />
+  <link rel="stylesheet" href="styles.css?v=20261125-15" />
 </head>
 <body>
   <header class="site-header">
@@ -46,6 +46,12 @@
     <section id="portfolio" class="portfolio section-pad">
       <div class="section-title centered"><p>02 / Портфолио</p><h2>Портфолио</h2></div>
       <div id="project-grid" class="art-grid" aria-label="Картины в наличии"></div>
+      <template id="featured-work">
+        <a class="art-card" href="dream-hounds.html">
+          <img src="dream-hounds.jpg" alt="Картина «Гончие сна»" />
+          <span class="art-card-copy"><strong>Гончие сна</strong><span>70 × 100 см</span><small>95 000 ₽</small></span>
+        </a>
+      </template>
     </section>
     <section class="section-pad" id="sold">
       <div class="section-title centered"><h2>Проданные картины</h2></div>
@@ -124,6 +130,6 @@
     </div>
   </dialog>
 
-  <script src="script.js?v=20261125-7"></script>
+  <script src="script.js?v=20261125-8"></script>
 </body>
 </html>
