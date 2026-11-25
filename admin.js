@@ -40,9 +40,10 @@ function setAuthenticated(authenticated) {
   loginView.hidden = authenticated;
   dashboard.hidden = !authenticated;
   logout.hidden = !authenticated;
-  if (authenticated) openDatabase().then(() => {
+  if (authenticated) openDatabase().then(async () => {
     renderLibrary();
-    if (sitePreview.contentDocument?.readyState === 'complete') setupPreview();
+    await setupPreview();
+    setTimeout(setupPreview, 700);
   });
 }
 
