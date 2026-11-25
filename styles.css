@@ -127,12 +127,14 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
 @media (max-width: 720px) {
   .site-header { min-height: 64px; padding: 0 max(20px, env(safe-area-inset-right)) 0 max(20px, env(safe-area-inset-left)); }
   .site-nav { top: 64px; }
-  .hero { min-height: auto; grid-template-columns: 1fr; gap: 48px; padding: 68px max(20px, env(safe-area-inset-right)) 105px max(20px, env(safe-area-inset-left)); }
+  .hero { min-height: 680px; display: block; padding: 34px max(20px, env(safe-area-inset-right)) 42px max(20px, env(safe-area-inset-left)); }
+  .hero-copy { position: relative; z-index: 3; }
+  .hero .eyebrow { margin-bottom: 12px; }
   .hero h1 { font-size: clamp(4.2rem, 20vw, 6.2rem); line-height: .82; }
   .hero h1 span + span { margin: 10px 0 0 32px; }
-  .circle-link { width: 100px; margin-top: 38px; }
-  .hero-portrait { width: calc(100% - 42px); justify-self: end; }
-  .hero-line { bottom: 1%; width: 150%; height: 27%; }
+  .circle-link { width: 100px; margin-top: 28px; }
+  .hero-portrait { position: absolute; z-index: 1; top: 285px; right: max(20px, env(safe-area-inset-right)); width: calc(100% - 78px); }
+  .hero-line { z-index: 2; bottom: 0; width: 150%; height: 27%; }
   .section-pad { padding: 88px max(20px, env(safe-area-inset-right)) 88px max(20px, env(safe-area-inset-left)); }
   .section-title { margin-bottom: 52px; }
   .section-title h2, .pricing h2, .contacts h2 { font-size: clamp(2.7rem, 13vw, 4.2rem); }
