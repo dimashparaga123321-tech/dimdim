@@ -212,7 +212,8 @@ function renderGalleryImage() {
 }
 
 function showWork(workKey, { commission = false } = {}) {
-  activeWork = works[workKey];
+  const work = works[workKey];
+  activeWork = work && { ...work, images: work.images.slice(0, 1) };
   if (!activeWork || !dialog) return;
   activeImage = 0;
   dialogTitle.textContent = activeWork.title;
@@ -229,7 +230,7 @@ function showWork(workKey, { commission = false } = {}) {
   const contact = dialog.querySelector('.dialog-contact');
   const sold = activeWork.status === 'Продана';
   contact.textContent = sold || commission ? 'Заказать копию' : 'Заказать';
-  contact.href = '#order';
+  contact.href = 'https://t.me/Art_Daria1';
   dialogYear.textContent = activeWork.year;
   dialogMaterials.textContent = activeWork.materials;
   thumbs.replaceChildren(...activeWork.images.map((source, index) => {
