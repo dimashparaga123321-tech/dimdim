@@ -138,6 +138,7 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
   .section-pad { padding: 88px max(20px, env(safe-area-inset-right)) 88px max(20px, env(safe-area-inset-left)); }
   .section-title { margin-bottom: 52px; }
   .section-title h2, .pricing h2, .contacts h2 { font-size: clamp(2.7rem, 13vw, 4.2rem); }
+  .pricing h2, .order .section-title h2 { font-size: clamp(1.85rem, 8.2vw, 2.15rem); letter-spacing: -.04em; white-space: nowrap; }
   .about-layout, .pricing, .order-layout { grid-template-columns: 1fr; gap: 44px; }
   .about-photo { min-height: 430px; }
   .about-text .lead { font-size: 1.35rem; }
