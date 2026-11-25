@@ -76,17 +76,17 @@ button { color: inherit; font: inherit; }
 .artwork-page > img { width: 100%; height: auto; margin: 20px 0 26px; }
 .artwork-page h1 { font-size: clamp(1.9rem, 5vw, 3.2rem); font-weight: 300; line-height: 1.12; }
 .artwork-page .artwork-price { font-size: 1.5rem; font-weight: 500; }
-.artwork-page { max-width: 1200px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: clamp(12px, 4vw, 56px); }
-.artwork-page > a { grid-column: 1 / -1; justify-self: start; }
-.artwork-page > img { margin: 0; max-height: calc(100svh - 120px); object-fit: contain; object-position: top center; }
+.artwork-page { max-width: 1440px; display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); align-items: start; column-gap: clamp(12px, 3vw, 48px); row-gap: 16px; padding-top: 14px; }
+.artwork-page > a { grid-area: 1 / 1 / 2 / -1; justify-self: start; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; background: var(--rose); border-radius: 999px; color: var(--ink); font-weight: 500; }
+.artwork-page > img { grid-area: 2 / 1; margin: 0; width: 100%; max-height: calc(100svh - 90px); object-fit: contain; object-position: top left; }
 .artwork-page-details > p { margin: .65em 0; }
 .artwork-description summary { display: inline-flex; align-items: center; gap: .6em; padding: .55em .8em; background: var(--ink); color: white; border-radius: 999px; cursor: pointer; font-weight: 500; }
 .artwork-description summary::-webkit-details-marker { display: none; }
 .artwork-description[open] summary span { transform: rotate(90deg); }
-.artwork-page-details { min-width: 0; overflow-wrap: anywhere; }
-.artwork-page-details h1 { margin-top: 0; }
+.artwork-page-details { grid-area: 2 / 2; min-width: 0; overflow-wrap: anywhere; font-weight: 400; }
+.artwork-page-details h1 { margin: 0 0 .55em; }
 @media (max-width: 600px) {
-  .artwork-page { padding-inline: 14px; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); font-size: 1rem; }
+  .artwork-page { padding-inline: 10px; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); font-size: 1rem; }
   .artwork-page h1 { font-size: clamp(1.2rem, 5vw, 1.9rem); font-weight: 400; }
   .artwork-page .artwork-price { font-size: 1.2rem; }
 }
