@@ -1,6 +1,58 @@
 const menuToggle = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('.site-nav');
 
+function cmsTextElements() {
+  const selector = 'h1,h2,h3,p,small,strong,span,figcaption,dt,dd,li,a,button';
+  return [...document.querySelectorAll(selector)].filter((element) => {
+    if (!element.textContent.trim() || element.closest('dialog') || element.closest('svg')) return false;
+    return ![...element.children].some((child) => child.matches(selector) && child.textContent.trim());
+  });
+}
+
+function cmsImageElements() {
+  return [...document.querySelectorAll('img,.hero-portrait,.about-photo,.wrapped-art')].filter((element) => !element.closest('dialog'));
+}
+
+function applyCmsImage(element, source) {
+  if (element.tagName === 'IMG') element.src = source;
+  else {
+    element.classList.add('cms-has-image');
+    element.style.backgroundImage = `url("${source}")`;
+    element.style.backgroundSize = 'cover';
+    element.style.backgroundPosition = 'center';
+    element.querySelector('span')?.setAttribute('hidden', '');
+  }
+}
+
+async function applyPublishedSiteContent() {
+  let published = {};
+  try { published = JSON.parse(localStorage.getItem('daria-site-published-v1')) || {}; } catch {}
+  cmsTextElements().forEach((element, index) => {
+    const value = published.text?.[`text-${index}`];
+    if (value !== undefined) element.textContent = value;
+  });
+  if (!('indexedDB' in window)) return;
+  const request = indexedDB.open('daria-portfolio', 2);
+  request.onupgradeneeded = () => {
+    const db = request.result;
+    if (!db.objectStoreNames.contains('artworks')) db.createObjectStore('artworks', { keyPath: 'id', autoIncrement: true });
+    if (!db.objectStoreNames.contains('media')) db.createObjectStore('media', { keyPath: 'key' });
+  };
+  request.onsuccess = () => {
+    const db = request.result;
+    const media = db.transaction('media').objectStore('media').getAll();
+    media.onsuccess = () => {
+      const map = new Map(media.result.map((record) => [record.key, record]));
+      cmsImageElements().forEach((element, index) => {
+        const blob = map.get(`image-${index}`)?.publishedBlob;
+        if (blob) applyCmsImage(element, URL.createObjectURL(blob));
+      });
+    };
+  };
+}
+
+if (!new URLSearchParams(location.search).has('editor')) applyPublishedSiteContent();
+
 menuToggle?.addEventListener('click', () => {
   const open = navigation.classList.toggle('is-open');
   menuToggle.setAttribute('aria-expanded', String(open));
@@ -82,14 +134,18 @@ function renderProject() {
 function loadLocalArtworks() {
   return new Promise((resolve) => {
     if (!('indexedDB' in window)) return resolve();
-    const request = indexedDB.open('daria-portfolio', 1);
-    request.onupgradeneeded = () => request.result.createObjectStore('artworks', { keyPath: 'id', autoIncrement: true });
+    const request = indexedDB.open('daria-portfolio', 2);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains('artworks')) db.createObjectStore('artworks', { keyPath: 'id', autoIncrement: true });
+      if (!db.objectStoreNames.contains('media')) db.createObjectStore('media', { keyPath: 'key' });
+    };
     request.onerror = () => resolve();
     request.onsuccess = () => {
       const rows = request.result.transaction('artworks').objectStore('artworks').getAll();
       rows.onerror = () => resolve();
       rows.onsuccess = () => {
-        rows.result.forEach((row) => {
+        rows.result.filter((row) => row.published !== false).forEach((row) => {
           const images = (row.images || []).map((blob) => URL.createObjectURL(blob));
           if (!images.length) return;
           works[`local-${row.id}`] = {
