@@ -237,6 +237,15 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
 .hero[data-background="floral"]::before {
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='180' viewBox='0 0 160 180'%3E%3Cg fill='none' stroke='%23bf8098' stroke-opacity='.48' stroke-width='1.4'%3E%3Cpath d='M30 150Q45 104 32 65M39 119Q15 117 13 96Q39 96 39 119ZM39 96Q59 90 62 72Q42 75 39 96ZM108 115Q126 87 119 42M122 84Q142 78 146 63Q129 63 122 84Z'/%3E%3Cpath d='M32 65C7 61 14 40 28 52C23 26 48 31 38 52C56 45 57 66 32 65ZM119 42C98 38 103 21 114 30C111 10 131 12 124 30C140 23 140 43 119 42Z'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 160px 180px, #faedf0;
 }
+.hero[data-background]::before {
+  inset:0;
+  border-radius:0;
+  box-shadow:none;
+  background:linear-gradient(90deg,#fbf7f2 0%,#fbf7f200 70%), url("hero-background-art.png") var(--art-position) center / 301% 100% no-repeat;
+}
+.hero[data-background="paper"] { --art-position:0%; }
+.hero[data-background="arch"] { --art-position:50%; }
+.hero[data-background="floral"] { --art-position:100%; }
   </style>
 </head>
 <body>
@@ -250,9 +259,9 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
   </header>
 
   <div class="background-picker" role="group" aria-label="Варианты фона">
-    <button type="button" data-option="arch" aria-pressed="true">Розовая арка</button>
-    <button type="button" data-option="paper" aria-pressed="false">Фактурная бумага</button>
-    <button type="button" data-option="floral" aria-pressed="false">Ботаника</button>
+    <button type="button" data-option="arch" aria-pressed="true">Мазки масла</button>
+    <button type="button" data-option="paper" aria-pressed="false">Бумажный рельеф</button>
+    <button type="button" data-option="floral" aria-pressed="false">Шёлк и тени</button>
   </div>
   <main>
     <section id="top" class="hero" data-background="arch" aria-labelledby="hero-title">
