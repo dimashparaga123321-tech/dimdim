@@ -132,6 +132,15 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
 }
 #portfolio .art-card-copy { flex-direction: column; align-items: flex-start; gap: 5px; }
 #portfolio .art-card-copy small, #dialog-price { color: var(--ink); font-size: 1rem; }
+#portfolio .art-card-copy, #sold .art-card-copy { flex-direction: column; align-items: flex-start; gap: 6px; overflow-wrap: anywhere; }
+#portfolio .art-card-copy strong, #sold .art-card-copy strong { font-size: clamp(1.125rem, 2.2vw, 1.5rem); }
+#portfolio .art-card-copy small, #sold .art-card-copy small, #dialog-price {
+  color: var(--ink);
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  font-weight: 500;
+  text-align: left;
+}
+#dialog-description { font-size: clamp(1.125rem, 2vw, 1.25rem); line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; }
 .dialog-close { position: sticky; z-index: 3; top: 0; width: 100%; min-height: 54px; padding: 0 clamp(20px, 4vw, 50px); border: 0; border-bottom: 1px solid var(--line); background: rgba(251,247,242,.96); text-align: right; text-transform: uppercase; cursor: pointer; }
 .dialog-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); gap: clamp(35px, 6vw, 80px); padding: clamp(24px, 5vw, 70px); }
 .dialog-gallery { position: relative; min-width: 0; }

@@ -125,7 +125,7 @@ function createProjectCard(workKey, work) {
 }
 
 function workPrice(work) {
-  if (work.status === 'Продана') return 'Продана';
+  if (work.status === 'Продана') return work.price ? `Продана за ${work.price} ₽` : 'Продана';
   if (work.price) return `${work.price} ₽`;
   return work.demoPrice || 'Цена по запросу';
 }
@@ -205,6 +205,10 @@ function showWork(workKey) {
   dialogKicker.textContent = activeWork.kicker;
   dialogDescription.textContent = activeWork.description;
   document.querySelector("#dialog-price").textContent = workPrice(activeWork);
+  const contact = dialog.querySelector('.dialog-contact');
+  const sold = activeWork.status === 'Продана';
+  contact.textContent = sold ? 'Заказать копию' : 'Обсудить похожую работу';
+  contact.href = sold ? '#order' : '#contacts';
   dialogYear.textContent = activeWork.year;
   dialogMaterials.textContent = activeWork.materials;
   thumbs.replaceChildren(...activeWork.images.map((source, index) => {
