@@ -1,4 +1,13 @@
 const menuToggle = document.querySelector('.menu-toggle');
+const aboutToggle = document.querySelector('#about-toggle');
+aboutToggle?.addEventListener('click', () => {
+  const expanded = aboutToggle.getAttribute('aria-expanded') === 'true';
+  document.querySelector('#about-short').hidden = !expanded;
+  document.querySelector('#about-full').hidden = expanded;
+  aboutToggle.setAttribute('aria-expanded', String(!expanded));
+  aboutToggle.textContent = expanded ? 'Прочитать историю' : 'Свернуть историю';
+  if (expanded) aboutToggle.focus();
+});
 const navigation = document.querySelector('.site-nav');
 
 function cmsTextElements() {
