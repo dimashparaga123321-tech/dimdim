@@ -78,7 +78,11 @@ button { color: inherit; font: inherit; }
 .artwork-page .artwork-price { font-size: 1.5rem; font-weight: 500; }
 .artwork-page { max-width: 1200px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: clamp(12px, 4vw, 56px); }
 .artwork-page > a { grid-column: 1 / -1; justify-self: start; }
-.artwork-page > img { margin: 0; }
+.artwork-page > img { margin: 0; max-height: calc(100svh - 120px); object-fit: contain; object-position: top center; }
+.artwork-page-details > p { margin: .65em 0; }
+.artwork-description summary { display: inline-flex; align-items: center; gap: .6em; padding: .55em .8em; background: var(--ink); color: white; border-radius: 999px; cursor: pointer; font-weight: 500; }
+.artwork-description summary::-webkit-details-marker { display: none; }
+.artwork-description[open] summary span { transform: rotate(90deg); }
 .artwork-page-details { min-width: 0; overflow-wrap: anywhere; }
 .artwork-page-details h1 { margin-top: 0; }
 @media (max-width: 600px) {
