@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261125-22" />
+  <link rel="stylesheet" href="styles.css?v=20261125-23" />
 </head>
 <body>
   <header class="site-header">
@@ -94,7 +94,6 @@
     <section class="section-pad" id="sold">
       <div class="section-title centered"><h2>Проданные картины</h2></div>
       <div id="sold-grid" class="art-grid"></div>
-      <p id="sold-empty" class="section-note">Здесь появятся проданные работы Дарьи.</p>
     </section>
 
     <section id="commissions" class="commissions section-pad">
@@ -114,7 +113,7 @@
         <ul><li>размер полотна;</li><li>сложность сюжета;</li><li>желаемые сроки изготовления.</li></ul>
         <a class="soft-button" href="#contacts">Рассчитать стоимость</a>
       </div>
-      <figure class="pricing-art"><img loading="lazy" decoding="async" src="met-45434-preview.webp" alt="Пример картины" /><figcaption>Пример авторской работы</figcaption></figure>
+      <figure class="pricing-art" id="pricing-carousel"><img src="inner-light-preview.webp" width="900" height="1125" alt="Картина «Внутренний свет»" /><button type="button">Пауза</button></figure>
     </section>
 
     <section id="order" class="order section-pad">
@@ -168,6 +167,7 @@
     </div>
   </dialog>
 
-  <script src="script.js?v=20261125-10"></script>
+  <dialog id="portfolio-artwork" class="work-dialog" aria-label="Картина"></dialog>
+  <script src="script.js?v=20261125-12"></script>
 </body>
 </html>

@@ -88,8 +88,23 @@ button { color: inherit; font: inherit; }
 .artwork-description[open] summary span { transform: rotate(90deg); }
 .artwork-page-details { grid-area: 2 / 2; min-width: 0; overflow-wrap: anywhere; font-weight: 400; }
 .artwork-page-details h1 { margin: 0 0 .55em; }
+.artwork-page { max-width: 1600px; column-gap: clamp(12px, 2.2vw, 32px); font-size: clamp(1.125rem, 1.65vw, 1.5rem); }
+.artwork-page > img { width: auto; max-width: 100%; justify-self: end; }
+#portfolio-artwork { width: min(1600px, calc(100% - 24px)); }
+#portfolio-artwork .artwork-page { padding: clamp(10px, 2vw, 24px); }
+#portfolio-artwork.is-closing { animation: artwork-enter .22s ease-in reverse both; }
+#pricing-carousel img { height: auto; object-fit: contain; }
+#pricing-carousel button { margin-top: 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); padding: 5px 14px; }
+#pricing-carousel img { aspect-ratio: 4 / 5; }
+@media (min-width: 921px) {
+  .about-text, .order-steps, .contacts-intro { font-size: 1.2rem; }
+  .art-card-copy strong { font-size: 1.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #portfolio-artwork.is-closing { animation: none; }
+}
 @media (max-width: 600px) {
-  .artwork-page { padding-inline: 10px; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); font-size: 1rem; }
+  .artwork-page { padding-inline: 10px; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); font-size: 1.0625rem; }
   .artwork-page h1 { font-size: clamp(1.2rem, 5vw, 1.9rem); font-weight: 400; }
   .artwork-page .artwork-price { font-size: 1.2rem; }
 }

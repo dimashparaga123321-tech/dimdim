@@ -136,7 +136,7 @@ function createProjectCard(workKey, work) {
 function workPrice(work) {
   if (work.status === 'Продана') return work.price ? `Продана за ${work.price} ₽` : 'Продана';
   if (work.price) return `${work.price} ₽`;
-  return work.demoPrice || 'Цена по запросу';
+  return 'Цена по запросу';
 }
 
 function renderProject() {
@@ -146,7 +146,6 @@ function renderProject() {
   const available = entries.filter(([key, work]) => key.startsWith('local-') && work.status !== 'Продана');
   projectGrid.replaceChildren(document.querySelector('#featured-work').content.cloneNode(true), ...available.map(([key, work]) => createProjectCard(key, work)));
   document.querySelector('#sold-grid').replaceChildren(...sold.map(([key, work]) => createProjectCard(key, work)));
-  document.querySelector('#sold-empty').hidden = sold.length > 0;
 }
 
 function loadLocalArtworks() {
@@ -251,12 +250,118 @@ document.querySelectorAll('[data-work]').forEach((card) => {
   }));
 });
 
-works.wave.demoPrice = '35 000 ₽ · пример';
-works.stories.demoPrice = '42 000 ₽ · пример';
-works.silence.demoPrice = '28 000 ₽ · пример';
-works.detail.demoPrice = '30 000 ₽ · пример';
 renderProject();
 loadLocalArtworks();
+
+const artworkDialog = document.querySelector('#portfolio-artwork');
+const artworkPages = new Map();
+const featuredCards = [...document.querySelectorAll('#project-grid a.art-card')];
+const warmImages = new Map();
+
+function warmImage(src) {
+  if (!warmImages.has(src)) {
+    const image = new Image();
+    image.src = src;
+    warmImages.set(src, image);
+  }
+  return warmImages.get(src);
+}
+
+function loadArtwork(url) {
+  if (!artworkPages.has(url)) {
+    artworkPages.set(url, fetch(url).then(response => {
+      if (!response.ok) throw new Error('Artwork unavailable');
+      return response.text();
+    }).then(html => {
+      const page = new DOMParser().parseFromString(html, 'text/html').querySelector('.artwork-page');
+      if (!page) throw new Error('Artwork missing');
+      return page;
+    }).catch(() => {
+      artworkPages.delete(url);
+      return null;
+    }));
+  }
+  return artworkPages.get(url);
+}
+
+function closeArtwork() {
+  if (artworkDialog.classList.contains('is-closing')) return;
+  artworkDialog.classList.add('is-closing');
+  const animation = artworkDialog.getAnimations()[0];
+  const finish = () => {
+    artworkDialog.close();
+    artworkDialog.classList.remove('is-closing');
+  };
+  if (animation) animation.finished.then(finish, finish);
+  else finish();
+}
+
+artworkDialog.addEventListener('cancel', event => {
+  event.preventDefault();
+  closeArtwork();
+});
+artworkDialog.addEventListener('click', event => {
+  if (event.target === artworkDialog) closeArtwork();
+});
+
+projectGrid.addEventListener('click', async event => {
+  const card = event.target.closest('a.art-card');
+  if (!card || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  const url = card.href;
+  const preview = card.querySelector('img');
+  const page = await loadArtwork(url);
+  if (artworkDialog.open) return;
+  if (!page) return void location.assign(url);
+  const content = page.cloneNode(true);
+  const full = new URL(page.querySelector('img').getAttribute('src'), url).href;
+  const image = content.querySelector('img');
+  image.src = preview.currentSrc || preview.src;
+  warmImage(full).decode().then(() => { image.src = full; }).catch(() => {});
+  const back = content.querySelector('a');
+  back.addEventListener('click', event => {
+    event.preventDefault();
+    closeArtwork();
+  });
+  artworkDialog.replaceChildren(content);
+  artworkDialog.showModal();
+  artworkDialog.scrollTop = 0;
+});
+
+window.addEventListener('load', () => {
+  featuredCards.forEach(card => {
+    warmImage(card.querySelector('img').src);
+    loadArtwork(card.href).then(page => {
+      if (page) warmImage(new URL(page.querySelector('img').getAttribute('src'), card.href).href);
+    });
+  });
+}, { once: true });
+
+const carousel = document.querySelector('#pricing-carousel');
+const carouselImage = carousel.querySelector('img');
+const carouselButton = carousel.querySelector('button');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let paused = reducedMotion.matches;
+let carouselVisible = false;
+carouselButton.textContent = paused ? 'Продолжить' : 'Пауза';
+carouselButton.onclick = () => {
+  paused = !paused;
+  carouselButton.textContent = paused ? 'Продолжить' : 'Пауза';
+};
+new IntersectionObserver(([entry]) => { carouselVisible = entry.isIntersecting; }).observe(carousel);
+setInterval(async () => {
+  if (paused || !carouselVisible || document.hidden) return;
+  const images = [...document.querySelectorAll('#project-grid img, #sold-grid img')]
+    .filter(image => image.src !== carouselImage.src);
+  if (!images.length) return;
+  const next = images[Math.floor(Math.random() * images.length)];
+  try { await warmImage(next.src).decode(); } catch { return; }
+  if (paused) return;
+  if (!reducedMotion.matches) await carouselImage.animate([{opacity:1},{opacity:0}], 220).finished;
+  carouselImage.src = next.src;
+  carouselImage.alt = next.alt;
+  if (!reducedMotion.matches) carouselImage.animate([{opacity:0},{opacity:1}], 300);
+}, 3000);
 
 document.querySelector('.dialog-close')?.addEventListener('click', () => dialog.close());
 document.querySelector('.gallery-arrow.prev')?.addEventListener('click', () => {
