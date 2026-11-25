@@ -47,6 +47,69 @@ const works = {
   }
 };
 
+const projectDialog = document.querySelector('#project-dialog');
+const projectGrid = document.querySelector('#project-grid');
+
+function createProjectCard(workKey, work) {
+  const button = document.createElement('button');
+  button.className = 'art-card';
+  button.type = 'button';
+  button.dataset.work = workKey;
+  const image = document.createElement('img');
+  image.src = work.cover || work.images[0];
+  image.alt = work.title;
+  if (work.crop) image.style.objectPosition = `${work.crop.x}% ${work.crop.y}%`;
+  const copy = document.createElement('span');
+  copy.className = 'art-card-copy';
+  const title = document.createElement('strong');
+  title.textContent = work.title;
+  const meta = document.createElement('small');
+  meta.textContent = `${work.kicker} · ${work.year}`;
+  copy.append(title, meta);
+  button.append(image, copy);
+  button.addEventListener('click', () => {
+    projectDialog?.close();
+    showWork(workKey);
+  });
+  return button;
+}
+
+function renderProject() {
+  if (!projectGrid) return;
+  projectGrid.replaceChildren(...Object.entries(works).map(([key, work]) => createProjectCard(key, work)));
+}
+
+function loadLocalArtworks() {
+  return new Promise((resolve) => {
+    if (!('indexedDB' in window)) return resolve();
+    const request = indexedDB.open('daria-portfolio', 1);
+    request.onupgradeneeded = () => request.result.createObjectStore('artworks', { keyPath: 'id', autoIncrement: true });
+    request.onerror = () => resolve();
+    request.onsuccess = () => {
+      const rows = request.result.transaction('artworks').objectStore('artworks').getAll();
+      rows.onerror = () => resolve();
+      rows.onsuccess = () => {
+        rows.result.forEach((row) => {
+          const images = (row.images || []).map((blob) => URL.createObjectURL(blob));
+          if (!images.length) return;
+          works[`local-${row.id}`] = {
+            title: row.title || 'Без названия',
+            kicker: 'Авторская работа',
+            year: row.year || '2026',
+            materials: row.materials || 'Материалы не указаны',
+            description: row.description || '',
+            crop: row.crop || null,
+            cover: row.cover ? URL.createObjectURL(row.cover) : images[0],
+            images
+          };
+        });
+        renderProject();
+        resolve();
+      };
+    };
+  });
+}
+
 const dialog = document.querySelector('#work-dialog');
 const dialogImage = document.querySelector('#dialog-image');
 const dialogTitle = document.querySelector('#dialog-title');
@@ -96,6 +159,16 @@ function showWork(workKey) {
 document.querySelectorAll('[data-work]').forEach((card) => {
   card.addEventListener('click', () => showWork(card.dataset.work));
 });
+
+document.querySelector('#open-project')?.addEventListener('click', async () => {
+  renderProject();
+  projectDialog?.showModal();
+});
+document.querySelector('.project-close')?.addEventListener('click', () => projectDialog?.close());
+projectDialog?.addEventListener('click', (event) => {
+  if (event.target === projectDialog) projectDialog.close();
+});
+loadLocalArtworks();
 
 document.querySelector('.dialog-close')?.addEventListener('click', () => dialog.close());
 document.querySelector('.gallery-arrow.prev')?.addEventListener('click', () => {

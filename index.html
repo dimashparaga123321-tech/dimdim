@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261125-6" />
+  <link rel="stylesheet" href="styles.css?v=20261125-7" />
 </head>
 <body>
   <header class="site-header">
@@ -46,13 +46,11 @@
 
     <section id="portfolio" class="portfolio section-pad">
       <div class="section-title centered"><p>02 / Портфолио</p><h2>Портфолио</h2></div>
-      <div class="art-grid" aria-label="Работы Дарьи">
-        <button class="art-card" type="button" data-work="wave"><img src="met-45434.jpg" alt="Демонстрационная работа Волна" /><span class="art-card-copy"><strong>Вода и движение</strong><small>Авторская работа · 2026</small></span></button>
-        <button class="art-card" type="button" data-work="stories"><img src="met-437984.jpg" alt="Демонстрационная работа Личные истории" /><span class="art-card-copy"><strong>Личные истории</strong><small>Авторская работа · 2026</small></span></button>
-        <button class="art-card" type="button" data-work="silence"><img src="met-436121.jpg" alt="Демонстрационная работа Тишина и цвет" /><span class="art-card-copy"><strong>Тишина и цвет</strong><small>Авторская работа · 2026</small></span></button>
-        <button class="art-card" type="button" data-work="detail"><img src="wave.jpg" alt="Демонстрационная авторская работа" /><span class="art-card-copy"><strong>Новая серия</strong><small>Авторская работа · 2026</small></span></button>
-      </div>
-      <p class="section-note">Нажмите на работу, чтобы посмотреть детали и несколько ракурсов.</p>
+      <button class="project-card" id="open-project" type="button" aria-haspopup="dialog">
+        <span class="project-cover"><img src="met-45434.jpg" alt="Обложка проекта «Авторские картины 2026»" /></span>
+        <span class="project-copy"><strong>Авторские картины</strong><small>2026</small></span>
+      </button>
+      <p class="section-note project-note">Один проект, в котором будут собраны все авторские картины Дарьи за 2026 год.</p>
     </section>
 
     <section id="commissions" class="commissions section-pad">
@@ -104,7 +102,15 @@
     </section>
   </main>
 
-  <footer><span>© 2026 Дарья Ненькова</span><span>Авторские картины и работы на заказ</span><a href="#top">Наверх</a></footer>
+  <footer><span>© 2026 Дарья Ненькова</span><span>Авторские картины и работы на заказ</span><span class="footer-actions"><a href="admin.html">Вход для автора</a><a href="#top">Наверх</a></span></footer>
+
+  <dialog id="project-dialog" class="project-dialog" aria-labelledby="project-title">
+    <div class="project-dialog-head">
+      <div><p>Портфолио · 2026</p><h2 id="project-title">Авторские картины</h2></div>
+      <button class="project-close" type="button" aria-label="Закрыть проект">Закрыть</button>
+    </div>
+    <div id="project-grid" class="art-grid project-grid" aria-label="Картины проекта"></div>
+  </dialog>
 
   <dialog id="work-dialog" class="work-dialog" aria-labelledby="dialog-title">
     <button class="dialog-close" type="button" aria-label="Закрыть">Закрыть</button>
@@ -123,6 +129,6 @@
     </div>
   </dialog>
 
-  <script src="script.js?v=20261125-1"></script>
+  <script src="script.js?v=20261125-2"></script>
 </body>
 </html>
