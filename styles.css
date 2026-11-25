@@ -150,6 +150,9 @@ button { color: inherit; font: inherit; }
 .contact-links a { min-height: 98px; display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; border-bottom: 1px solid var(--ink); }
 .contact-links span { font: 200 clamp(1.65rem, 3vw, 2.7rem)/1 var(--font); }
 .contact-links small { color: var(--muted); }
+.contact-links .contact-pill { border: 1px solid var(--ink); border-radius: 999px; padding: 7px 12px; color: var(--ink); font-size: 1rem; font-weight: 500; white-space: nowrap; }
+.contact-links a:has(.contact-pill) { gap: 8px; }
+.contact-links a:hover .contact-pill, .contact-links a:focus-visible .contact-pill { background: var(--ink); color: white; }
 footer { min-height: 90px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px clamp(22px, 7vw, 110px); border-top: 1px solid var(--line); background: #f1d9e3; font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; }
 .footer-actions { display: flex; gap: 28px; }
 
