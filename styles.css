@@ -91,10 +91,11 @@ button { color: inherit; font: inherit; }
 .artwork-page { max-width: 1600px; column-gap: clamp(12px, 2.2vw, 32px); font-size: clamp(1.125rem, 1.65vw, 1.5rem); }
 .artwork-page > img { width: auto; max-width: 100%; justify-self: end; }
 #portfolio-artwork { width: min(1600px, calc(100% - 24px)); }
-#portfolio-artwork .artwork-page { padding: clamp(10px, 2vw, 24px); }
+#portfolio-artwork .artwork-page { padding: 12px; row-gap: 8px; }
+#portfolio-artwork .artwork-page > img { max-height: calc(100svh - 112px); object-fit: contain; }
+#work-dialog .dialog-gallery > img { max-height: min(65svh, calc(100svh - 155px)); object-fit: contain; }
 #portfolio-artwork.is-closing { animation: artwork-enter .22s ease-in reverse both; }
 #pricing-carousel img { height: auto; object-fit: contain; }
-#pricing-carousel button { margin-top: 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); padding: 5px 14px; }
 #pricing-carousel img { aspect-ratio: 4 / 5; }
 @media (min-width: 921px) {
   .about-text, .order-steps, .contacts-intro { font-size: 1.2rem; }

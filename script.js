@@ -346,24 +346,16 @@ window.addEventListener('load', () => {
 
 const carousel = document.querySelector('#pricing-carousel');
 const carouselImage = carousel.querySelector('img');
-const carouselButton = carousel.querySelector('button');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-let paused = reducedMotion.matches;
 let carouselVisible = false;
-carouselButton.textContent = paused ? 'Продолжить' : 'Пауза';
-carouselButton.onclick = () => {
-  paused = !paused;
-  carouselButton.textContent = paused ? 'Продолжить' : 'Пауза';
-};
 new IntersectionObserver(([entry]) => { carouselVisible = entry.isIntersecting; }).observe(carousel);
 setInterval(async () => {
-  if (paused || !carouselVisible || document.hidden) return;
+  if (reducedMotion.matches || !carouselVisible || document.hidden) return;
   const images = [...document.querySelectorAll('#project-grid img, #sold-grid [data-sold-record] img')]
     .filter(image => image.src !== carouselImage.src);
   if (!images.length) return;
   const next = images[Math.floor(Math.random() * images.length)];
   try { await warmImage(next.src).decode(); } catch { return; }
-  if (paused) return;
   if (!reducedMotion.matches) await carouselImage.animate([{opacity:1},{opacity:0}], 220).finished;
   carouselImage.src = next.src;
   carouselImage.alt = next.alt;
