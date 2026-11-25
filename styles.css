@@ -82,7 +82,12 @@ button { color: inherit; font: inherit; }
 .order-steps article > span { color: var(--rose-dark); font-size: .75rem; letter-spacing: .08em; }
 .order-steps h3 { margin: 0 0 7px; font-size: 1.35rem; font-weight: 300; }
 .order-steps p { max-width: 690px; margin: 0; color: var(--muted); }
+.order-steps article p + p { margin-top: 12px; }
+.order-steps strong { color: var(--ink); font-weight: 500; }
 .order-includes { margin: 28px 0 0; padding: 22px 24px; background: var(--blush); color: var(--ink) !important; }
+.order-includes h3 { margin: 0 0 12px; font-size: 1.15rem; font-weight: 400; }
+.order-includes ul { margin: 0 0 20px; padding-left: 20px; }
+.order-includes p { color: var(--ink); }
 
 .contacts { background: #f1d9e3; }
 .contacts h2 { max-width: 940px; }
