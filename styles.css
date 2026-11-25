@@ -137,8 +137,15 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
   .hero .eyebrow { margin-bottom: 12px; }
   .hero h1 { font-size: clamp(4.2rem, 20vw, 6.2rem); line-height: .82; }
   .hero h1 span + span { margin: 10px 0 0 32px; }
-  .circle-link { width: 100px; margin-top: 28px; }
-  .hero-portrait { position: absolute; z-index: 1; top: 285px; right: max(20px, env(safe-area-inset-right)); width: calc(100% - 78px); }
+  .circle-link {
+    position: absolute;
+    z-index: 4;
+    top: 520px;
+    right: 0;
+    width: 100px;
+    margin: 0;
+  }
+  .hero-portrait { position: absolute; z-index: 1; top: 285px; left: max(20px, env(safe-area-inset-left)); width: calc(100% - 78px); }
   .hero-line { z-index: 2; bottom: 0; width: 150%; height: 27%; }
   .section-pad { padding: 88px max(20px, env(safe-area-inset-right)) 88px max(20px, env(safe-area-inset-left)); }
   .section-title { margin-bottom: 52px; }
