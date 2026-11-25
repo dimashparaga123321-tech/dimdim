@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261125-10" />
+  <link rel="stylesheet" href="styles.css?v=20261125-11" />
 </head>
 <body>
   <header class="site-header">
@@ -45,11 +45,12 @@
 
     <section id="portfolio" class="portfolio section-pad">
       <div class="section-title centered"><p>02 / Портфолио</p><h2>Портфолио</h2></div>
-      <button class="project-card" id="open-project" type="button" aria-haspopup="dialog">
-        <span class="project-cover"><img src="met-45434.jpg" alt="Обложка проекта «Авторские картины 2026»" /></span>
-        <span class="project-copy"><strong>Авторские картины</strong><small>2026</small></span>
-      </button>
-      <p class="section-note project-note">Один проект, в котором будут собраны все авторские картины Дарьи за 2026 год.</p>
+      <div id="project-grid" class="art-grid" aria-label="Картины в наличии"></div>
+    </section>
+    <section class="section-pad" id="sold">
+      <div class="section-title centered"><h2>Проданные картины</h2></div>
+      <div id="sold-grid" class="art-grid"></div>
+      <p id="sold-empty" class="section-note">Здесь появятся проданные работы Дарьи.</p>
     </section>
 
     <section id="commissions" class="commissions section-pad">
@@ -103,14 +104,6 @@
 
   <footer><span>© 2026 Дарья Ненькова</span><span>Авторские картины и работы на заказ</span><span class="footer-actions"><a href="admin.html">Админка Дарьи</a><a href="#top">Наверх</a></span></footer>
 
-  <dialog id="project-dialog" class="project-dialog" aria-labelledby="project-title">
-    <div class="project-dialog-head">
-      <div><p>Портфолио · 2026</p><h2 id="project-title">Авторские картины</h2></div>
-      <button class="project-close" type="button" aria-label="Закрыть проект">Закрыть</button>
-    </div>
-    <div id="project-grid" class="art-grid project-grid" aria-label="Картины проекта"></div>
-  </dialog>
-
   <dialog id="work-dialog" class="work-dialog" aria-labelledby="dialog-title">
     <button class="dialog-close" type="button" aria-label="Закрыть">Закрыть</button>
     <div class="dialog-layout">
@@ -121,13 +114,13 @@
         <div id="dialog-thumbs" class="dialog-thumbs" aria-label="Другие ракурсы"></div>
       </div>
       <div class="dialog-copy">
-        <p id="dialog-kicker">Авторская работа</p><h2 id="dialog-title">Название картины</h2><p id="dialog-description"></p>
+        <p id="dialog-kicker">Авторская работа</p><h2 id="dialog-title">Название картины</h2><p id="dialog-price"></p><p id="dialog-description"></p>
         <dl><div><dt>Год</dt><dd id="dialog-year">2026</dd></div><div><dt>Материалы</dt><dd id="dialog-materials">Холст, акрил</dd></div></dl>
         <a class="dialog-contact" href="#contacts">Обсудить похожую работу</a>
       </div>
     </div>
   </dialog>
 
-  <script src="script.js?v=20261125-3"></script>
+  <script src="script.js?v=20261125-4"></script>
 </body>
 </html>

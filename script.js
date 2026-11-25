@@ -99,7 +99,6 @@ const works = {
   }
 };
 
-const projectDialog = document.querySelector('#project-dialog');
 const projectGrid = document.querySelector('#project-grid');
 
 function createProjectCard(workKey, work) {
@@ -116,19 +115,29 @@ function createProjectCard(workKey, work) {
   const title = document.createElement('strong');
   title.textContent = work.title;
   const meta = document.createElement('small');
-  meta.textContent = `${work.kicker} · ${work.year}`;
+  meta.textContent = workPrice(work);
   copy.append(title, meta);
   button.append(image, copy);
   button.addEventListener('click', () => {
-    projectDialog?.close();
     showWork(workKey);
   });
   return button;
 }
 
+function workPrice(work) {
+  if (work.status === 'Продана') return 'Продана';
+  if (work.price) return `${work.price} ₽`;
+  return work.demoPrice || 'Цена по запросу';
+}
+
 function renderProject() {
   if (!projectGrid) return;
-  projectGrid.replaceChildren(...Object.entries(works).map(([key, work]) => createProjectCard(key, work)));
+  const entries = Object.entries(works).sort(([, a], [, b]) => (b.createdAt || 0) - (a.createdAt || 0));
+  const sold = entries.filter(([, work]) => work.status === 'Продана');
+  const available = entries.filter(([, work]) => work.status !== 'Продана');
+  projectGrid.replaceChildren(...available.map(([key, work]) => createProjectCard(key, work)));
+  document.querySelector('#sold-grid').replaceChildren(...sold.map(([key, work]) => createProjectCard(key, work)));
+  document.querySelector('#sold-empty').hidden = sold.length > 0;
 }
 
 function loadLocalArtworks() {
@@ -154,6 +163,9 @@ function loadLocalArtworks() {
             year: row.year || '2026',
             materials: row.materials || 'Материалы не указаны',
             description: row.description || '',
+            status: row.status,
+            price: row.price,
+            createdAt: row.createdAt || row.id,
             crop: row.crop || null,
             cover: row.cover ? URL.createObjectURL(row.cover) : images[0],
             images
@@ -192,6 +204,7 @@ function showWork(workKey) {
   dialogTitle.textContent = activeWork.title;
   dialogKicker.textContent = activeWork.kicker;
   dialogDescription.textContent = activeWork.description;
+  document.querySelector("#dialog-price").textContent = workPrice(activeWork);
   dialogYear.textContent = activeWork.year;
   dialogMaterials.textContent = activeWork.materials;
   thumbs.replaceChildren(...activeWork.images.map((source, index) => {
@@ -216,14 +229,11 @@ document.querySelectorAll('[data-work]').forEach((card) => {
   card.addEventListener('click', () => showWork(card.dataset.work));
 });
 
-document.querySelector('#open-project')?.addEventListener('click', async () => {
-  renderProject();
-  projectDialog?.showModal();
-});
-document.querySelector('.project-close')?.addEventListener('click', () => projectDialog?.close());
-projectDialog?.addEventListener('click', (event) => {
-  if (event.target === projectDialog) projectDialog.close();
-});
+works.wave.demoPrice = '35 000 ₽ · пример';
+works.stories.demoPrice = '42 000 ₽ · пример';
+works.silence.demoPrice = '28 000 ₽ · пример';
+works.detail.demoPrice = '30 000 ₽ · пример';
+renderProject();
 loadLocalArtworks();
 
 document.querySelector('.dialog-close')?.addEventListener('click', () => dialog.close());
