@@ -213,12 +213,7 @@ function showWork(workKey, { commission = false } = {}) {
   dialogTitle.textContent = activeWork.title;
   dialogKicker.textContent = activeWork.kicker;
   const description = (activeWork.description || '').trim();
-  const split = description.length > 100 ? description.lastIndexOf(' ', 85) : -1;
-  const more = document.querySelector('#description-more');
-  more.open = false;
-  more.hidden = split < 1;
-  dialogDescription.textContent = split < 1 ? description : description.slice(0, split);
-  document.querySelector('#description-rest').textContent = split < 1 ? '' : description.slice(split + 1);
+  dialogDescription.textContent = description;
   dialog.querySelector('.gallery-controls').hidden = activeWork.images.length < 2;
   document.querySelector("#dialog-price").textContent = workPrice(activeWork);
   const contact = dialog.querySelector('.dialog-contact');

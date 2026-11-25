@@ -260,3 +260,23 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: .01ms !important; }
 }
+.artwork-page, .dialog-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: clamp(12px, 2vw, 24px);
+  font-size: clamp(1.0625rem, 1.6vw, 1.25rem);
+  line-height: 1.45;
+}
+.artwork-page { max-width: 1080px; padding-bottom: 30px; }
+.artwork-page > img { width: auto; max-width: 100%; justify-self: end; }
+.dialog-layout { padding: clamp(12px, 2.5vw, 30px); row-gap: 12px; }
+.dialog-copy { min-width: 0; overflow-wrap: anywhere; font-weight: 400; }
+.dialog-copy h2 { font-size: clamp(1.25rem, 4vw, 2.8rem); }
+.dialog-copy dl { margin: 12px 0; }
+.dialog-copy dl div { grid-template-columns: minmax(0, 1fr); gap: 2px; padding-block: 6px; }
+.gallery-controls { grid-template-columns: 36px minmax(0, 1fr) 36px; gap: 4px; }
+.gallery-arrow { width: 36px; height: 40px; }
+@media (max-width: 600px) {
+  .dialog-thumbs { display: none; }
+  .gallery-controls .next { grid-column: 3; }
+  .dialog-contact { padding-inline: 10px; }
+}
