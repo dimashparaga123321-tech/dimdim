@@ -197,7 +197,7 @@ function renderGalleryImage() {
   [...thumbs.children].forEach((button, index) => button.classList.toggle('is-active', index === activeImage));
 }
 
-function showWork(workKey) {
+function showWork(workKey, { commission = false } = {}) {
   activeWork = works[workKey];
   if (!activeWork || !dialog) return;
   activeImage = 0;
@@ -214,7 +214,7 @@ function showWork(workKey) {
   document.querySelector("#dialog-price").textContent = workPrice(activeWork);
   const contact = dialog.querySelector('.dialog-contact');
   const sold = activeWork.status === 'Продана';
-  contact.textContent = sold ? 'Заказать копию' : 'Заказать';
+  contact.textContent = sold || commission ? 'Заказать копию' : 'Заказать';
   contact.href = '#order';
   dialogYear.textContent = activeWork.year;
   dialogMaterials.textContent = activeWork.materials;
@@ -237,7 +237,9 @@ function showWork(workKey) {
 }
 
 document.querySelectorAll('[data-work]').forEach((card) => {
-  card.addEventListener('click', () => showWork(card.dataset.work));
+  card.addEventListener('click', () => showWork(card.dataset.work, {
+    commission: Boolean(card.closest('#commissions'))
+  }));
 });
 
 works.wave.demoPrice = '35 000 ₽ · пример';
