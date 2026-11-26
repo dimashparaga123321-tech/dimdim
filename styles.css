@@ -299,8 +299,22 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
   *, *::before, *::after { transition-duration: .01ms !important; }
 }
 #portfolio-artwork, #work-dialog { margin: auto; }
-#portfolio-artwork .artwork-page { padding: 12px; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); column-gap: clamp(8px, 1.4vw, 18px); }
-#portfolio-artwork .artwork-page > img { object-position: left top; }
+#portfolio-artwork .artwork-page, #work-dialog .dialog-layout {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: 12px;
+  grid-template-columns: auto minmax(0, min(34vw, 460px));
+  column-gap: clamp(8px, 1.4vw, 18px);
+}
+#portfolio-artwork .artwork-page > img, #work-dialog .dialog-gallery > img {
+  width: auto;
+  height: auto;
+  max-width: min(61vw, 850px);
+  max-height: calc(100dvh - 82px);
+  justify-self: center;
+  object-position: center;
+}
 .catalog-tools button { transition: background .2s, color .2s, transform .2s; }
 .catalog-tools button:hover, .catalog-tools button:focus-visible { background: var(--rose); }
 .catalog-tools button:active { background: var(--ink); color: white; transform: scale(.97); }
@@ -312,8 +326,8 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
 #order .order-layout { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 720px) {
   #portfolio-artwork, #work-dialog { width: calc(100% - 8px); max-height: calc(100dvh - 8px); }
-  #portfolio-artwork .artwork-page { padding: 6px; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); column-gap: 8px; }
-  #work-dialog .dialog-layout { grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); gap: 8px; padding: 8px; }
+  #portfolio-artwork .artwork-page, #work-dialog .dialog-layout { padding: 6px; grid-template-columns: auto minmax(0, 34vw); gap: 8px; }
+  #portfolio-artwork .artwork-page > img, #work-dialog .dialog-gallery > img { max-width: calc(66vw - 30px); }
   #work-dialog .dialog-copy h2 { font-size: clamp(1.15rem, 5vw, 1.8rem); }
   #work-dialog .dialog-copy dl div { grid-template-columns: minmax(0, 1fr); gap: 0; }
   #work-dialog .dialog-contact { padding-inline: 8px; text-align: center; }
