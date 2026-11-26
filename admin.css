@@ -168,3 +168,9 @@ input, textarea, select, .editor-head button, .admin-header button { font-size: 
 .publish-local { background: #383638; color: white; }
 .publish-local:active { background: #000; }
 .publish-confirm button:not(.publish-local):active, #close-editor:active, .edit-work:active, .save-work:active { background: #e9b3c8; color: #29282b; }
+#admin-site-preview { display:block; width:100%; height:75dvh; border:1px solid var(--line); margin-block:12px; }
+.dashboard:has(#admin-site-preview) { max-width:1440px; }
+@media (max-width:760px) {
+  #admin-site-preview { border:0; }
+  .dashboard:has(#admin-site-preview) { padding-inline:10px; }
+}

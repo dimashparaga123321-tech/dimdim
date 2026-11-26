@@ -25,7 +25,8 @@ function setAuthenticated(authenticated) {
   loginView.hidden = authenticated;
   dashboard.hidden = !authenticated;
   logout.hidden = !authenticated;
-  if (authenticated) openDatabase().then(renderLibrary).catch(() => markDraftChanged('Хранилище браузера недоступно.'));
+  if (authenticated) openDatabase().then(renderLibrary).then(refreshSitePreview).catch(() => markDraftChanged('Хранилище браузера недоступно.'));
+  else document.querySelector('#admin-site-preview').removeAttribute('src');
 }
 
 document.querySelector('#login-form').addEventListener('submit', async (event) => {
@@ -269,7 +270,8 @@ publishButton.onclick = async () => {
       tx.onabort = () => reject(tx.error);
       const store = tx.objectStore('artworks');
       for (const row of rows) {
-        if (row.removed) store.delete(row.id);
+        if (row.removed && !row.sourcePage) store.delete(row.id);
+        else if (row.removed) store.put({ id: row.id, sourcePage: row.sourcePage, removed: true });
         else if (row.pending || row.published === false) {
           const { pending, live, removed, ...record } = row;
           store.put({ ...record, published: true });
@@ -280,6 +282,7 @@ publishButton.onclick = async () => {
     publishDialog.close();
     markDraftChanged('Изменения применены в этом браузере.');
     await renderLibrary();
+    refreshSitePreview();
   } catch {
     publishDialog.close();
     markDraftChanged('Не удалось применить изменения. Попробуйте снова.');
@@ -287,5 +290,53 @@ publishButton.onclick = async () => {
     publishButton.disabled = false;
   }
 };
+
+function refreshSitePreview() {
+  document.querySelector('#admin-site-preview').src = 'index.html';
+}
+
+document.querySelector('#admin-site-preview').addEventListener('load', event => {
+  const doc = event.target.contentDocument;
+  doc?.addEventListener('click', async click => {
+    const card = click.target.closest('#project-grid .art-card, #sold-grid .art-card');
+    if (!card) {
+      const label = click.target.closest('.hero .circle-link');
+      if (label) {
+        click.preventDefault();
+        const value = prompt('Текст кнопки на главной', contactLabel.value);
+        if (value?.trim()) {
+          contactLabel.value = value.trim().slice(0, 32);
+          label.textContent = contactLabel.value;
+        }
+      }
+      return;
+    }
+    click.preventDefault();
+    click.stopPropagation();
+    try {
+      const rows = await getAllWorks();
+      const file = card.getAttribute('href');
+      const key = card.dataset.work;
+      const existing = rows.find(row => !row.removed && (file ? row.sourcePage === file : key === `local-${row.id}`));
+      if (existing) return openArtworkEditor(existing);
+      if (!file || !artworkMarkup[file]) return;
+      const page = new DOMParser().parseFromString(artworkMarkup[file], 'text/html');
+      const metadata = page.querySelector('.artwork-page-details > p').textContent.split(',');
+      const response = await fetch(page.querySelector('img').getAttribute('src'));
+      if (!response.ok) throw new Error('Photo unavailable');
+      openArtworkEditor({
+        sourcePage: file, published: false,
+        title: page.querySelector('h1').textContent.replace(/^Авторская картина /, '').replace(/[«»]/g, ''),
+        size: metadata[0].trim(), year: metadata[1]?.trim() || '2026',
+        price: page.querySelector('.artwork-price').textContent.replace(/\D/g, ''),
+        materials: page.querySelector('.artwork-price + p')?.textContent || '',
+        description: page.querySelector('.artwork-description p')?.textContent || '',
+        images: [await response.blob()]
+      });
+    } catch {
+      markDraftChanged('Не удалось открыть картину для редактирования.');
+    }
+  }, { capture: true });
+});
 
 setAuthenticated(sessionStorage.getItem(SESSION_KEY) === '1');

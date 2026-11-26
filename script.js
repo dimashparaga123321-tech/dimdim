@@ -102,6 +102,7 @@ function renderProject() {
   const cards = [...document.querySelector('#featured-work').content.children].map(card => card.cloneNode(true));
   cards.push(...available.map(([key, work]) => createProjectCard(key, work)));
   const hidden = new Set(JSON.parse(localStorage.getItem('daria-hidden-artworks') || '[]'));
+  replacedArtworkPages.forEach(page => hidden.add(page));
   const getValue = card => {
     const price = card.querySelector('small').textContent;
     return price.includes('₽') ? Number(price.replace(/\D/g, '')) : null;
@@ -126,6 +127,7 @@ function renderProject() {
   }));
 }
 
+const replacedArtworkPages = new Set();
 function loadLocalArtworks() {
   return new Promise((resolve) => {
     if (!('indexedDB' in window)) return resolve();
@@ -141,6 +143,8 @@ function loadLocalArtworks() {
       rows.onerror = () => resolve();
       rows.onsuccess = () => {
         rows.result.map(row => row.pending ? row.live : row).filter(row => row && row.published !== false).forEach((row) => {
+          if (row.sourcePage) replacedArtworkPages.add(row.sourcePage);
+          if (row.removed) return;
           const images = (row.images || []).map((blob) => URL.createObjectURL(blob));
           if (!images.length) return;
           works[`local-${row.id}`] = {
@@ -303,7 +307,11 @@ projectGrid.addEventListener('click', async event => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'artwork-description-button';
-    button.textContent = 'Описание ↓';
+    button.textContent = 'Описание';
+    const arrow = document.createElement('span');
+    arrow.textContent = '↓';
+    arrow.setAttribute('aria-hidden', 'true');
+    button.append(arrow);
     button.setAttribute('aria-expanded', 'false');
     description.id = 'portfolio-description';
     button.setAttribute('aria-controls', description.id);
@@ -311,12 +319,11 @@ projectGrid.addEventListener('click', async event => {
     button.addEventListener('click', () => {
       description.open = !description.open;
       button.setAttribute('aria-expanded', String(description.open));
-      if (description.open) description.scrollIntoView({
-        block: 'nearest',
-        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
-      });
     });
     content.querySelector('.artwork-page-details').append(button);
+    button.after(description);
+    description.hidden = true;
+    button.addEventListener('click', () => { description.hidden = !description.open; });
   }
   const full = new URL(page.querySelector('img').getAttribute('src'), url).href;
   const image = content.querySelector('img');
