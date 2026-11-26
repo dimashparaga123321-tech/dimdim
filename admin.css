@@ -174,3 +174,6 @@ input, textarea, select, .editor-head button, .admin-header button { font-size: 
   #admin-site-preview { border:0; }
   .dashboard:has(#admin-site-preview) { padding-inline:10px; }
 }
+.login-card .remember-login { display:flex; align-items:center; gap:10px; }
+.remember-login input[type="checkbox"] { width:20px; min-height:20px; flex:none; }
+.admin-work-actions { flex-wrap:wrap; }

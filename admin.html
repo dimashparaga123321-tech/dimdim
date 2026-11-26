@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="admin.css?v=20261126-9" />
+  <link rel="stylesheet" href="admin.css?v=20261126-10" />
 </head>
 <body>
   <header class="admin-header">
@@ -25,6 +25,7 @@
         <h1 id="login-title">Админка Дарьи</h1>
         <label>Логин<input name="login" autocomplete="username" required /></label>
         <label>Пароль<input name="password" type="password" autocomplete="current-password" required /></label>
+        <label class="remember-login"><input name="remember" type="checkbox" checked /> Запомнить вход на этом устройстве</label>
         <button type="submit">Войти</button>
         <output id="login-message" role="status"></output>
       </form>
@@ -37,7 +38,7 @@
       <a href="index.html#portfolio">Открыть портфолио</a>
       <p><label>Текст кнопки на главной <input id="contact-label" maxlength="32" /></label></p>
       <button id="publish-local" class="publish-local" type="button">Отправить на сайт</button>
-      <p>Нажмите на картину в предпросмотре, чтобы её изменить.</p>
+      <p>Нажмите на картину или текст в предпросмотре, чтобы изменить их.</p>
       <iframe id="admin-site-preview" title="Предпросмотр сайта Дарьи"></iframe>
       <div class="library-head"><h2>Добавленные картины</h2><span id="work-count"></span></div>
       <div id="work-list" class="work-list"></div>
@@ -84,6 +85,6 @@
       <button id="confirm-publish" class="publish-local" type="button">Подтвердить</button>
     </form>
   </dialog>
-  <script src="admin.js?v=20261126-9"></script>
+  <script src="admin.js?v=20261126-10"></script>
 </body>
 </html>

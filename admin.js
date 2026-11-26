@@ -37,6 +37,7 @@ document.querySelector('#login-form').addEventListener('submit', async (event) =
     && await sha256(form.elements.password.value) === PASSWORD_HASH;
   if (!valid) return void (message.textContent = 'Неверный логин или пароль.');
   sessionStorage.setItem(SESSION_KEY, '1');
+  if (form.elements.remember.checked) localStorage.setItem(SESSION_KEY, '1');
   form.reset();
   message.textContent = '';
   setAuthenticated(true);
@@ -44,6 +45,7 @@ document.querySelector('#login-form').addEventListener('submit', async (event) =
 
 logout.addEventListener('click', () => {
   sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY);
   setAuthenticated(false);
 });
 
@@ -122,6 +124,19 @@ async function renderLibrary() {
     edit.className = 'edit-work';
     edit.textContent = 'Изменить';
     edit.addEventListener('click', () => openArtworkEditor(row));
+    const markSold = document.createElement('button');
+    markSold.type = 'button';
+    markSold.textContent = row.status === 'Продана' ? 'Вернуть в наличие' : 'Отметить проданной';
+    markSold.onclick = async () => {
+      try {
+        await updateWork({ ...row, status: row.status === 'Продана' ? 'В наличии' : 'Продана',
+          pending: true, live: row.pending ? row.live : (row.published !== false ? row : null) });
+        await renderLibrary();
+        markDraftChanged('Статус сохранён в черновике.');
+      } catch {
+        markDraftChanged('Не удалось изменить статус.');
+      }
+    };
     const remove = document.createElement('button');
     remove.type = 'button';
     remove.className = 'delete-work';
@@ -137,7 +152,7 @@ async function renderLibrary() {
       }
     });
     text.append(title, meta);
-    actions.append(edit, remove);
+    actions.append(edit, markSold, remove);
     copy.append(text, actions);
     article.append(image, copy);
     return article;
@@ -258,6 +273,7 @@ function renderBuiltInWorks() {
 const publishDialog = document.querySelector('#publish-confirm');
 const publishButton = document.querySelector('#confirm-publish');
 const contactLabel = document.querySelector('#contact-label');
+const textDraft = JSON.parse(localStorage.getItem('daria-site-text-v2') || '{}');
 contactLabel.value = localStorage.getItem('daria-contact-label') || 'Связаться';
 document.querySelector('#publish-local').onclick = () => publishDialog.showModal();
 publishButton.onclick = async () => {
@@ -279,6 +295,7 @@ publishButton.onclick = async () => {
       }
     });
     localStorage.setItem('daria-contact-label', contactLabel.value.trim() || 'Связаться');
+    localStorage.setItem('daria-site-text-v2', JSON.stringify(textDraft));
     publishDialog.close();
     markDraftChanged('Изменения применены в этом браузере.');
     await renderLibrary();
@@ -307,6 +324,16 @@ document.querySelector('#admin-site-preview').addEventListener('load', event => 
         if (value?.trim()) {
           contactLabel.value = value.trim().slice(0, 32);
           label.textContent = contactLabel.value;
+        }
+      } else {
+        const element = click.target.closest('[data-edit-text]');
+        if (!element) return;
+        click.preventDefault();
+        const value = prompt('Изменить текст', element.textContent.trim());
+        if (value?.trim()) {
+          textDraft[element.dataset.editText] = value.trim();
+          element.textContent = value.trim();
+          markDraftChanged('Текст сохранён в черновике.');
         }
       }
       return;
@@ -339,4 +366,4 @@ document.querySelector('#admin-site-preview').addEventListener('load', event => 
   }, { capture: true });
 });
 
-setAuthenticated(sessionStorage.getItem(SESSION_KEY) === '1');
+setAuthenticated(sessionStorage.getItem(SESSION_KEY) === '1' || localStorage.getItem(SESSION_KEY) === '1');

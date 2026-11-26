@@ -298,3 +298,20 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: .01ms !important; }
 }
+#portfolio-artwork, #work-dialog { margin: auto; }
+#portfolio-artwork .artwork-page { padding: 12px; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); column-gap: clamp(8px, 1.4vw, 18px); }
+#portfolio-artwork .artwork-page > img { object-position: right top; }
+#portfolio-artwork .artwork-description > summary { display: none; }
+#description-more > summary { color: white; margin-block: 0 12px; }
+#description-more > summary span { opacity: 0; transform: translateY(-4px); transition: opacity .2s, transform .2s; }
+#description-more[open] > summary span { opacity: 1; transform: translateY(0); }
+#dialog-description:empty, .dialog-copy dl > [hidden] { display: none; }
+#order .order-layout { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 720px) {
+  #portfolio-artwork, #work-dialog { width: calc(100% - 8px); max-height: calc(100dvh - 8px); }
+  #portfolio-artwork .artwork-page { padding: 8px; }
+  #work-dialog .dialog-layout { grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); gap: 8px; padding: 8px; }
+  #work-dialog .dialog-copy h2 { font-size: clamp(1.15rem, 5vw, 1.8rem); }
+  #work-dialog .dialog-copy dl div { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  #work-dialog .dialog-contact { padding-inline: 8px; text-align: center; }
+}

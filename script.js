@@ -12,6 +12,13 @@ const navigation = document.querySelector('.site-nav');
 
 // Read only explicitly named overrides. Old position-based drafts could target unrelated elements.
 const siteButtonLabel = localStorage.getItem('daria-contact-label');
+try {
+  const overrides = JSON.parse(localStorage.getItem('daria-site-text-v2') || '{}');
+  document.querySelectorAll('[data-edit-text]').forEach(element => {
+    const value = overrides[element.dataset.editText];
+    if (typeof value === 'string') element.textContent = value;
+  });
+} catch {}
 if (siteButtonLabel) document.querySelector('.circle-link').textContent = siteButtonLabel;
 menuToggle?.addEventListener('click', () => {
   const open = navigation.classList.toggle('is-open');
@@ -196,12 +203,14 @@ function showWork(workKey, { commission = false } = {}) {
   dialogTitle.textContent = activeWork.title;
   dialogKicker.textContent = activeWork.kicker;
   const description = (activeWork.description || '').trim();
-  const split = description.length > 100 ? description.lastIndexOf(' ', 85) : -1;
   const more = document.querySelector('#description-more');
   more.open = false;
-  more.hidden = split < 1;
-  dialogDescription.textContent = split < 1 ? description : description.slice(0, split);
-  document.querySelector('#description-rest').textContent = split < 1 ? '' : description.slice(split + 1);
+  more.hidden = !description;
+  dialogDescription.textContent = '';
+  document.querySelector('#description-rest').textContent = description;
+  const size = document.querySelector('#dialog-size');
+  size.parentElement.hidden = !activeWork.size;
+  size.textContent = activeWork.size || '';
   dialog.querySelector('.gallery-controls').hidden = activeWork.images.length < 2;
   document.querySelector("#dialog-price").textContent = workPrice(activeWork);
   const contact = dialog.querySelector('.dialog-contact');

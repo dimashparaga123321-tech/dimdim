@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261126-9" />
+  <link rel="stylesheet" href="styles.css?v=20261126-10" />
 </head>
 <body>
   <header class="site-header">
@@ -32,17 +32,17 @@
     </section>
 
     <section id="about" class="about section-pad">
-      <div class="section-title"><h2>Обо мне</h2></div>
+      <div class="section-title"><h2 data-edit-text="about-1">Обо мне</h2></div>
       <div class="about-layout">
         <img src="darya-studio.webp" alt="Дарья за работой в мастерской" width="1320" height="1746" loading="lazy" decoding="async" />
         <div class="about-text">
-          <p id="about-short" class="lead">Я — Дарья Ненькова, художник с 2012 года. Пишу на заказ и создаю авторские картины. В женских образах, собаках и натюрмортах ищу собственный почерк и то тихое чувство, к которому хочется возвращаться.</p>
+          <p id="about-short" class="lead" data-edit-text="about-2">Я — Дарья Ненькова, художник с 2012 года. Пишу на заказ и создаю авторские картины. В женских образах, собаках и натюрмортах ищу собственный почерк и то тихое чувство, к которому хочется возвращаться.</p>
           <div id="about-full" hidden>
-            <p class="lead">Я — Дарья Ненькова, художник с 2012 года. В своём творчестве совмещаю работу на заказ и создание авторских картин, а сейчас особенно внимательно ищу собственный почерк — тот самый узнаваемый ритм мазков, света и настроения, который делает каждую работу по-настоящему моей.</p>
-            <p>В авторских картинах меня особенно притягивают три направления. Женские образы — это не просто портреты, а попытки поймать внутреннее состояние: задумчивость, лёгкую усталость, момент тишины, когда человек остаётся наедине с собой. Я стараюсь не идеализировать, а передавать живую эмоцию и характер.</p>
-            <p>Собаки в моих работах — это про тепло, привязанность и простую искренность. Люблю показывать их не как «красивых моделей», а как настоящих компаньонов: немного неуклюжих, бесконечно преданных, с собственной маленькой историей в глазах.</p>
-            <p>Натюрморты — мой способ замедлиться и разглядеть красоту в повседневности. Чашка на столе, ветка, ткань, игра теней — всё это становится поводом для разговора о спокойствии и внимательности к деталям.</p>
-            <p>Для меня важно, чтобы картина не просто украшала интерьер, а становилась точкой опоры — тем самым тихим местом, куда хочется возвращаться взглядом снова и снова.</p>
+            <p class="lead" data-edit-text="about-3">Я — Дарья Ненькова, художник с 2012 года. В своём творчестве совмещаю работу на заказ и создание авторских картин, а сейчас особенно внимательно ищу собственный почерк — тот самый узнаваемый ритм мазков, света и настроения, который делает каждую работу по-настоящему моей.</p>
+            <p data-edit-text="about-4">В авторских картинах меня особенно притягивают три направления. Женские образы — это не просто портреты, а попытки поймать внутреннее состояние: задумчивость, лёгкую усталость, момент тишины, когда человек остаётся наедине с собой. Я стараюсь не идеализировать, а передавать живую эмоцию и характер.</p>
+            <p data-edit-text="about-5">Собаки в моих работах — это про тепло, привязанность и простую искренность. Люблю показывать их не как «красивых моделей», а как настоящих компаньонов: немного неуклюжих, бесконечно преданных, с собственной маленькой историей в глазах.</p>
+            <p data-edit-text="about-6">Натюрморты — мой способ замедлиться и разглядеть красоту в повседневности. Чашка на столе, ветка, ткань, игра теней — всё это становится поводом для разговора о спокойствии и внимательности к деталям.</p>
+            <p data-edit-text="about-7">Для меня важно, чтобы картина не просто украшала интерьер, а становилась точкой опоры — тем самым тихим местом, куда хочется возвращаться взглядом снова и снова.</p>
           </div>
           <button id="about-toggle" class="soft-button" type="button" aria-expanded="false" aria-controls="about-full" style="border:0;cursor:pointer">Прочитать историю</button>
         </div>
@@ -50,7 +50,7 @@
     </section>
 
     <section id="portfolio" class="portfolio section-pad">
-      <div class="section-title centered"><h2>Портфолио</h2></div>
+      <div class="section-title centered"><h2 data-edit-text="portfolio-1">Портфолио</h2></div>
       <div id="project-grid" class="art-grid" aria-label="Картины в наличии"></div>
       <div class="catalog-tools"><button id="art-more" type="button">Развернуть</button><button id="art-less" type="button" hidden>Свернуть</button></div>
       <template id="featured-work">
@@ -93,33 +93,32 @@
       </template>
     </section>
     <section class="commissions section-pad" id="sold">
-      <div class="section-title centered"><h2>Проданные картины</h2></div>
+      <div class="section-title centered"><h2 data-edit-text="sold-1">Проданные картины</h2></div>
       <div id="sold-grid" class="art-grid" aria-label="Проданные картины">
       </div>
     </section>
 
     <section id="pricing" class="pricing section-pad">
       <div class="pricing-copy">
-        <h2>Стоимость картины</h2>
-        <p class="pricing-lead">Стоимость картины на заказ всегда рассчитывается индивидуально. На цену влияют три основных фактора:</p>
-        <ul><li>размер полотна;</li><li>сложность сюжета;</li><li>желаемые сроки изготовления.</li></ul>
+        <h2 data-edit-text="pricing-1">Стоимость картины</h2>
+        <p class="pricing-lead" data-edit-text="pricing-2">Стоимость картины на заказ всегда рассчитывается индивидуально. На цену влияют три основных фактора:</p>
+        <ul><li data-edit-text="pricing-3">размер полотна;</li><li data-edit-text="pricing-4">сложность сюжета;</li><li data-edit-text="pricing-5">желаемые сроки изготовления.</li></ul>
         <a class="soft-button" href="#contacts">Рассчитать стоимость</a>
       </div>
       <figure class="pricing-art" id="pricing-carousel"><img src="inner-light-preview.webp" width="900" height="1125" alt="Картина «Внутренний свет»" /></figure>
     </section>
 
     <section id="order" class="order section-pad">
-      <div class="section-title"><h2>Как заказать картину</h2></div>
+      <div class="section-title"><h2 data-edit-text="order-1">Как заказать картину</h2></div>
       <div class="order-layout">
-        <div class="order-visual"><div class="wrapped-art" role="img" aria-label="Упакованная картина"><span>Фото упаковки картины</span></div></div>
         <div class="order-steps">
-          <article><span>01</span><div><h3>Как заказать картину</h3><p>Хотите уникальную картину именно для вашего интерьера? Я пишу картины на заказ с 2012 года — в разных техниках и стилях. Расскажите о своей идее или пришлите референс — я подготовлю эскиз, чтобы вы заранее увидели композицию. Работаю в разных техниках и стилях. Холсты изготавливаются индивидуально, поэтому могу выполнить работу в любом формате. Давайте создадим вместе что-то особенное!</p></div></article>
-          <article><span>02</span><div><h3>Сроки</h3><p>Срок изготовления картины рассчитывается индивидуально — он зависит от формата, техники и деталей заказа. Если у вас ограниченные сроки, сообщите об этом сразу: я посчитаю и скажу, успею ли написать картину к нужной дате.</p></div></article>
-          <article><span>03</span><div><h3>Оплата</h3><p>Работаю по предоплате 50% — переводом на карту или наличными при личной встрече. Остаток вы вносите, когда мы согласуем готовую картину при встрече. Если картина отправляется в другой город — остаток оплачивается перед отправкой.</p></div></article>
-          <article><span>04</span><div><h3>Доставка</h3><p>Отправляю картины по всей России и Белоруссии компанией СДЭК — <strong>бесплатно до пункта выдачи заказов</strong>. Перед отправкой я лично и бережно упакую вашу картину, чтобы она доехала в целости.</p><p>Если удобнее получить картину курьером — доставка курьером оплачивается отдельно.</p></div></article>
+          <article><span>01</span><div><h3 data-edit-text="order-2">Как заказать картину</h3><p data-edit-text="order-3">Хотите уникальную картину именно для вашего интерьера? Я пишу картины на заказ с 2012 года — в разных техниках и стилях. Расскажите о своей идее или пришлите референс — я подготовлю эскиз, чтобы вы заранее увидели композицию. Работаю в разных техниках и стилях. Холсты изготавливаются индивидуально, поэтому могу выполнить работу в любом формате. Давайте создадим вместе что-то особенное!</p></div></article>
+          <article><span>02</span><div><h3 data-edit-text="order-4">Сроки</h3><p data-edit-text="order-5">Срок изготовления картины рассчитывается индивидуально — он зависит от формата, техники и деталей заказа. Если у вас ограниченные сроки, сообщите об этом сразу: я посчитаю и скажу, успею ли написать картину к нужной дате.</p></div></article>
+          <article><span>03</span><div><h3 data-edit-text="order-6">Оплата</h3><p data-edit-text="order-7">Работаю по предоплате 50% — переводом на карту или наличными при личной встрече. Остаток вы вносите, когда мы согласуем готовую картину при встрече. Если картина отправляется в другой город — остаток оплачивается перед отправкой.</p></div></article>
+          <article><span>04</span><div><h3 data-edit-text="order-8">Доставка</h3><p>Отправляю картины по всей России и Белоруссии компанией СДЭК — <strong>бесплатно до пункта выдачи заказов</strong>. Перед отправкой я лично и бережно упакую вашу картину, чтобы она доехала в целости.</p><p data-edit-text="order-9">Если удобнее получить картину курьером — доставка курьером оплачивается отдельно.</p></div></article>
           <div class="order-includes">
-            <h3>В стоимость входит:</h3>
-            <ul><li>подарочная упаковка;</li><li>надёжная упаковка для транспортировки;</li><li>страховка картины.</li></ul>
+            <h3 data-edit-text="order-10">В стоимость входит:</h3>
+            <ul><li data-edit-text="order-11">подарочная упаковка;</li><li data-edit-text="order-12">надёжная упаковка для транспортировки;</li><li data-edit-text="order-13">страховка картины.</li></ul>
             <p><em>Остались вопросы или готовы заказать свою картину? Напишите мне — обсудим вашу идею, сроки и стоимость.</em></p>
           </div>
         </div>
@@ -127,8 +126,8 @@
     </section>
 
     <section id="contacts" class="contacts section-pad">
-      <h2>Обсудим вашу идею?</h2>
-      <p class="contacts-intro">Напишите Дарье — вместе можно подобрать формат, сроки и стоимость будущей картины.</p>
+      <h2 data-edit-text="contacts-1">Обсудим вашу идею?</h2>
+      <p class="contacts-intro" data-edit-text="contacts-2">Напишите Дарье — вместе можно подобрать формат, сроки и стоимость будущей картины.</p>
       <div class="contact-links">
         <a href="https://t.me/Art_Daria1"><span>Telegram</span><small class="contact-pill">@Art_Daria1</small></a>
         <a href="https://www.instagram.com/Art__daria/"><span>Instagram</span><small class="contact-pill">@Art__daria</small></a>
@@ -152,8 +151,8 @@
       </div>
       <div class="dialog-copy">
         <p id="dialog-kicker">Авторская работа</p><h2 id="dialog-title">Название картины</h2><p id="dialog-price"></p><p id="dialog-description"></p>
-        <details id="description-more" hidden><summary>Далее <span aria-hidden="true">↓</span></summary><div class="description-reveal"><p id="description-rest"></p></div></details>
-        <dl><div><dt>Год</dt><dd id="dialog-year">2026</dd></div><div><dt>Материалы</dt><dd id="dialog-materials">Холст, акрил</dd></div></dl>
+        <dl><div><dt>Размер</dt><dd id="dialog-size"></dd></div><div><dt>Год</dt><dd id="dialog-year">2026</dd></div><div><dt>Материалы</dt><dd id="dialog-materials">Холст, акрил</dd></div></dl>
+        <details id="description-more" class="artwork-description" hidden><summary>Описание <span aria-hidden="true">↓</span></summary><div class="description-reveal"><p id="description-rest"></p></div></details>
         <a class="dialog-contact" href="#order">Заказать</a>
       </div>
     </div>
@@ -161,6 +160,6 @@
 
   <dialog id="portfolio-artwork" class="work-dialog" aria-label="Картина"></dialog>
   <script src="artwork-pages.js"></script>
-  <script src="script.js?v=20261126-9"></script>
+  <script src="script.js?v=20261126-10"></script>
 </body>
 </html>
