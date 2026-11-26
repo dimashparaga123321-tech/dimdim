@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261126-12" />
+  <link rel="stylesheet" href="styles.css?v=20261126-13" />
 </head>
 <body>
   <header class="site-header">
@@ -119,7 +119,10 @@
           <div class="order-includes">
             <h3 data-edit-text="order-10">В стоимость входит:</h3>
             <ul><li data-edit-text="order-11">подарочная упаковка;</li><li data-edit-text="order-12">надёжная упаковка для транспортировки;</li><li data-edit-text="order-13">страховка картины.</li></ul>
-            <p><em>Остались вопросы или готовы заказать свою картину? Напишите мне — обсудим вашу идею, сроки и стоимость.</em></p>
+            <div class="order-contact-row">
+              <p><em>Остались вопросы или готовы заказать свою картину? Напишите мне — обсудим вашу идею, сроки и стоимость.</em></p>
+              <a class="artwork-contact-button" href="#contacts">Заказать картину</a>
+            </div>
           </div>
         </div>
       </div>
@@ -153,13 +156,14 @@
         <p id="dialog-kicker">Авторская работа</p><h2 id="dialog-title">Название картины</h2><p id="dialog-price"></p><p id="dialog-description"></p>
         <dl><div><dt>Размер</dt><dd id="dialog-size"></dd></div><div><dt>Год</dt><dd id="dialog-year">2026</dd></div><div><dt>Материалы</dt><dd id="dialog-materials">Холст, акрил</dd></div></dl>
         <details id="description-more" class="artwork-description" hidden><summary>Описание <span aria-hidden="true">↓</span></summary><div class="description-reveal"><p id="description-rest"></p></div></details>
-        <a class="dialog-contact" href="#order">Заказать</a>
+        <button type="button" class="dialog-contact" data-artwork-contact>Заказать</button>
       </div>
     </div>
   </dialog>
 
   <dialog id="portfolio-artwork" class="work-dialog" aria-label="Картина"></dialog>
   <script src="artwork-pages.js"></script>
-  <script src="script.js?v=20261126-10"></script>
+  <script src="artwork-contact.js"></script>
+  <script src="script.js?v=20261126-11"></script>
 </body>
 </html>

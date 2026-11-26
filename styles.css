@@ -332,3 +332,16 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
   #work-dialog .dialog-copy dl div { grid-template-columns: minmax(0, 1fr); gap: 0; }
   #work-dialog .dialog-contact { padding-inline: 8px; text-align: center; }
 }
+.contact-choice { box-sizing:border-box; width:min(420px, calc(100% - 24px)); padding:24px; border:0; border-radius:20px; background:var(--paper); color:var(--ink); }
+.contact-choice::backdrop { background:#20182080; }
+.contact-choice h2 { margin:0 44px 12px 0; font-size:1.45rem; line-height:1.2; }
+.contact-choice-close { position:absolute; top:8px; right:8px; width:44px; height:44px; border:0; background:transparent; font-size:1.6rem; cursor:pointer; }
+.contact-choice a { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:4px 12px; min-height:48px; padding:6px 0; border-bottom:1px solid var(--line); }
+.contact-choice a span { overflow-wrap:anywhere; }
+.artwork-contact-button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; margin:6px 0; padding:8px 12px; border:1px solid var(--ink); border-radius:999px; background:var(--paper); color:var(--ink); font:inherit; text-align:center; cursor:pointer; }
+.artwork-contact-button:hover, .artwork-contact-button:focus-visible { background:var(--rose); }
+.artwork-description-button + .artwork-contact-button { margin-left:4px; }
+.dialog-contact { border:0; cursor:pointer; }
+.order-contact-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px 20px; }
+.order-contact-row p { flex:1 1 240px; }
+.catalog-tools[hidden] { display:none; }

@@ -216,7 +216,6 @@ function showWork(workKey, { commission = false } = {}) {
   const contact = dialog.querySelector('.dialog-contact');
   const sold = activeWork.status === 'Продана';
   contact.textContent = sold || commission ? 'Заказать копию' : 'Заказать';
-  contact.href = 'https://t.me/Art_Daria1';
   dialogYear.textContent = activeWork.year;
   dialogMaterials.textContent = activeWork.materials;
   thumbs.replaceChildren(...activeWork.images.map((source, index) => {
@@ -334,6 +333,7 @@ projectGrid.addEventListener('click', async event => {
     description.hidden = true;
     button.addEventListener('click', () => { description.hidden = !description.open; });
   }
+  window.addArtworkContact(content.querySelector('.artwork-page-details'));
   const full = new URL(page.querySelector('img').getAttribute('src'), url).href;
   const image = content.querySelector('img');
   image.src = preview.currentSrc || preview.src;
@@ -387,4 +387,3 @@ document.querySelector('.gallery-arrow.next')?.addEventListener('click', () => {
 dialog?.addEventListener('click', (event) => {
   if (event.target === dialog) dialog.close();
 });
-document.querySelector('.dialog-contact')?.addEventListener('click', () => dialog.close());

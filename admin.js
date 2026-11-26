@@ -307,6 +307,14 @@ publishButton.onclick = async () => {
 };
 
 const frame = document.querySelector('#admin-site-preview');
+const previewMode = document.querySelector('#preview-mode');
+previewMode.onclick = () => {
+  const viewing = previewMode.getAttribute('aria-pressed') !== 'true';
+  previewMode.setAttribute('aria-pressed', String(viewing));
+  previewMode.textContent = viewing ? 'Вернуться к редактированию' : 'Смотреть как посетитель';
+  frame.contentDocument?.querySelectorAll('.admin-inline-tools').forEach(element => { element.hidden = viewing; });
+  frame.scrollIntoView({ block: 'start' });
+};
 const sectionPicker = document.querySelector('#edit-section');
 const textEditor = document.querySelector('#text-editor');
 const publishedTexts = () => JSON.parse(localStorage.getItem('daria-site-text-v2') || '{}');
@@ -403,6 +411,7 @@ document.querySelector('#admin-site-preview').addEventListener('load', event => 
     if (!section) continue;
     const controls = doc.createElement('div');
     controls.className = 'catalog-tools admin-inline-tools';
+    controls.hidden = previewMode.getAttribute('aria-pressed') === 'true';
     const edit = doc.createElement('button');
     edit.textContent = 'Изменить текст';
     edit.onclick = () => openSectionText(option.value);
@@ -429,7 +438,7 @@ document.querySelector('#admin-site-preview').addEventListener('load', event => 
   }
   doc?.addEventListener('click', async click => {
     const card = click.target.closest('#project-grid .art-card, #sold-grid .art-card');
-    if (!card) return;
+    if (!card || previewMode.getAttribute('aria-pressed') === 'true') return;
     click.preventDefault();
     click.stopPropagation();
     try {
