@@ -94,13 +94,17 @@ button { color: inherit; font: inherit; }
 #portfolio-artwork .artwork-page { padding: 12px; row-gap: 8px; }
 #portfolio-artwork .artwork-page > img { max-height: calc(100svh - 112px); object-fit: contain; }
 .artwork-page > .artwork-description { grid-column: 1 / -1; }
+#portfolio-artwork .artwork-page { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
+#portfolio-artwork .artwork-page > img { width: 100%; justify-self: stretch; }
+#portfolio-artwork .artwork-description summary[hidden] { display: none; }
+.artwork-description-button { margin-top: 6px; padding: 8px 12px; border: 0; border-radius: 999px; background: var(--ink); color: white; cursor: pointer; }
 .catalog-tools { width: min(100%, 1120px); margin: 18px auto; display: flex; flex-wrap: wrap; gap: 12px; }
 .catalog-tools select, .catalog-tools button { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 999px; padding: 6px 12px; }
 .catalog-tools button:not([hidden]) { cursor: pointer; }
 #project-grid > [hidden] { display: none; }
 @media (max-width: 720px) {
   .artwork-page { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
-  #portfolio-artwork .artwork-page { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+  #portfolio-artwork .artwork-page { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
 }
 #work-dialog .dialog-gallery > img { max-height: min(65svh, calc(100svh - 155px)); object-fit: contain; }
 #portfolio-artwork.is-closing { animation: artwork-enter .22s ease-in reverse both; }

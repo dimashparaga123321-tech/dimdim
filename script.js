@@ -139,7 +139,7 @@ function workPrice(work) {
   return 'Цена по запросу';
 }
 
-let visibleArtworks = 6;
+let visibleArtworks = 8;
 const artworkSort = document.querySelector('#art-sort');
 const artworkMore = document.querySelector('#art-more');
 const artworkLess = document.querySelector('#art-less');
@@ -169,7 +169,7 @@ function renderProject() {
   cards.forEach((card, index) => { card.hidden = index >= visibleArtworks; });
   projectGrid.replaceChildren(...cards);
   artworkMore.hidden = visibleArtworks >= cards.length;
-  artworkLess.hidden = visibleArtworks <= 6;
+  artworkLess.hidden = visibleArtworks <= 8;
   const soldGrid = document.querySelector('#sold-grid');
   soldGrid.querySelectorAll('[data-sold-record]').forEach(card => card.remove());
   soldGrid.prepend(...sold.map(([key, work]) => {
@@ -282,7 +282,7 @@ document.querySelectorAll('[data-work]').forEach((card) => {
   }));
 });
 
-artworkSort.addEventListener('change', () => { visibleArtworks = 6; renderProject(); });
+artworkSort.addEventListener('change', () => { visibleArtworks = 8; renderProject(); });
 artworkMore.addEventListener('click', () => { visibleArtworks += 2; renderProject(); });
 artworkLess.addEventListener('click', () => { visibleArtworks -= 2; renderProject(); });
 renderProject();
@@ -351,6 +351,26 @@ projectGrid.addEventListener('click', async event => {
   if (artworkDialog.open) return;
   if (!page) return void location.assign(url);
   const content = page.cloneNode(true);
+  const description = content.querySelector('.artwork-description');
+  if (description) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'artwork-description-button';
+    button.textContent = 'Описание ↓';
+    button.setAttribute('aria-expanded', 'false');
+    description.id = 'portfolio-description';
+    button.setAttribute('aria-controls', description.id);
+    description.querySelector('summary').hidden = true;
+    button.addEventListener('click', () => {
+      description.open = !description.open;
+      button.setAttribute('aria-expanded', String(description.open));
+      if (description.open) description.scrollIntoView({
+        block: 'nearest',
+        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+      });
+    });
+    content.querySelector('.artwork-page-details').append(button);
+  }
   const full = new URL(page.querySelector('img').getAttribute('src'), url).href;
   const image = content.querySelector('img');
   image.src = preview.currentSrc || preview.src;
