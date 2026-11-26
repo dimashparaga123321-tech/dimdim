@@ -141,3 +141,24 @@ output { display:block; min-height:24px; margin-top:14px; color:#a23e61; }
   .canvas-tip { font-size:.68rem; }
   .publish-bar button { padding-inline:14px; }
 }
+/* The mobile editor uses the system font and full-size touch controls. */
+body { --font: system-ui, sans-serif; font-weight: 400; }
+.is-authenticated .admin-header { display: grid; }
+.dashboard { max-width: 960px; margin: auto; padding: 24px 16px 48px; }
+.dashboard h1 { margin: 0; font-size: 2rem; }
+.dashboard a { display: inline-block; padding: 12px; text-decoration: underline; }
+.dashboard .library-head { margin-top: 24px; }
+#new-work, .save-work, .login-card button { background: #29282b; color: #fff; font-size: 1rem; letter-spacing: 0; text-transform: none; }
+.editor-head h2, .login-card h1 { font: 600 clamp(1.5rem, 5vw, 2.2rem)/1.2 var(--font); }
+.fields-column label, .crop-controls label, .login-card label { font-size: 1rem; letter-spacing: 0; }
+input, textarea, select, .editor-head button, .admin-header button { font-size: 1rem; min-height: 44px; }
+.file-button { font-size: 1rem; letter-spacing: 0; text-transform: none; }
+.crop-preview { width: min(100%, 280px); margin-inline: auto; }
+.built-in-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: space-between; }
+.built-in-row button, .admin-work-actions button { min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: white; font-size: 1rem; color: var(--ink); text-transform: none; }
+@media(max-width: 760px) {
+  .dashboard .work-list { grid-template-columns: minmax(0,1fr); gap: 16px; }
+  .dashboard .admin-work { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 14px; }
+  .dashboard .admin-work-copy { display: block; padding: 0; }
+  .dashboard .admin-work-actions { flex-wrap: wrap; margin-top: 8px; }
+}

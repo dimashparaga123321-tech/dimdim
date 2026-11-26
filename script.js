@@ -140,7 +140,6 @@ function workPrice(work) {
 }
 
 let visibleArtworks = 8;
-const artworkSort = document.querySelector('#art-sort');
 const artworkMore = document.querySelector('#art-more');
 const artworkLess = document.querySelector('#art-less');
 
@@ -151,12 +150,8 @@ function renderProject() {
   const available = entries.filter(([key, work]) => key.startsWith('local-') && work.status !== 'Продана');
   const cards = [...document.querySelector('#featured-work').content.children].map(card => card.cloneNode(true));
   cards.push(...available.map(([key, work]) => createProjectCard(key, work)));
-  const sort = artworkSort.value;
+  const hidden = new Set(JSON.parse(localStorage.getItem('daria-hidden-artworks') || '[]'));
   const getValue = card => {
-    if (sort === 'large' || sort === 'small') {
-      const dimensions = card.textContent.match(/(\d+)\s*[×хx]\s*(\d+)/i);
-      return dimensions ? Number(dimensions[1]) * Number(dimensions[2]) : null;
-    }
     const price = card.querySelector('small').textContent;
     return price.includes('₽') ? Number(price.replace(/\D/g, '')) : null;
   };
@@ -164,11 +159,12 @@ function renderProject() {
     const x = getValue(a), y = getValue(b);
     if (x === null) return y === null ? 0 : 1;
     if (y === null) return -1;
-    return (sort === 'low' || sort === 'small') ? x - y : y - x;
+    return y - x;
   });
-  cards.forEach((card, index) => { card.hidden = index >= visibleArtworks; });
-  projectGrid.replaceChildren(...cards);
-  artworkMore.hidden = visibleArtworks >= cards.length;
+  const shown = cards.filter(card => !hidden.has(card.getAttribute('href')));
+  shown.forEach((card, index) => { card.hidden = index >= visibleArtworks; });
+  projectGrid.replaceChildren(...shown);
+  artworkMore.hidden = visibleArtworks >= shown.length;
   artworkLess.hidden = visibleArtworks <= 8;
   const soldGrid = document.querySelector('#sold-grid');
   soldGrid.querySelectorAll('[data-sold-record]').forEach(card => card.remove());
@@ -203,6 +199,7 @@ function loadLocalArtworks() {
             materials: row.materials || 'Материалы не указаны',
             description: row.description || '',
             status: row.status,
+            size: row.size,
             price: row.price,
             createdAt: row.createdAt || row.id,
             crop: row.crop || null,
@@ -282,7 +279,6 @@ document.querySelectorAll('[data-work]').forEach((card) => {
   }));
 });
 
-artworkSort.addEventListener('change', () => { visibleArtworks = 8; renderProject(); });
 artworkMore.addEventListener('click', () => { visibleArtworks += 2; renderProject(); });
 artworkLess.addEventListener('click', () => { visibleArtworks -= 2; renderProject(); });
 renderProject();

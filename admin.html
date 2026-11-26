@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="admin.css?v=20261125-4" />
+  <link rel="stylesheet" href="admin.css?v=20261126-7" />
 </head>
 <body>
   <header class="admin-header">
@@ -30,44 +30,17 @@
       </form>
     </section>
 
-    <section id="dashboard" class="visual-editor" hidden>
-      <div class="editor-toolbar">
-        <div class="editor-status"><strong>Админка Дарьи</strong><span id="draft-status">Все изменения сохранены</span></div>
-        <div class="toolbar-actions"><button id="discard-draft" type="button">Отменить правки</button><button id="publish-site" class="publish-site" type="button">Отправить на сайт</button></div>
-      </div>
-
-      <div class="editor-workspace">
-        <nav class="editor-nav" aria-label="Разделы сайта">
-          <p>Разделы сайта</p>
-          <button type="button" data-section="top">Главная</button>
-          <button type="button" data-section="about">Обо мне</button>
-          <button type="button" data-section="portfolio">Портфолио</button>
-          <button type="button" data-section="commissions">Заказы</button>
-          <button type="button" data-section="pricing">Стоимость</button>
-          <button type="button" data-section="order">Как заказать</button>
-          <button type="button" data-section="contacts">Контакты</button>
-          <button id="manage-works" class="manage-works" type="button">Управление картинами</button>
-        </nav>
-
-        <div class="site-canvas">
-          <div class="canvas-tip">Нажмите на любой текст или фотографию прямо на сайте</div>
-          <iframe id="site-preview" title="Редактируемая копия сайта" src="index.html?editor=1"></iframe>
-        </div>
-
-        <aside id="inspector" class="inspector" aria-live="polite">
-          <div id="inspector-empty" class="inspector-empty"><p>Редактор элемента</p><h2>Выберите текст или фотографию</h2><span>После нажатия здесь появятся настройки выбранного элемента.</span></div>
-          <form id="text-inspector" hidden><p>Редактирование текста</p><h2 id="text-element-name">Текст</h2><label>Содержание<textarea id="text-value" rows="9"></textarea></label><button type="submit">Применить текст</button></form>
-          <form id="image-inspector" hidden><p>Редактирование фотографии</p><h2 id="image-element-name">Фотография</h2><div class="inspector-image"><img id="image-preview" alt="Предпросмотр выбранной фотографии" /></div><label class="file-button">Выбрать другое фото<input id="replacement-image" type="file" accept="image/jpeg,image/png,image/webp" /></label><div class="crop-controls"><label>По горизонтали<input id="image-x" type="range" min="0" max="100" value="50" /></label><label>По вертикали<input id="image-y" type="range" min="0" max="100" value="50" /></label><label>Масштаб<input id="image-zoom" type="range" min="100" max="180" value="100" /></label></div><button type="submit">Применить фотографию</button></form>
-        </aside>
-      </div>
-
-      <div class="publish-bar"><span id="publish-message">Черновик виден только в админке</span><button id="publish-site-mobile" type="button">Отправить на сайт</button></div>
+    <section id="dashboard" class="dashboard" hidden>
+      <h1>Картины</h1>
+      <p>Тестовый режим. Изменения видны только в этом браузере.</p>
+      <button id="new-work" type="button">Добавить картину</button>
+      <a href="index.html#portfolio">Открыть портфолио</a>
+      <div class="library-head"><h2>Добавленные картины</h2><span id="work-count"></span></div>
+      <div id="work-list" class="work-list"></div>
+      <p id="empty-library">Здесь появятся добавленные картины.</p>
+      <section id="built-in-works"><h2>Картины на сайте</h2><div id="built-in-list" class="work-list"></div></section>
+      <output id="draft-status" role="status"></output>
     </section>
-
-    <dialog id="works-manager" class="works-manager">
-      <div class="editor-head"><div><p>Авторские картины · 2026</p><h2>Управление картинами</h2></div><button id="close-works" type="button">Закрыть</button></div>
-      <div class="works-manager-body"><button id="new-work" type="button">Добавить картину</button><div class="library-head"><h3>Все картины</h3><span id="work-count">0 работ</span></div><div id="work-list" class="work-list"></div><p id="empty-library" class="empty-library">Здесь появятся картины, которые вы добавите.</p></div>
-    </dialog>
   </main>
 
   <dialog id="editor" class="editor">
@@ -76,8 +49,8 @@
       <div class="editor-layout">
         <div class="preview-column">
           <div id="crop-preview" class="crop-preview"><span>Выберите главное фото</span><img alt="Предпросмотр картины" /></div>
-          <label class="file-button">Загрузить фотографии<input id="artwork-images" name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple required /></label>
-          <p class="file-help">До четырёх фотографий: первая станет обложкой, остальные — дополнительными ракурсами.</p>
+          <label class="file-button">Выбрать фото<input id="artwork-images" name="images" type="file" accept="image/jpeg,image/png,image/webp" required /></label>
+          <p class="file-help">Фото можно выбрать из галереи телефона или из файлов.</p>
           <div class="crop-controls">
             <label>По горизонтали<input name="cropX" type="range" min="0" max="100" value="50" /></label>
             <label>По вертикали<input name="cropY" type="range" min="0" max="100" value="50" /></label>
@@ -91,13 +64,14 @@
           <label>Описание<textarea name="description" rows="7" maxlength="1200" placeholder="История картины, идея и вдохновение"></textarea></label>
           <label>Размер<input name="size" maxlength="60" placeholder="80 × 100 см" /></label>
           <label>Стоимость, ₽<input name="price" inputmode="numeric" placeholder="Необязательно" /></label>
-          <button class="save-work" type="submit">Сохранить картину</button>
+          <button class="save-work" type="submit">Сохранить в этом браузере</button>
           <output id="save-message" role="status"></output>
         </div>
       </div>
     </form>
   </dialog>
 
-  <script src="admin.js?v=20261125-3"></script>
+  <script src="artwork-pages.js"></script>
+  <script src="admin.js?v=20261126-7"></script>
 </body>
 </html>
