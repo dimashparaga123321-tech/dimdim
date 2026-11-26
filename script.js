@@ -139,12 +139,37 @@ function workPrice(work) {
   return 'Цена по запросу';
 }
 
+let visibleArtworks = 6;
+const artworkSort = document.querySelector('#art-sort');
+const artworkMore = document.querySelector('#art-more');
+const artworkLess = document.querySelector('#art-less');
+
 function renderProject() {
   if (!projectGrid) return;
   const entries = Object.entries(works).sort(([, a], [, b]) => (b.createdAt || 0) - (a.createdAt || 0));
   const sold = entries.filter(([, work]) => work.status === 'Продана');
   const available = entries.filter(([key, work]) => key.startsWith('local-') && work.status !== 'Продана');
-  projectGrid.replaceChildren(document.querySelector('#featured-work').content.cloneNode(true), ...available.map(([key, work]) => createProjectCard(key, work)));
+  const cards = [...document.querySelector('#featured-work').content.children].map(card => card.cloneNode(true));
+  cards.push(...available.map(([key, work]) => createProjectCard(key, work)));
+  const sort = artworkSort.value;
+  const getValue = card => {
+    if (sort === 'large' || sort === 'small') {
+      const dimensions = card.textContent.match(/(\d+)\s*[×хx]\s*(\d+)/i);
+      return dimensions ? Number(dimensions[1]) * Number(dimensions[2]) : null;
+    }
+    const price = card.querySelector('small').textContent;
+    return price.includes('₽') ? Number(price.replace(/\D/g, '')) : null;
+  };
+  cards.sort((a, b) => {
+    const x = getValue(a), y = getValue(b);
+    if (x === null) return y === null ? 0 : 1;
+    if (y === null) return -1;
+    return (sort === 'low' || sort === 'small') ? x - y : y - x;
+  });
+  cards.forEach((card, index) => { card.hidden = index >= visibleArtworks; });
+  projectGrid.replaceChildren(...cards);
+  artworkMore.hidden = visibleArtworks >= cards.length;
+  artworkLess.hidden = visibleArtworks <= 6;
   const soldGrid = document.querySelector('#sold-grid');
   soldGrid.querySelectorAll('[data-sold-record]').forEach(card => card.remove());
   soldGrid.prepend(...sold.map(([key, work]) => {
@@ -257,6 +282,9 @@ document.querySelectorAll('[data-work]').forEach((card) => {
   }));
 });
 
+artworkSort.addEventListener('change', () => { visibleArtworks = 6; renderProject(); });
+artworkMore.addEventListener('click', () => { visibleArtworks += 2; renderProject(); });
+artworkLess.addEventListener('click', () => { visibleArtworks -= 2; renderProject(); });
 renderProject();
 loadLocalArtworks();
 
@@ -275,6 +303,8 @@ function warmImage(src) {
 }
 
 function loadArtwork(url) {
+  const html = typeof artworkMarkup !== 'undefined' && artworkMarkup[new URL(url).pathname.split('/').pop()];
+  if (html) return Promise.resolve(new DOMParser().parseFromString(html, 'text/html').querySelector('.artwork-page'));
   if (!artworkPages.has(url)) {
     artworkPages.set(url, fetch(url).then(response => {
       if (!response.ok) throw new Error('Artwork unavailable');

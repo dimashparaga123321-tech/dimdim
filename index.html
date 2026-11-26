@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261126-4" />
+  <link rel="stylesheet" href="styles.css?v=20261126-5" />
 </head>
 <body>
   <header class="site-header">
@@ -51,7 +51,9 @@
 
     <section id="portfolio" class="portfolio section-pad">
       <div class="section-title centered"><h2>Портфолио</h2></div>
+      <div class="catalog-tools"><label>Сортировка <select id="art-sort"><option value="high">Сначала дорогие</option><option value="low">Сначала дешёвые</option><option value="large">Сначала большие</option><option value="small">Сначала маленькие</option></select></label></div>
       <div id="project-grid" class="art-grid" aria-label="Картины в наличии"></div>
+      <div class="catalog-tools"><button id="art-more" type="button">Развернуть</button><button id="art-less" type="button" hidden>Свернуть</button></div>
       <template id="featured-work">
         <a class="art-card" href="inner-light.html">
           <img loading="lazy" decoding="async" src="inner-light-preview.webp" alt="Картина «Внутренний свет»" />
@@ -163,6 +165,7 @@
   </dialog>
 
   <dialog id="portfolio-artwork" class="work-dialog" aria-label="Картина"></dialog>
-  <script src="script.js?v=20261126-3"></script>
+  <script src="artwork-pages.js"></script>
+  <script src="script.js?v=20261126-4"></script>
 </body>
 </html>
