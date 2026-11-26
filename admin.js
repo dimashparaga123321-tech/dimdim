@@ -77,30 +77,35 @@ const addWork = (work) => storeRequest('artworks', 'readwrite', 'add', work);
 const updateWork = (work) => storeRequest('artworks', 'readwrite', 'put', work);
 
 function markDraftChanged(message = 'Сохранено в этом браузере.') {
-  document.querySelector('#draft-status').textContent = message;
+  const status = document.querySelector('#draft-status');
+  status.textContent = message;
+  status.classList.add('status-toast');
+  clearTimeout(markDraftChanged.timeout);
+  markDraftChanged.timeout = setTimeout(() => status.classList.remove('status-toast'), 4500);
 }
 
-async function cropImage(file, crop, aspect = .8) {
-  const source = await createImageBitmap(file);
-  const width = 1600;
-  const height = Math.round(width / Math.max(.35, Math.min(2.4, aspect)));
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = Math.min(height, 2400);
-  const zoom = crop.zoom / 100;
-  const scale = Math.max(canvas.width / source.width, canvas.height / source.height) * zoom;
-  const sourceWidth = canvas.width / scale;
-  const sourceHeight = canvas.height / scale;
-  const sourceX = (source.width - sourceWidth) * (crop.x / 100);
-  const sourceY = (source.height - sourceHeight) * (crop.y / 100);
-  canvas.getContext('2d', { alpha: false }).drawImage(source, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
-  source.close();
-  return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('crop failed')), 'image/jpeg', .95));
+async function previewBlob(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const photo = new Image();
+    photo.src = url;
+    await photo.decode();
+    const scale = Math.min(1, 1600 / Math.max(photo.naturalWidth, photo.naturalHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(photo.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(photo.naturalHeight * scale));
+    canvas.getContext('2d').drawImage(photo, 0, 0, canvas.width, canvas.height);
+    return await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image conversion failed')), 'image/jpeg', .9));
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 async function renderLibrary() {
   renderBuiltInWorks();
-  const rows = (await getAllWorks()).filter(row => !row.removed).reverse();
+  const records = await getAllWorks();
+  renderChanges(records);
+  const rows = records.filter(row => !row.removed).reverse();
   const list = document.querySelector('#work-list');
   document.querySelector('#work-count').textContent = `${rows.length} ${rows.length === 1 ? 'работа' : 'работ'}`;
   document.querySelector('#empty-library').hidden = rows.length > 0;
@@ -170,14 +175,10 @@ function openArtworkEditor(row = null) {
   artworkForm.elements.description.value = row?.description || '';
   artworkForm.elements.size.value = row?.size || '';
   artworkForm.elements.price.value = row?.price || '';
-  artworkForm.elements.cropX.value = row?.crop?.x ?? 50;
-  artworkForm.elements.cropY.value = row?.crop?.y ?? 50;
-  artworkForm.elements.zoom.value = row?.crop?.zoom || 100;
   artworkForm.elements.images.required = !row;
   document.querySelector('#editor .editor-head h2').textContent = row ? 'Редактировать картину' : 'Добавить картину';
   if (row) {
     artworkPreviewImage.src = URL.createObjectURL(row.images[0]);
-    updateArtworkCrop();
     artworkPreviewImage.style.display = 'block';
     artworkPreview.querySelector('span').hidden = true;
   } else {
@@ -195,23 +196,17 @@ editor.addEventListener('click', (event) => { if (event.target === editor) edito
 document.querySelector('#artwork-images').addEventListener('change', (event) => {
   const files = [...event.target.files].slice(0, 4);
   if (artworkPreviewUrl) URL.revokeObjectURL(artworkPreviewUrl);
-  if (!files.length) return;
+  if (!files.length) {
+    artworkPreviewImage.src = editingArtworkRecord ? URL.createObjectURL(editingArtworkRecord.images[0]) : '';
+    artworkPreviewImage.style.display = editingArtworkRecord ? 'block' : 'none';
+    artworkPreview.querySelector('span').hidden = Boolean(editingArtworkRecord);
+    return;
+  }
   artworkPreviewUrl = URL.createObjectURL(files[0]);
   artworkPreviewImage.src = artworkPreviewUrl;
   artworkPreviewImage.style.display = 'block';
   artworkPreview.querySelector('span').hidden = true;
-  updateArtworkCrop();
 });
-
-function updateArtworkCrop() {
-  const x = artworkForm.elements.cropX.value;
-  const y = artworkForm.elements.cropY.value;
-  const zoom = Number(artworkForm.elements.zoom.value) / 100;
-  artworkPreviewImage.style.objectPosition = `${x}% ${y}%`;
-  artworkPreviewImage.style.transform = `scale(${zoom})`;
-}
-
-['cropX', 'cropY', 'zoom'].forEach((name) => artworkForm.elements[name].addEventListener('input', updateArtworkCrop));
 
 artworkForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -219,10 +214,11 @@ artworkForm.addEventListener('submit', async (event) => {
   const newFiles = [...artworkForm.elements.images.files].slice(0, 4);
   const images = newFiles.length ? newFiles : editingArtworkRecord?.images;
   if (!images?.length) return;
+  const save = event.submitter;
+  save.disabled = true;
   message.textContent = 'Сохраняем…';
   try {
-    const crop = { x: Number(artworkForm.elements.cropX.value), y: Number(artworkForm.elements.cropY.value), zoom: Number(artworkForm.elements.zoom.value) };
-    const cover = await cropImage(images[0], crop, .8);
+    const cover = newFiles.length || !editingArtworkRecord?.cover ? await previewBlob(images[0]) : editingArtworkRecord.cover;
     const work = {
       ...(editingArtworkRecord || {}),
       title: artworkForm.elements.title.value.trim(),
@@ -232,7 +228,7 @@ artworkForm.addEventListener('submit', async (event) => {
       description: artworkForm.elements.description.value.trim(),
       size: artworkForm.elements.size.value.trim(),
       price: artworkForm.elements.price.value.trim(),
-      crop, cover, images, published: false, pending: true,
+      crop: null, cover, images: newFiles.length ? [cover] : images, published: false, pending: true,
       live: editingArtworkRecord?.pending ? editingArtworkRecord.live : (editingArtworkRecord?.published !== false ? editingArtworkRecord : null),
       updatedAt: Date.now()
     };
@@ -240,15 +236,18 @@ artworkForm.addEventListener('submit', async (event) => {
     else await addWork(work);
     editor.close();
     message.textContent = '';
-    markDraftChanged();
+    markDraftChanged(`«${work.title}» сохранена в черновике для раздела «${work.status === 'Продана' ? 'Проданные картины' : 'Портфолио'}».`);
     await renderLibrary();
   } catch (error) {
-    message.textContent = error?.name === 'QuotaExceededError' ? 'В браузере недостаточно места для этих файлов.' : 'Не удалось сохранить картину.';
+    message.textContent = error?.name === 'QuotaExceededError' ? 'В браузере недостаточно места для этих файлов.' : 'Не удалось открыть фото. Попробуйте выбрать файл JPEG или PNG.';
+  } finally {
+    save.disabled = false;
   }
 });
 
+const hiddenDraft = new Set(JSON.parse(localStorage.getItem('daria-hidden-artworks') || '[]'));
 function renderBuiltInWorks() {
-  const hidden = new Set(JSON.parse(localStorage.getItem('daria-hidden-artworks') || '[]'));
+  const hidden = hiddenDraft;
   const list = document.querySelector('#built-in-list');
   list.replaceChildren(...Object.entries(artworkMarkup).map(([file, markup]) => {
     const page = new DOMParser().parseFromString(markup, 'text/html');
@@ -259,11 +258,11 @@ function renderBuiltInWorks() {
     label.textContent = title;
     const button = document.createElement('button');
     button.textContent = hidden.has(file) ? 'Вернуть' : 'Убрать';
-    button.onclick = () => {
+    button.onclick = async () => {
       if (hidden.has(file)) hidden.delete(file);
       else if (confirm(`Убрать ${title} из портфолио в этом браузере?`)) hidden.add(file);
-      localStorage.setItem('daria-hidden-artworks', JSON.stringify([...hidden]));
       renderBuiltInWorks();
+      renderChanges(await getAllWorks());
     };
     row.append(label, button);
     return row;
@@ -272,9 +271,7 @@ function renderBuiltInWorks() {
 
 const publishDialog = document.querySelector('#publish-confirm');
 const publishButton = document.querySelector('#confirm-publish');
-const contactLabel = document.querySelector('#contact-label');
-const textDraft = JSON.parse(localStorage.getItem('daria-site-text-v2') || '{}');
-contactLabel.value = localStorage.getItem('daria-contact-label') || 'Связаться';
+const textDraft = JSON.parse(localStorage.getItem('daria-site-text-draft-v2') || localStorage.getItem('daria-site-text-v2') || '{}');
 document.querySelector('#publish-local').onclick = () => publishDialog.showModal();
 publishButton.onclick = async () => {
   publishButton.disabled = true;
@@ -294,8 +291,9 @@ publishButton.onclick = async () => {
         }
       }
     });
-    localStorage.setItem('daria-contact-label', contactLabel.value.trim() || 'Связаться');
     localStorage.setItem('daria-site-text-v2', JSON.stringify(textDraft));
+    localStorage.removeItem('daria-site-text-draft-v2');
+    localStorage.setItem('daria-hidden-artworks', JSON.stringify([...hiddenDraft]));
     publishDialog.close();
     markDraftChanged('Изменения применены в этом браузере.');
     await renderLibrary();
@@ -308,36 +306,130 @@ publishButton.onclick = async () => {
   }
 };
 
+const frame = document.querySelector('#admin-site-preview');
+const sectionPicker = document.querySelector('#edit-section');
+const textEditor = document.querySelector('#text-editor');
+const publishedTexts = () => JSON.parse(localStorage.getItem('daria-site-text-v2') || '{}');
+
+function renderChanges(records) {
+  const previous = publishedTexts();
+  const changes = records.filter(row => row.pending || row.published === false)
+    .map(row => `${row.removed ? 'Удаление' : 'Картина'} · ${row.title} · ${row.status === 'Продана' ? 'Проданные картины' : 'Портфолио'}`);
+  const previouslyHidden = new Set(JSON.parse(localStorage.getItem('daria-hidden-artworks') || '[]'));
+  for (const file of new Set([...previouslyHidden, ...hiddenDraft])) {
+    if (previouslyHidden.has(file) === hiddenDraft.has(file)) continue;
+    const title = new DOMParser().parseFromString(artworkMarkup[file] || '', 'text/html').querySelector('h1')?.textContent || file;
+    changes.push(`${hiddenDraft.has(file) ? 'Скрыть' : 'Вернуть'} · ${title} · Портфолио`);
+  }
+  for (const key of Object.keys(textDraft)) {
+    if (textDraft[key] === previous[key]) continue;
+    const section = [...sectionPicker.options].find(option => option.value === key.split('-')[0]);
+    const text = `Текст · ${section?.textContent || key}`;
+    if (!changes.includes(text)) changes.push(text);
+  }
+  const list = document.querySelector('#changes-list');
+  list.replaceChildren(...(changes.length ? changes : ['Нет изменений к отправке']).map(value => {
+    const item = document.createElement('li');
+    item.textContent = value;
+    return item;
+  }));
+}
+
+function openSectionText(section) {
+  const target = frame.contentDocument?.getElementById(section);
+  if (!target) return;
+  frame.scrollIntoView({ block: 'start' });
+  const rect = target.getBoundingClientRect();
+  window.scrollBy(0, rect.top);
+  const title = [...sectionPicker.options].find(option => option.value === section)?.textContent;
+  document.querySelector('#text-heading').textContent = `Изменить текст · ${title}`;
+  const fields = document.querySelector('#text-fields');
+  fields.replaceChildren(...[...target.querySelectorAll('[data-edit-text]')].map((element, index) => {
+    const label = document.createElement('label');
+    label.textContent = element.matches('h2,h3') ? 'Заголовок' : `Текст ${index + 1}`;
+    const input = document.createElement('textarea');
+    input.rows = 3;
+    input.dataset.key = element.dataset.editText;
+    input.value = textDraft[input.dataset.key] ?? element.textContent.trim();
+    label.append(input);
+    return label;
+  }));
+  textEditor.showModal();
+}
+
+document.querySelector('#edit-section-text').onclick = () => {
+  if (sectionPicker.value) openSectionText(sectionPicker.value);
+  else sectionPicker.focus();
+};
+document.querySelector('#text-form').addEventListener('submit', event => {
+  if (event.submitter?.value !== 'save') return;
+  document.querySelectorAll('#text-fields textarea').forEach(input => {
+    const element = frame.contentDocument.querySelector(`[data-edit-text="${input.dataset.key}"]`);
+    if (element && input.value.trim() !== element.textContent.trim()) {
+      textDraft[input.dataset.key] = input.value.trim();
+      element.textContent = input.value.trim();
+    }
+  });
+  localStorage.setItem('daria-site-text-draft-v2', JSON.stringify(textDraft));
+  getAllWorks().then(renderChanges);
+  markDraftChanged('Текст сохранён в черновике.');
+});
+
+let previewResize;
 function refreshSitePreview() {
-  document.querySelector('#admin-site-preview').src = 'index.html';
+  document.querySelector('#admin-site-preview').src = './';
 }
 
 document.querySelector('#admin-site-preview').addEventListener('load', event => {
   const doc = event.target.contentDocument;
+  if (!doc?.querySelector('#portfolio')) return;
+  const style = doc.createElement('style');
+  style.textContent = '.hero { min-height:680px } .site-header { position:relative } .admin-inline-tools { grid-column:1/-1; width:100%; margin:0 0 14px }';
+  doc.head.append(style);
+  doc.querySelectorAll('[data-edit-text]').forEach(element => {
+    const value = textDraft[element.dataset.editText];
+    if (typeof value === 'string') element.textContent = value;
+  });
+  previewResize?.disconnect();
+  const resize = () => {
+    if (!doc.querySelector('dialog[open]')) frame.style.height = `${doc.body.offsetHeight}px`;
+  };
+  previewResize = new ResizeObserver(resize);
+  previewResize.observe(doc.body);
+  resize();
+  for (const option of sectionPicker.options) {
+    if (!option.value) continue;
+    const section = doc.getElementById(option.value);
+    if (!section) continue;
+    const controls = doc.createElement('div');
+    controls.className = 'catalog-tools admin-inline-tools';
+    const edit = doc.createElement('button');
+    edit.textContent = 'Изменить текст';
+    edit.onclick = () => openSectionText(option.value);
+    controls.append(edit);
+    if (option.value === 'portfolio' || option.value === 'sold') {
+      const add = doc.createElement('button');
+      add.textContent = 'Добавить картину';
+      add.onclick = () => {
+        openArtworkEditor();
+        artworkForm.elements.status.value = option.value === 'sold' ? 'Продана' : 'В портфолио';
+      };
+      controls.append(add);
+    }
+    section.prepend(controls);
+  }
+  for (const link of doc.querySelectorAll('a[href^="#"]')) {
+    link.addEventListener('click', click => {
+      const target = doc.getElementById(link.hash.slice(1));
+      if (!target) return;
+      click.preventDefault();
+      window.scrollBy({ top: frame.getBoundingClientRect().top + target.getBoundingClientRect().top,
+        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    });
+  }
   doc?.addEventListener('click', async click => {
     const card = click.target.closest('#project-grid .art-card, #sold-grid .art-card');
-    if (!card) {
-      const label = click.target.closest('.hero .circle-link');
-      if (label) {
-        click.preventDefault();
-        const value = prompt('Текст кнопки на главной', contactLabel.value);
-        if (value?.trim()) {
-          contactLabel.value = value.trim().slice(0, 32);
-          label.textContent = contactLabel.value;
-        }
-      } else {
-        const element = click.target.closest('[data-edit-text]');
-        if (!element) return;
-        click.preventDefault();
-        const value = prompt('Изменить текст', element.textContent.trim());
-        if (value?.trim()) {
-          textDraft[element.dataset.editText] = value.trim();
-          element.textContent = value.trim();
-          markDraftChanged('Текст сохранён в черновике.');
-        }
-      }
-      return;
-    }
+    if (!card) return;
     click.preventDefault();
     click.stopPropagation();
     try {

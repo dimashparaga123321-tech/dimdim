@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="admin.css?v=20261126-10" />
+  <link rel="stylesheet" href="admin.css?v=20261126-11" />
 </head>
 <body>
   <header class="admin-header">
@@ -32,19 +32,24 @@
     </section>
 
     <section id="dashboard" class="dashboard" hidden>
-      <h1>Картины</h1>
-      <p>Тестовый режим. Изменения видны только в этом браузере.</p>
-      <button id="new-work" type="button">Добавить картину</button>
-      <a href="index.html#portfolio">Открыть портфолио</a>
-      <p><label>Текст кнопки на главной <input id="contact-label" maxlength="32" /></label></p>
-      <button id="publish-local" class="publish-local" type="button">Отправить на сайт</button>
-      <p>Нажмите на картину или текст в предпросмотре, чтобы изменить их.</p>
-      <iframe id="admin-site-preview" title="Предпросмотр сайта Дарьи"></iframe>
+      <iframe id="admin-site-preview" title="Сайт Дарьи в режиме редактирования" scrolling="no"></iframe>
+      <div class="admin-tools">
+        <a href="./#portfolio" target="_blank" rel="noopener">Открыть портфолио</a>
+        <label>Раздел для редактирования
+          <select id="edit-section"><option value="">Выберите раздел</option><option value="about">Обо мне</option><option value="portfolio">Портфолио</option><option value="sold">Проданные картины</option><option value="pricing">Стоимость картины</option><option value="order">Как заказать картину</option><option value="contacts">Контакты</option></select>
+        </label>
+        <button id="edit-section-text" type="button">Изменить текст</button>
+        <button id="new-work" type="button">Добавить картину</button>
+        <button id="publish-local" class="publish-local" type="button">Отправить на сайт</button>
+        <h2>Изменения</h2>
+        <ul id="changes-list"></ul>
+        <p>Изменения применяются в этом браузере.</p>
+        <output id="draft-status" role="status"></output>
+      </div>
       <div class="library-head"><h2>Добавленные картины</h2><span id="work-count"></span></div>
       <div id="work-list" class="work-list"></div>
       <p id="empty-library">Здесь появятся добавленные картины.</p>
       <section id="built-in-works"><h2>Картины на сайте</h2><div id="built-in-list" class="work-list"></div></section>
-      <output id="draft-status" role="status"></output>
     </section>
   </main>
 
@@ -54,17 +59,12 @@
       <div class="editor-layout">
         <div class="preview-column">
           <div id="crop-preview" class="crop-preview"><span>Выберите главное фото</span><img alt="Предпросмотр картины" /></div>
-          <label class="file-button">Выбрать фото<input id="artwork-images" name="images" type="file" accept="image/jpeg,image/png,image/webp" required /></label>
+          <label class="file-button">Выбрать фото<input id="artwork-images" name="images" type="file" accept="image/*" required /></label>
           <p class="file-help">Фото можно выбрать из галереи телефона или из файлов.</p>
-          <div class="crop-controls">
-            <label>По горизонтали<input name="cropX" type="range" min="0" max="100" value="50" /></label>
-            <label>По вертикали<input name="cropY" type="range" min="0" max="100" value="50" /></label>
-            <label>Масштаб<input name="zoom" type="range" min="100" max="180" value="100" /></label>
-          </div>
         </div>
         <div class="fields-column">
           <label>Название картины<input name="title" required maxlength="100" placeholder="Например, «Тишина сада»" /></label>
-          <div class="field-row"><label>Год<input name="year" inputmode="numeric" value="2026" maxlength="4" required /></label><label>Статус<select name="status"><option>В портфолио</option><option>В наличии</option><option>Продана</option></select></label></div>
+          <div class="field-row"><label>Год<input name="year" inputmode="numeric" value="2026" maxlength="4" required /></label><label>В какой раздел добавить<select name="status"><option>В портфолио</option><option>В наличии</option><option>Продана</option></select></label></div>
           <label>Материалы<input name="materials" maxlength="120" placeholder="Холст, масло" /></label>
           <label>Описание<textarea name="description" rows="7" maxlength="1200" placeholder="История картины, идея и вдохновение"></textarea></label>
           <label>Размер<input name="size" maxlength="60" placeholder="80 × 100 см" /></label>
@@ -85,6 +85,14 @@
       <button id="confirm-publish" class="publish-local" type="button">Подтвердить</button>
     </form>
   </dialog>
-  <script src="admin.js?v=20261126-10"></script>
+  <dialog id="text-editor" class="publish-confirm">
+    <form method="dialog" id="text-form">
+      <h2 id="text-heading"></h2>
+      <div id="text-fields"></div>
+      <button value="cancel">Отмена</button>
+      <button id="apply-text" value="save" class="publish-local">Сохранить черновик</button>
+    </form>
+  </dialog>
+  <script src="admin.js?v=20261126-11"></script>
 </body>
 </html>
