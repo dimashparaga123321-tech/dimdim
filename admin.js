@@ -72,7 +72,6 @@ function storeRequest(store, mode, action, value) {
 const getAllWorks = () => storeRequest('artworks', 'readonly', 'getAll');
 const addWork = (work) => storeRequest('artworks', 'readwrite', 'add', work);
 const updateWork = (work) => storeRequest('artworks', 'readwrite', 'put', work);
-const removeWork = (id) => storeRequest('artworks', 'readwrite', 'delete', id);
 
 function markDraftChanged(message = 'Сохранено в этом браузере.') {
   document.querySelector('#draft-status').textContent = message;
@@ -98,7 +97,7 @@ async function cropImage(file, crop, aspect = .8) {
 
 async function renderLibrary() {
   renderBuiltInWorks();
-  const rows = (await getAllWorks()).reverse();
+  const rows = (await getAllWorks()).filter(row => !row.removed).reverse();
   const list = document.querySelector('#work-list');
   document.querySelector('#work-count').textContent = `${rows.length} ${rows.length === 1 ? 'работа' : 'работ'}`;
   document.querySelector('#empty-library').hidden = rows.length > 0;
@@ -114,7 +113,7 @@ async function renderLibrary() {
     const title = document.createElement('h3');
     title.textContent = row.title;
     const meta = document.createElement('p');
-    meta.textContent = [row.year, row.status, row.published ? 'На сайте' : 'Черновик'].filter(Boolean).join(' · ');
+    meta.textContent = [row.year, row.status, row.pending || row.published === false ? 'Черновик' : 'На сайте'].filter(Boolean).join(' · ');
     const actions = document.createElement('div');
     actions.className = 'admin-work-actions';
     const edit = document.createElement('button');
@@ -129,8 +128,8 @@ async function renderLibrary() {
     remove.addEventListener('click', async () => {
       if (!confirm(`Удалить «${row.title}»?`)) return;
       try {
-        await removeWork(row.id);
-        markDraftChanged('Картина удалена в этом браузере.');
+        await updateWork({ ...row, removed: true, pending: true, live: row.pending ? row.live : (row.published !== false ? row : null) });
+        markDraftChanged('Удаление сохранено в черновике.');
         await renderLibrary();
       } catch {
         markDraftChanged('Удалить картину не удалось.');
@@ -217,7 +216,9 @@ artworkForm.addEventListener('submit', async (event) => {
       description: artworkForm.elements.description.value.trim(),
       size: artworkForm.elements.size.value.trim(),
       price: artworkForm.elements.price.value.trim(),
-      crop, cover, images, published: true, updatedAt: Date.now()
+      crop, cover, images, published: false, pending: true,
+      live: editingArtworkRecord?.pending ? editingArtworkRecord.live : (editingArtworkRecord?.published !== false ? editingArtworkRecord : null),
+      updatedAt: Date.now()
     };
     if (editingArtworkId) await updateWork({ ...work, id: editingArtworkId });
     else await addWork(work);
@@ -252,5 +253,39 @@ function renderBuiltInWorks() {
     return row;
   }));
 }
+
+const publishDialog = document.querySelector('#publish-confirm');
+const publishButton = document.querySelector('#confirm-publish');
+const contactLabel = document.querySelector('#contact-label');
+contactLabel.value = localStorage.getItem('daria-contact-label') || 'Связаться';
+document.querySelector('#publish-local').onclick = () => publishDialog.showModal();
+publishButton.onclick = async () => {
+  publishButton.disabled = true;
+  try {
+    const rows = await getAllWorks();
+    await new Promise((resolve, reject) => {
+      const tx = database.transaction('artworks', 'readwrite');
+      tx.oncomplete = resolve;
+      tx.onabort = () => reject(tx.error);
+      const store = tx.objectStore('artworks');
+      for (const row of rows) {
+        if (row.removed) store.delete(row.id);
+        else if (row.pending || row.published === false) {
+          const { pending, live, removed, ...record } = row;
+          store.put({ ...record, published: true });
+        }
+      }
+    });
+    localStorage.setItem('daria-contact-label', contactLabel.value.trim() || 'Связаться');
+    publishDialog.close();
+    markDraftChanged('Изменения применены в этом браузере.');
+    await renderLibrary();
+  } catch {
+    publishDialog.close();
+    markDraftChanged('Не удалось применить изменения. Попробуйте снова.');
+  } finally {
+    publishButton.disabled = false;
+  }
+};
 
 setAuthenticated(sessionStorage.getItem(SESSION_KEY) === '1');

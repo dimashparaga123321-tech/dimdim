@@ -162,3 +162,9 @@ input, textarea, select, .editor-head button, .admin-header button { font-size: 
   .dashboard .admin-work-copy { display: block; padding: 0; }
   .dashboard .admin-work-actions { flex-wrap: wrap; margin-top: 8px; }
 }
+.publish-confirm { width: min(92%, 430px); padding: 20px; border: 0; border-radius: 16px; }
+.publish-confirm::backdrop { background: #0007; }
+.publish-local, .publish-confirm button { min-height: 44px; padding: 8px 18px; border: 1px solid #29282b; border-radius: 999px; }
+.publish-local { background: #383638; color: white; }
+.publish-local:active { background: #000; }
+.publish-confirm button:not(.publish-local):active, #close-editor:active, .edit-work:active, .save-work:active { background: #e9b3c8; color: #29282b; }

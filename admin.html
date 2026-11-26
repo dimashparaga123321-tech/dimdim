@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="admin.css?v=20261126-7" />
+  <link rel="stylesheet" href="admin.css?v=20261126-8" />
 </head>
 <body>
   <header class="admin-header">
@@ -35,6 +35,8 @@
       <p>Тестовый режим. Изменения видны только в этом браузере.</p>
       <button id="new-work" type="button">Добавить картину</button>
       <a href="index.html#portfolio">Открыть портфолио</a>
+      <p><label>Текст кнопки на главной <input id="contact-label" maxlength="32" /></label></p>
+      <button id="publish-local" class="publish-local" type="button">Отправить на сайт</button>
       <div class="library-head"><h2>Добавленные картины</h2><span id="work-count"></span></div>
       <div id="work-list" class="work-list"></div>
       <p id="empty-library">Здесь появятся добавленные картины.</p>
@@ -64,7 +66,7 @@
           <label>Описание<textarea name="description" rows="7" maxlength="1200" placeholder="История картины, идея и вдохновение"></textarea></label>
           <label>Размер<input name="size" maxlength="60" placeholder="80 × 100 см" /></label>
           <label>Стоимость, ₽<input name="price" inputmode="numeric" placeholder="Необязательно" /></label>
-          <button class="save-work" type="submit">Сохранить в этом браузере</button>
+          <button class="save-work" type="submit">Сохранить черновик</button>
           <output id="save-message" role="status"></output>
         </div>
       </div>
@@ -72,6 +74,14 @@
   </dialog>
 
   <script src="artwork-pages.js"></script>
-  <script src="admin.js?v=20261126-7"></script>
+  <dialog id="publish-confirm" class="publish-confirm">
+    <form method="dialog">
+      <h2>Применить изменения?</h2>
+      <p>Изменения появятся на сайте в этом браузере.</p>
+      <button type="submit">Отмена</button>
+      <button id="confirm-publish" class="publish-local" type="button">Подтвердить</button>
+    </form>
+  </dialog>
+  <script src="admin.js?v=20261126-8"></script>
 </body>
 </html>
