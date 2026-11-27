@@ -186,3 +186,8 @@ input, textarea, select, .editor-head button, .admin-header button { font-size: 
 .login-card .remember-login { display:flex; align-items:center; gap:10px; }
 .remember-login input[type="checkbox"] { width:20px; min-height:20px; flex:none; }
 .admin-work-actions { flex-wrap:wrap; }
+#selected-photos { list-style:none; padding:0; display:grid; gap:8px; }
+#selected-photos li { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+#selected-photos img { width:48px; height:48px; object-fit:contain; }
+#selected-photos span { flex:1 0 60px; }
+#selected-photos button { min-height:44px; padding:6px 9px; border:1px solid var(--line); border-radius:8px; background:white; }

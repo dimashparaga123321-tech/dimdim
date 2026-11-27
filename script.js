@@ -192,12 +192,15 @@ function renderGalleryImage() {
   const source = activeWork.images[activeImage];
   dialogImage.src = source;
   dialogImage.alt = `${activeWork.title}, фотография ${activeImage + 1}`;
-  [...thumbs.children].forEach((button, index) => button.classList.toggle('is-active', index === activeImage));
+  [...thumbs.children].forEach((button, index) => {
+    button.classList.toggle('is-active', index === activeImage);
+    button.setAttribute('aria-pressed', String(index === activeImage));
+  });
 }
 
 function showWork(workKey, { commission = false } = {}) {
   const work = works[workKey];
-  activeWork = work && { ...work, images: work.images.slice(0, 1) };
+  activeWork = work;
   if (!activeWork || !dialog) return;
   activeImage = 0;
   dialogTitle.textContent = activeWork.title;

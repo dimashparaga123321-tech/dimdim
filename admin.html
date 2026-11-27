@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="admin.css?v=20261126-11" />
+  <link rel="stylesheet" href="admin.css?v=20261127-2" />
 </head>
 <body>
   <header class="admin-header">
@@ -61,8 +61,10 @@
       <div class="editor-layout">
         <div class="preview-column">
           <div id="crop-preview" class="crop-preview"><span>Выберите главное фото</span><img alt="Предпросмотр картины" /></div>
-          <label class="file-button">Выбрать фото<input id="artwork-images" name="images" type="file" accept="image/*" required /></label>
-          <p class="file-help">Фото можно выбрать из галереи телефона или из файлов.</p>
+          <label class="file-button">Добавить фото<input id="artwork-images" name="images" type="file" accept="image/*" multiple /></label>
+          <p class="file-help">Выберите до восьми фото сразу или добавляйте по одному. Обложка видна в каталоге, остальные фото — в карточке.</p>
+          <p id="photo-count" role="status"></p>
+          <ul id="selected-photos" aria-label="Фотографии картины"></ul>
         </div>
         <div class="fields-column">
           <label>Название картины<input name="title" required maxlength="100" placeholder="Например, «Тишина сада»" /></label>
@@ -95,6 +97,6 @@
       <button id="apply-text" value="save" class="publish-local">Сохранить черновик</button>
     </form>
   </dialog>
-  <script src="admin.js?v=20261127-1"></script>
+  <script src="admin.js?v=20261127-2"></script>
 </body>
 </html>

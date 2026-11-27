@@ -210,7 +210,8 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
 .gallery-controls { display:grid; grid-template-columns:44px minmax(0,1fr) 44px; align-items:center; gap:8px; margin-top:12px; }
 .gallery-controls[hidden] { display:none; }
 .gallery-arrow { width:44px; height:44px; border:1px solid var(--line); border-radius:50%; background:transparent; font-size:1.25rem; cursor:pointer; }
-.gallery-controls .dialog-thumbs { justify-content:center; margin-top:0; }
+.gallery-controls .dialog-thumbs { justify-content:center; flex-wrap:wrap; gap:6px; margin-top:0; }
+.gallery-controls .dialog-thumbs button { width:clamp(24px, 5vw, 52px); }
 .gallery-controls .dialog-thumbs button { min-width:0; }
 #description-more summary { cursor:pointer; color:var(--ink); font-weight:500; }
 #description-rest { margin:10px 0 0; font-size:1.125rem; line-height:1.6; white-space:pre-line; overflow-wrap:anywhere; }

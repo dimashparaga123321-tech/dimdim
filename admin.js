@@ -10,7 +10,9 @@ const artworkForm = document.querySelector('#artwork-form');
 const artworkPreview = document.querySelector('#crop-preview');
 const artworkPreviewImage = artworkPreview.querySelector('img');
 let database;
-let artworkPreviewUrl = '';
+const maxArtworkPhotos = 8;
+let artworkPhotos = [];
+let photoUrls = [];
 let editingArtworkId = null;
 let editingArtworkRecord = null;
 
@@ -175,17 +177,8 @@ function openArtworkEditor(row = null) {
   artworkForm.elements.description.value = row?.description || '';
   artworkForm.elements.size.value = row?.size || '';
   artworkForm.elements.price.value = row?.price || '';
-  artworkForm.elements.images.required = !row;
-  document.querySelector('#editor .editor-head h2').textContent = row ? 'Редактировать картину' : 'Добавить картину';
-  if (row) {
-    artworkPreviewImage.src = URL.createObjectURL(row.images[0]);
-    artworkPreviewImage.style.display = 'block';
-    artworkPreview.querySelector('span').hidden = true;
-  } else {
-    artworkPreviewImage.removeAttribute('src');
-    artworkPreviewImage.style.display = 'none';
-    artworkPreview.querySelector('span').hidden = false;
-  }
+  artworkPhotos = (row?.images || []).map(blob => ({ blob, stored: true }));
+  renderArtworkPhotos();
   editor.showModal();
 }
 
@@ -193,32 +186,78 @@ document.querySelector('#new-work').addEventListener('click', () => openArtworkE
 document.querySelector('#close-editor').addEventListener('click', () => editor.close());
 editor.addEventListener('click', (event) => { if (event.target === editor) editor.close(); });
 
-document.querySelector('#artwork-images').addEventListener('change', (event) => {
-  const files = [...event.target.files].slice(0, 4);
-  if (artworkPreviewUrl) URL.revokeObjectURL(artworkPreviewUrl);
-  if (!files.length) {
-    artworkPreviewImage.src = editingArtworkRecord ? URL.createObjectURL(editingArtworkRecord.images[0]) : '';
-    artworkPreviewImage.style.display = editingArtworkRecord ? 'block' : 'none';
-    artworkPreview.querySelector('span').hidden = Boolean(editingArtworkRecord);
-    return;
-  }
-  artworkPreviewUrl = URL.createObjectURL(files[0]);
-  artworkPreviewImage.src = artworkPreviewUrl;
-  artworkPreviewImage.style.display = 'block';
-  artworkPreview.querySelector('span').hidden = true;
+function clearPhotoUrls() {
+  photoUrls.forEach(url => URL.revokeObjectURL(url));
+  photoUrls = [];
+}
+
+function renderArtworkPhotos() {
+  clearPhotoUrls();
+  photoUrls = artworkPhotos.map(({ blob }) => URL.createObjectURL(blob));
+  artworkPreviewImage.style.display = photoUrls.length ? 'block' : 'none';
+  if (photoUrls.length) artworkPreviewImage.src = photoUrls[0];
+  else artworkPreviewImage.removeAttribute('src');
+  artworkPreview.querySelector('span').hidden = Boolean(photoUrls.length);
+  document.querySelector('#photo-count').textContent = `Фото: ${photoUrls.length} из ${maxArtworkPhotos}`;
+  document.querySelector('#selected-photos').replaceChildren(...photoUrls.map((url, index) => {
+    const item = document.createElement('li');
+    const thumb = document.createElement('img');
+    thumb.src = url;
+    thumb.alt = '';
+    const label = document.createElement('span');
+    label.textContent = index === 0 ? 'Обложка' : `Фото ${index + 1}`;
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.textContent = 'Убрать';
+    remove.setAttribute('aria-label', `Убрать фото ${index + 1}`);
+    remove.onclick = () => {
+      artworkPhotos.splice(index, 1);
+      renderArtworkPhotos();
+    };
+    item.append(thumb, label);
+    if (index > 0) {
+      const cover = document.createElement('button');
+      cover.type = 'button';
+      cover.textContent = 'На обложку';
+      cover.onclick = () => {
+        artworkPhotos.unshift(...artworkPhotos.splice(index, 1));
+        renderArtworkPhotos();
+      };
+      item.append(cover);
+    }
+    item.append(remove);
+    return item;
+  }));
+}
+
+editor.addEventListener('close', clearPhotoUrls);
+document.querySelector('#artwork-images').addEventListener('change', event => {
+  const files = [...event.target.files];
+  const room = Math.max(0, maxArtworkPhotos - artworkPhotos.length);
+  artworkPhotos.push(...files.slice(0, room).map(blob => ({ blob, stored: false })));
+  event.target.value = '';
+  document.querySelector('#save-message').textContent = files.length > room
+    ? 'Можно добавить до восьми фото. Уберите лишние из списка.' : '';
+  renderArtworkPhotos();
 });
 
 artworkForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const message = document.querySelector('#save-message');
-  const newFiles = [...artworkForm.elements.images.files].slice(0, 4);
-  const images = newFiles.length ? newFiles : editingArtworkRecord?.images;
-  if (!images?.length) return;
+  if (!artworkPhotos.length) {
+    message.textContent = 'Выберите хотя бы одно фото картины.';
+    return;
+  }
+  const photosToSave = [...artworkPhotos];
   const save = event.submitter;
   save.disabled = true;
   message.textContent = 'Сохраняем…';
   try {
-    const cover = newFiles.length || !editingArtworkRecord?.cover ? await previewBlob(images[0]) : editingArtworkRecord.cover;
+    const images = [];
+    for (const photo of photosToSave) {
+      images.push(photo.stored ? photo.blob : await previewBlob(photo.blob));
+    }
+    const cover = images[0];
     const work = {
       ...(editingArtworkRecord || {}),
       title: artworkForm.elements.title.value.trim(),
@@ -228,7 +267,7 @@ artworkForm.addEventListener('submit', async (event) => {
       description: artworkForm.elements.description.value.trim(),
       size: artworkForm.elements.size.value.trim(),
       price: artworkForm.elements.price.value.trim(),
-      crop: null, cover, images: newFiles.length ? [cover] : images, published: false, pending: true,
+      crop: null, cover, images, published: false, pending: true,
       live: editingArtworkRecord?.pending ? editingArtworkRecord.live : (editingArtworkRecord?.published !== false ? editingArtworkRecord : null),
       updatedAt: Date.now()
     };
