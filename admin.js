@@ -86,6 +86,45 @@ function storeRequest(store, mode, action, value) {
 const getAllWorks = () => storeRequest('artworks', 'readonly', 'getAll');
 const addWork = (work) => storeRequest('artworks', 'readwrite', 'add', work);
 const updateWork = (work) => storeRequest('artworks', 'readwrite', 'put', work);
+const transferArtworks = document.querySelector('#transfer-artworks');
+
+transferArtworks.onclick = async () => {
+  const status = document.querySelector('#transfer-status');
+  transferArtworks.disabled = true;
+  status.textContent = 'Готовим файл с картинами…';
+  try {
+    const rows = (await getAllWorks()).filter(row => !row.removed && artworkImages(row).length);
+    const artworks = await Promise.all(rows.map(async row => {
+      const photos = await Promise.all(artworkImages(row).map(blob => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+      })));
+      const { title, size, year, status, price, materials, description, sourcePage } = row;
+      return { title, size, year, status, price, materials, description, sourcePage, photos };
+    }));
+    const contents = JSON.stringify({ artworks });
+    const file = new File([contents], 'darya-artworks.json', { type: 'application/json' });
+    if (navigator.canShare?.({ files: [file] }) && navigator.userActivation?.isActive !== false) {
+      await navigator.share({ files: [file], title: 'Картины Дарьи' });
+      status.textContent = '';
+    } else {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(new Blob([contents], { type: 'application/octet-stream' }));
+      link.download = file.name;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 30000);
+      status.textContent = 'Прикрепите файл darya-artworks.json целиком. На iPhone его можно сохранить через «Поделиться» → «Сохранить в Файлы».';
+    }
+  } catch (error) {
+    status.textContent = error.name === 'AbortError' ? '' : 'Не удалось подготовить файл. Попробуйте ещё раз.';
+  } finally {
+    transferArtworks.disabled = false;
+  }
+};
 
 function markDraftChanged(message = 'Сохранено в этом браузере.') {
   const status = document.querySelector('#draft-status');
@@ -132,8 +171,10 @@ async function renderLibrary() {
   renderChanges(records);
   const rows = records.filter(row => !row.removed).reverse();
   const list = document.querySelector('#work-list');
-  document.querySelector('#work-count').textContent = `${rows.length} ${rows.length === 1 ? 'работа' : 'работ'}`;
+  const endings = { one: 'работа', few: 'работы', many: 'работ' };
+  document.querySelector('#work-count').textContent = `${rows.length} ${endings[new Intl.PluralRules('ru').select(rows.length)]}`;
   document.querySelector('#empty-library').hidden = rows.length > 0;
+  transferArtworks.hidden = !rows.some(row => artworkImages(row).length);
   libraryPhotoUrls.forEach(url => URL.revokeObjectURL(url));
   libraryPhotoUrls = [];
   list.replaceChildren(...rows.map((row) => {
@@ -188,36 +229,7 @@ async function renderLibrary() {
       }
     });
     text.append(title, meta);
-    const download = document.createElement('button');
-    download.type = 'button';
-    download.textContent = 'Скачать для публикации';
-    download.disabled = !photos.length;
-    download.onclick = async () => {
-      download.disabled = true;
-      try {
-        const encodedPhotos = await Promise.all(photos.map(blob => new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = () => reject(reader.error);
-          reader.readAsDataURL(blob);
-        })));
-        const { title, size, year, status, price, materials, description, sourcePage } = row;
-        const file = new Blob([JSON.stringify({ title, size, year, status, price, materials, description, sourcePage, photos: encodedPhotos }, null, 2)], { type: 'application/json' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(file);
-        link.download = 'darya-artwork.json';
-        document.body.append(link);
-        link.click();
-        link.remove();
-        setTimeout(() => URL.revokeObjectURL(link.href), 30000);
-        markDraftChanged('Отправьте скачанный файл, чтобы добавить картину для всех посетителей.');
-      } catch {
-        markDraftChanged('Не удалось скачать карточку.');
-      } finally {
-        download.disabled = false;
-      }
-    };
-    actions.append(edit, markSold, remove, download);
+    actions.append(edit, markSold, remove);
     copy.append(text, actions);
     article.append(image, copy);
     return article;
@@ -346,7 +358,7 @@ artworkForm.addEventListener('submit', async (event) => {
     else await addWork(work);
     editor.close();
     message.textContent = '';
-    markDraftChanged(`${work.title} — черновик для раздела «${work.status === 'Продана' ? 'Проданные картины' : 'Портфолио'}». Нажмите «Отправить на сайт» → «Подтвердить».`);
+    markDraftChanged(`${work.title} — черновик для раздела «${work.status === 'Продана' ? 'Проданные картины' : 'Портфолио'}». Нажмите «Применить в этом браузере» → «Подтвердить».`);
     await renderLibrary();
   } catch (error) {
     message.textContent = error?.name === 'QuotaExceededError' ? 'В браузере недостаточно места для этих файлов.' : 'Не удалось открыть фото. Попробуйте выбрать файл JPEG или PNG.';

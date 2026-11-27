@@ -42,14 +42,16 @@
         </label>
         <button id="edit-section-text" type="button">Изменить текст</button>
         <button id="new-work" type="button">Добавить картину</button>
-        <button id="publish-local" class="publish-local" type="button">Отправить на сайт</button>
-        <p>После сохранения черновика нажмите «Отправить на сайт», затем «Подтвердить». Откройте нужный раздел по ссылкам выше. В портфолио после первых восьми работ нажмите «Развернуть».</p>
+        <button id="publish-local" class="publish-local" type="button">Применить в этом браузере</button>
+        <p>После подтверждения откройте нужный раздел по ссылкам выше. В портфолио после первых восьми работ нажмите «Развернуть».</p>
         <h2>Изменения</h2>
         <ul id="changes-list"></ul>
-        <p>Изменения применяются в этом браузере. Чтобы передать картину для публикации для всех, нажмите «Скачать для публикации» у её карточки.</p>
+        <p>Сейчас изменения сохраняются в этом браузере. Для переноса всех добавленных картин вместе с фотографиями используйте кнопку ниже.</p>
         <output id="draft-status" role="status"></output>
       </div>
       <div class="library-head"><h2>Добавленные картины</h2><span id="work-count"></span></div>
+      <div class="admin-work-actions"><button id="transfer-artworks" type="button" hidden>Передать картины для публикации</button></div>
+      <output id="transfer-status" role="status"></output>
       <div id="work-list" class="work-list"></div>
       <p id="empty-library">Здесь появятся добавленные картины.</p>
       <section id="built-in-works"><h2>Картины на сайте</h2><div id="built-in-list" class="work-list"></div></section>
@@ -99,6 +101,6 @@
       <button id="apply-text" value="save" class="publish-local">Сохранить черновик</button>
     </form>
   </dialog>
-  <script src="admin.js?v=20261127-12"></script>
+  <script src="admin.js?v=20261127-13"></script>
 </body>
 </html>
