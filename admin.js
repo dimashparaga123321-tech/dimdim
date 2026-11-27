@@ -108,44 +108,6 @@ const addWork = (work) => storeRequest('artworks', 'readwrite', 'add', work);
 const updateWork = (work) => storeRequest('artworks', 'readwrite', 'put', work);
 const transferArtworks = document.querySelector('#transfer-artworks');
 
-transferArtworks.onclick = async () => {
-  const status = document.querySelector('#transfer-status');
-  transferArtworks.disabled = true;
-  status.textContent = 'Готовим файл с картинами…';
-  try {
-    const rows = (await getDrafts()).filter(row => !row.removed && artworkImages(row).length);
-    const artworks = await Promise.all(rows.map(async row => {
-      const photos = await Promise.all(artworkImages(row).map(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(blob);
-      })));
-      const { title, size, year, status, price, materials, description, sourcePage } = row;
-      return { title, size, year, status, price, materials, description, sourcePage, photos };
-    }));
-    const contents = JSON.stringify({ artworks });
-    const file = new File([contents], 'darya-artworks.json', { type: 'application/json' });
-    if (navigator.canShare?.({ files: [file] }) && navigator.userActivation?.isActive !== false) {
-      await navigator.share({ files: [file], title: 'Картины Дарьи' });
-      status.textContent = '';
-    } else {
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(new Blob([contents], { type: 'application/octet-stream' }));
-      link.download = file.name;
-      document.body.append(link);
-      link.click();
-      link.remove();
-      setTimeout(() => URL.revokeObjectURL(link.href), 30000);
-      status.textContent = 'Прикрепите файл darya-artworks.json целиком. На iPhone его можно сохранить через «Поделиться» → «Сохранить в Файлы».';
-    }
-  } catch (error) {
-    status.textContent = error.name === 'AbortError' ? '' : 'Не удалось подготовить файл. Попробуйте ещё раз.';
-  } finally {
-    transferArtworks.disabled = false;
-  }
-};
-
 function markDraftChanged(message = 'Сохранено в этом браузере.') {
   const status = document.querySelector('#draft-status');
   status.textContent = message;
@@ -194,7 +156,9 @@ async function renderLibrary() {
   const endings = { one: 'работа', few: 'работы', many: 'работ' };
   document.querySelector('#work-count').textContent = `${rows.length} ${endings[new Intl.PluralRules('ru').select(rows.length)]}`;
   document.querySelector('#empty-library').hidden = rows.length > 0;
-  document.querySelector('#transfer-options').hidden = Boolean(sharedCatalog) || !rows.some(row => artworkImages(row).length);
+  document.querySelector('#transfer-options').hidden = !rows.some(row => typeof row.id === 'number' && artworkImages(row).length);
+  transferArtworks.disabled = !sharedState;
+  document.querySelector('#transfer-status').textContent = sharedState ? '' : 'Перенос станет доступен после подключения общего каталога.';
   libraryPhotoUrls.forEach(url => URL.revokeObjectURL(url));
   libraryPhotoUrls = [];
   list.replaceChildren(...rows.map((row) => {
@@ -482,13 +446,14 @@ const publishAll = document.querySelector('#publish-local');
 const textDraft = JSON.parse(localStorage.getItem('daria-site-text-draft-v2') || localStorage.getItem('daria-site-text-v2') || '{}');
 function openPublish(id = null, title = '') {
   publishSelection = id;
-  document.querySelector('#publish-title').textContent = title ? `Опубликовать «${title.replace(/^«|»$/g, '')}»?` : 'Опубликовать изменения?';
+  document.querySelector('#publish-title').textContent = id === 'device' ? 'Перенести работы с этого устройства?' : title ? `Опубликовать «${title.replace(/^«|»$/g, '')}»?` : 'Опубликовать изменения?';
   document.querySelector('#publish-hint').textContent = sharedCatalog
     ? 'После подтверждения изменения появятся на сайте для всех посетителей.'
     : 'Общее хранилище ещё не подключено. Изменения будут видны только в этом браузере.';
   publishDialog.showModal();
 }
 publishAll.onclick = () => openPublish();
+transferArtworks.onclick = () => { if (sharedState) openPublish('device'); };
 
 async function initializeEditor() {
   refreshSitePreview();
@@ -510,7 +475,9 @@ async function initializeEditor() {
 
 async function publishSharedChanges(selection) {
   if (!sharedState) throw new Error('Catalog is not ready');
-  const rows = (await getDrafts()).filter(row => selection === null || row.id === selection);
+  const rows = (await getDrafts()).filter(row => selection === 'device'
+    ? typeof row.id === 'number' && !row.removed
+    : selection === null || row.id === selection);
   const content = structuredClone(sharedState.content);
   const hidden = selection === null ? new Set(hiddenDraft) : new Set(content.hidden);
   let device = localStorage.getItem('daria-catalog-migration-device');
@@ -560,7 +527,7 @@ async function publishSharedChanges(selection) {
   localStorage.setItem('daria-artwork-revision', crypto.randomUUID());
   return missingPhotos.length
     ? `Нужны фото: ${missingPhotos.join(', ')}.${committed.length || selection === null ? ' Остальные изменения опубликованы.' : ''}`
-    : 'Изменения опубликованы для всех.';
+    : selection === 'device' ? `Работы опубликованы для всех (${committed.length}).` : 'Изменения опубликованы для всех.';
 }
 
 publishButton.onclick = async () => {
