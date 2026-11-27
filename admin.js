@@ -138,7 +138,7 @@ async function renderLibrary() {
     const title = document.createElement('h3');
     title.textContent = row.title;
     const meta = document.createElement('p');
-    meta.textContent = [row.year, row.status, row.pending || row.published === false ? 'Черновик' : 'На сайте'].filter(Boolean).join(' · ');
+    meta.textContent = [row.year, row.status, row.pending || row.published === false ? 'Черновик' : 'Видна в этом браузере'].filter(Boolean).join(' · ');
     const actions = document.createElement('div');
     actions.className = 'admin-work-actions';
     const edit = document.createElement('button');
@@ -174,7 +174,35 @@ async function renderLibrary() {
       }
     });
     text.append(title, meta);
-    actions.append(edit, markSold, remove);
+    const download = document.createElement('button');
+    download.type = 'button';
+    download.textContent = 'Скачать для публикации';
+    download.onclick = async () => {
+      download.disabled = true;
+      try {
+        const photos = await Promise.all(row.images.map(blob => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(blob);
+        })));
+        const { title, size, year, status, price, materials, description, sourcePage } = row;
+        const file = new Blob([JSON.stringify({ title, size, year, status, price, materials, description, sourcePage, photos }, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(file);
+        link.download = 'darya-artwork.json';
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(link.href), 30000);
+        markDraftChanged('Отправьте скачанный файл, чтобы добавить картину для всех посетителей.');
+      } catch {
+        markDraftChanged('Не удалось скачать карточку.');
+      } finally {
+        download.disabled = false;
+      }
+    };
+    actions.append(edit, markSold, remove, download);
     copy.append(text, actions);
     article.append(image, copy);
     return article;
