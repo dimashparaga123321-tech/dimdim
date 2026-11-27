@@ -53,7 +53,7 @@ function createProjectCard(workKey, work) {
   copy.append(title, meta);
   button.append(image, copy);
   button.addEventListener('click', () => {
-    showWork(workKey);
+    showWork(works[workKey]);
   });
   return button;
 }
@@ -147,7 +147,6 @@ const dialog = document.querySelector('#work-dialog');
 const dialogImage = document.querySelector('#dialog-image');
 const dialogTitle = document.querySelector('#dialog-title');
 const dialogKicker = document.querySelector('#dialog-kicker');
-const dialogDescription = document.querySelector('#dialog-description');
 const dialogYear = document.querySelector('#dialog-year');
 const dialogMaterials = document.querySelector('#dialog-materials');
 const thumbs = document.querySelector('#dialog-thumbs');
@@ -157,7 +156,15 @@ let activeImage = 0;
 function renderGalleryImage() {
   if (!activeWork) return;
   const source = activeWork.images[activeImage];
-  dialogImage.src = source;
+  const work = activeWork;
+  const index = activeImage;
+  dialogImage.src = index === 0 && work.preview ? work.preview : source;
+  if (index === 0 && work.preview) {
+    warmImage(source).decode().then(() => {
+      if (activeWork === work && activeImage === index) dialogImage.src = source;
+    }).catch(() => {});
+  }
+  document.querySelector('#dialog-photo-count').textContent = `${index + 1} из ${work.images.length}`;
   dialogImage.alt = `${activeWork.title}, фотография ${activeImage + 1}`;
   [...thumbs.children].forEach((button, index) => {
     button.classList.toggle('is-active', index === activeImage);
@@ -165,8 +172,8 @@ function renderGalleryImage() {
   });
 }
 
-function showWork(workKey, { commission = false } = {}) {
-  const work = works[workKey];
+function showWork(work) {
+  if (!work?.images?.length || dialog.open) return;
   activeWork = work;
   if (!activeWork || !dialog) return;
   activeImage = 0;
@@ -176,17 +183,17 @@ function showWork(workKey, { commission = false } = {}) {
   const more = document.querySelector('#description-more');
   more.open = false;
   more.hidden = !description;
-  dialogDescription.textContent = '';
   document.querySelector('#description-rest').textContent = description;
   const size = document.querySelector('#dialog-size');
   size.parentElement.hidden = !activeWork.size;
   size.textContent = activeWork.size || '';
   dialog.querySelector('.gallery-controls').hidden = activeWork.images.length < 2;
-  document.querySelector("#dialog-price").textContent = workPrice(activeWork);
+  document.querySelector("#dialog-price").textContent = activeWork.priceLabel || workPrice(activeWork);
   const contact = dialog.querySelector('.dialog-contact');
   const sold = activeWork.status === 'Продана';
-  contact.textContent = sold || commission ? 'Заказать копию' : 'Заказать';
-  dialogYear.textContent = activeWork.year;
+  contact.textContent = sold ? 'Заказать копию' : 'Написать о картине';
+  dialogYear.textContent = activeWork.year || '';
+  dialogYear.parentElement.hidden = !activeWork.year;
   dialogMaterials.textContent = activeWork.materials;
   thumbs.replaceChildren(...activeWork.images.map((source, index) => {
     const button = document.createElement('button');
@@ -204,20 +211,14 @@ function showWork(workKey, { commission = false } = {}) {
   }));
   renderGalleryImage();
   dialog.showModal();
+  dialog.scrollTop = 0;
 }
-
-document.querySelectorAll('[data-work]').forEach((card) => {
-  card.addEventListener('click', () => showWork(card.dataset.work, {
-    commission: Boolean(card.closest('#sold'))
-  }));
-});
 
 artworkMore.addEventListener('click', () => { visibleArtworks += 2; renderProject(); });
 artworkLess.addEventListener('click', () => { visibleArtworks -= 2; renderProject(); });
 renderProject();
 loadLocalArtworks();
 
-const artworkDialog = document.querySelector('#portfolio-artwork');
 const artworkPages = new Map();
 const warmImages = new Map();
 
@@ -249,26 +250,6 @@ function loadArtwork(url) {
   return artworkPages.get(url);
 }
 
-function closeArtwork() {
-  if (artworkDialog.classList.contains('is-closing')) return;
-  artworkDialog.classList.add('is-closing');
-  const animation = artworkDialog.getAnimations()[0];
-  const finish = () => {
-    artworkDialog.close();
-    artworkDialog.classList.remove('is-closing');
-  };
-  if (animation) animation.finished.then(finish, finish);
-  else finish();
-}
-
-artworkDialog.addEventListener('cancel', event => {
-  event.preventDefault();
-  closeArtwork();
-});
-artworkDialog.addEventListener('click', event => {
-  if (event.target === artworkDialog) closeArtwork();
-});
-
 projectGrid.addEventListener('click', async event => {
   const card = event.target.closest('a.art-card');
   if (!card || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
@@ -276,45 +257,19 @@ projectGrid.addEventListener('click', async event => {
   const url = card.href;
   const preview = card.querySelector('img');
   const page = await loadArtwork(url);
-  if (artworkDialog.open) return;
   if (!page) return void location.assign(url);
-  const content = page.cloneNode(true);
-  const description = content.querySelector('.artwork-description');
-  if (description) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'artwork-description-button';
-    button.textContent = 'Описание';
-    const arrow = document.createElement('span');
-    arrow.textContent = '↓';
-    arrow.setAttribute('aria-hidden', 'true');
-    button.append(arrow);
-    button.setAttribute('aria-expanded', 'false');
-    description.id = 'portfolio-description';
-    button.setAttribute('aria-controls', description.id);
-    description.querySelector('summary').hidden = true;
-    button.addEventListener('click', () => {
-      description.open = !description.open;
-      button.setAttribute('aria-expanded', String(description.open));
-    });
-    content.querySelector('.artwork-page-details').append(button);
-    button.after(description);
-    description.hidden = true;
-    button.addEventListener('click', () => { description.hidden = !description.open; });
-  }
-  window.addArtworkContact(content.querySelector('.artwork-page-details'));
-  const full = new URL(page.querySelector('img').getAttribute('src'), url).href;
-  const image = content.querySelector('img');
-  image.src = preview.currentSrc || preview.src;
-  warmImage(full).decode().then(() => { image.src = full; }).catch(() => {});
-  const back = content.querySelector('a');
-  back.addEventListener('click', event => {
-    event.preventDefault();
-    closeArtwork();
+  const details = page.querySelector('.artwork-page-details');
+  const [size, year] = details.querySelector('p').textContent.split(',').map(value => value.trim());
+  showWork({
+    title: details.querySelector('h1').textContent,
+    kicker: 'Авторская работа',
+    size, year,
+    priceLabel: details.querySelector('.artwork-price').textContent,
+    materials: details.querySelector('.artwork-price + p')?.textContent || '',
+    description: [...page.querySelectorAll('.artwork-description p')].map(p => p.textContent.trim()).join('\n\n'),
+    preview: preview.currentSrc || preview.src,
+    images: [new URL(page.querySelector('img').getAttribute('src'), url).href]
   });
-  artworkDialog.replaceChildren(content);
-  artworkDialog.showModal();
-  artworkDialog.scrollTop = 0;
 });
 
 

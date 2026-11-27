@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@100..500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261127-6" />
+  <link rel="stylesheet" href="styles.css?v=20261127-8" />
 </head>
 <body>
   <header class="site-header">
@@ -153,9 +153,10 @@
           <div id="dialog-thumbs" class="dialog-thumbs" aria-label="Другие ракурсы"></div>
           <button class="gallery-arrow next" type="button" aria-label="Следующее фото">→</button>
         </div>
+        <p id="dialog-photo-count" aria-live="polite"></p>
       </div>
       <div class="dialog-copy">
-        <p id="dialog-kicker">Авторская работа</p><h2 id="dialog-title">Название картины</h2><p id="dialog-price"></p><p id="dialog-description"></p>
+        <p id="dialog-kicker">Авторская работа</p><h2 id="dialog-title">Название картины</h2><p id="dialog-price"></p>
         <dl><div><dt>Размер</dt><dd id="dialog-size"></dd></div><div><dt>Год</dt><dd id="dialog-year">2026</dd></div><div><dt>Материалы</dt><dd id="dialog-materials">Холст, акрил</dd></div></dl>
         <details id="description-more" class="artwork-description" hidden><summary>Описание <span aria-hidden="true">↓</span></summary><div class="description-reveal"><p id="description-rest"></p></div></details>
         <button type="button" class="dialog-contact" data-artwork-contact>Заказать</button>
@@ -163,9 +164,8 @@
     </div>
   </dialog>
 
-  <dialog id="portfolio-artwork" class="work-dialog" aria-label="Картина"></dialog>
   <script src="artwork-pages.js?v=20261127-4"></script>
   <script src="artwork-contact.js"></script>
-  <script src="script.js?v=20261127-5"></script>
+  <script src="script.js?v=20261127-8"></script>
 </body>
 </html>

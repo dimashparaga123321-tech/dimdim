@@ -348,3 +348,24 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
 .catalog-tools[hidden] { display:none; }
 .brand-mark { display: inline-flex; align-items: center; }
 .brand-mark img { display: block; flex: none; }
+#work-dialog .dialog-layout {
+  width: 100%;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: clamp(10px, 2vw, 24px);
+}
+#work-dialog .dialog-gallery, #work-dialog .dialog-copy { min-width:0; }
+#work-dialog .dialog-copy { overflow-wrap:anywhere; }
+#work-dialog .dialog-gallery > img {
+  width: 100%;
+  max-width: 100%;
+  height: clamp(160px, 56dvh, 640px);
+  max-height: none;
+  object-fit: contain;
+}
+#dialog-photo-count { margin:4px 0 0; text-align:center; font-size:.95rem; }
+.gallery-controls[hidden] + #dialog-photo-count { display:none; }
+@media (max-width: 720px) {
+  #work-dialog .dialog-layout { grid-template-columns: minmax(0, 1.16fr) minmax(0, 1fr); }
+  #work-dialog .dialog-gallery > img { height: min(42dvh, 280px); }
+  #work-dialog .gallery-controls { grid-template-columns:44px minmax(0,1fr) 44px; gap:3px; }
+}
