@@ -285,6 +285,30 @@ artworkForm.addEventListener('submit', async (event) => {
 });
 
 const hiddenDraft = new Set(JSON.parse(localStorage.getItem('daria-hidden-artworks') || '[]'));
+async function openBuiltInArtwork(file, records) {
+  const rows = records || await getAllWorks();
+  const existing = rows.find(row => row.sourcePage === file);
+  if (existing?.removed) {
+    markDraftChanged('Эта картина удалена. Чтобы добавить её заново, используйте «Добавить картину».');
+    return;
+  }
+  if (existing) return openArtworkEditor(existing);
+  if (!file || !artworkMarkup[file]) return;
+  const page = new DOMParser().parseFromString(artworkMarkup[file], 'text/html');
+  const metadata = page.querySelector('.artwork-page-details > p').textContent.split(',');
+  const response = await fetch(page.querySelector('img').getAttribute('src'));
+  if (!response.ok) throw new Error('Photo unavailable');
+  openArtworkEditor({
+    sourcePage: file, published: false,
+    title: page.querySelector('h1').textContent.replace(/^Авторская картина /, '').replace(/[«»]/g, ''),
+    size: metadata[0].trim(), year: metadata[1]?.trim() || '2026',
+    price: page.querySelector('.artwork-price').textContent.replace(/\D/g, ''),
+    materials: page.querySelector('.artwork-price + p')?.textContent || '',
+    description: page.querySelector('.artwork-description p')?.textContent || '',
+    images: [await response.blob()]
+  });
+}
+
 function renderBuiltInWorks() {
   const hidden = hiddenDraft;
   const list = document.querySelector('#built-in-list');
@@ -303,7 +327,21 @@ function renderBuiltInWorks() {
       renderBuiltInWorks();
       renderChanges(await getAllWorks());
     };
-    row.append(label, button);
+    const photos = document.createElement('button');
+    photos.type = 'button';
+    photos.textContent = 'Добавить фото';
+    photos.setAttribute('aria-label', `Добавить фото к картине ${title}`);
+    photos.onclick = async () => {
+      photos.disabled = true;
+      try {
+        await openBuiltInArtwork(file);
+      } catch {
+        markDraftChanged('Не удалось загрузить фото картины. Попробуйте ещё раз.');
+      } finally {
+        photos.disabled = false;
+      }
+    };
+    row.append(label, photos, button);
     return row;
   }));
 }
@@ -486,20 +524,7 @@ document.querySelector('#admin-site-preview').addEventListener('load', event => 
       const key = card.dataset.work;
       const existing = rows.find(row => !row.removed && (file ? row.sourcePage === file : key === `local-${row.id}`));
       if (existing) return openArtworkEditor(existing);
-      if (!file || !artworkMarkup[file]) return;
-      const page = new DOMParser().parseFromString(artworkMarkup[file], 'text/html');
-      const metadata = page.querySelector('.artwork-page-details > p').textContent.split(',');
-      const response = await fetch(page.querySelector('img').getAttribute('src'));
-      if (!response.ok) throw new Error('Photo unavailable');
-      openArtworkEditor({
-        sourcePage: file, published: false,
-        title: page.querySelector('h1').textContent.replace(/^Авторская картина /, '').replace(/[«»]/g, ''),
-        size: metadata[0].trim(), year: metadata[1]?.trim() || '2026',
-        price: page.querySelector('.artwork-price').textContent.replace(/\D/g, ''),
-        materials: page.querySelector('.artwork-price + p')?.textContent || '',
-        description: page.querySelector('.artwork-description p')?.textContent || '',
-        images: [await response.blob()]
-      });
+      if (file) await openBuiltInArtwork(file, rows);
     } catch {
       markDraftChanged('Не удалось открыть картину для редактирования.');
     }
