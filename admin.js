@@ -236,7 +236,7 @@ artworkForm.addEventListener('submit', async (event) => {
     else await addWork(work);
     editor.close();
     message.textContent = '';
-    markDraftChanged(`«${work.title}» сохранена в черновике для раздела «${work.status === 'Продана' ? 'Проданные картины' : 'Портфолио'}».`);
+    markDraftChanged(`${work.title} — черновик для раздела «${work.status === 'Продана' ? 'Проданные картины' : 'Портфолио'}». Нажмите «Отправить на сайт» → «Подтвердить».`);
     await renderLibrary();
   } catch (error) {
     message.textContent = error?.name === 'QuotaExceededError' ? 'В браузере недостаточно места для этих файлов.' : 'Не удалось открыть фото. Попробуйте выбрать файл JPEG или PNG.';
@@ -295,7 +295,7 @@ publishButton.onclick = async () => {
     localStorage.removeItem('daria-site-text-draft-v2');
     localStorage.setItem('daria-hidden-artworks', JSON.stringify([...hiddenDraft]));
     publishDialog.close();
-    markDraftChanged('Изменения применены в этом браузере.');
+    markDraftChanged('Готово. Откройте нужный раздел в предпросмотре или на сайте в этом же браузере.');
     await renderLibrary();
     refreshSitePreview();
   } catch {
