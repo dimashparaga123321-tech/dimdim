@@ -31,40 +31,7 @@ navigation?.addEventListener('click', (event) => {
   menuToggle?.setAttribute('aria-expanded', 'false');
 });
 
-const works = {
-  wave: {
-    title: 'Вода и движение',
-    kicker: 'Авторская работа',
-    year: '2026',
-    materials: 'Холст, акрил',
-    description: 'Работа о внутренней силе и движении. Здесь позже появится личная история картины и замысел Дарьи.',
-    images: ['met-45434.jpg', 'detail-45434.jpg', 'wave.jpg']
-  },
-  stories: {
-    title: 'Личные истории',
-    kicker: 'Авторская работа',
-    year: '2026',
-    materials: 'Холст, смешанная техника',
-    description: 'Картина, в которой личная история раскрывается через цвет, детали и настроение.',
-    images: ['met-437984.jpg', 'detail-437984.jpg', 'met-437984.jpg']
-  },
-  silence: {
-    title: 'Тишина и цвет',
-    kicker: 'Авторская работа',
-    year: '2026',
-    materials: 'Холст, акрил',
-    description: 'Спокойная работа о паузе, внимании к себе и ощущении пространства.',
-    images: ['met-436121.jpg', 'detail-436121.jpg', 'met-436121.jpg']
-  },
-  detail: {
-    title: 'Новая серия',
-    kicker: 'Авторская работа',
-    year: '2026',
-    materials: 'Холст, смешанная техника',
-    description: 'Демонстрационная карточка будущей работы. Название, описание и фотографии легко заменить.',
-    images: ['wave.jpg', 'detail-45434.jpg', 'met-45434.jpg']
-  }
-};
+const works = {};
 
 const projectGrid = document.querySelector('#project-grid');
 
