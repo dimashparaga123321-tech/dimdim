@@ -252,7 +252,6 @@ loadLocalArtworks();
 
 const artworkDialog = document.querySelector('#portfolio-artwork');
 const artworkPages = new Map();
-const featuredCards = [...document.querySelectorAll('#project-grid a.art-card')];
 const warmImages = new Map();
 
 function warmImage(src) {
@@ -351,14 +350,6 @@ projectGrid.addEventListener('click', async event => {
   artworkDialog.scrollTop = 0;
 });
 
-window.addEventListener('load', () => {
-  featuredCards.forEach(card => {
-    warmImage(card.querySelector('img').src);
-    loadArtwork(card.href).then(page => {
-      if (page) warmImage(new URL(page.querySelector('img').getAttribute('src'), card.href).href);
-    });
-  });
-}, { once: true });
 
 const carousel = document.querySelector('#pricing-carousel');
 const carouselImage = carousel.querySelector('img');
