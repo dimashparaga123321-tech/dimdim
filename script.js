@@ -34,6 +34,7 @@ navigation?.addEventListener('click', (event) => {
 const works = {};
 
 const projectGrid = document.querySelector('#project-grid');
+const artworkRevisionKey = 'daria-artwork-revision';
 
 function createProjectCard(workKey, work) {
   const button = document.createElement('button');
@@ -90,7 +91,9 @@ function renderProject() {
   const shown = cards.filter(card => !hidden.has(card.getAttribute('href')));
   shown.forEach((card, index) => { card.hidden = index >= visibleArtworks; });
   projectGrid.replaceChildren(...shown);
-  artworkMore.hidden = visibleArtworks >= shown.length;
+  const remaining = Math.max(0, shown.length - visibleArtworks);
+  artworkMore.hidden = remaining === 0;
+  artworkMore.textContent = remaining > 0 ? `Развернуть (ещё ${remaining})` : 'Развернуть';
   artworkLess.hidden = visibleArtworks <= 8;
   const soldGrid = document.querySelector('#sold-grid');
   soldGrid.querySelectorAll('[data-sold-record]').forEach(card => card.remove());
@@ -102,45 +105,73 @@ function renderProject() {
 }
 
 const replacedArtworkPages = new Set();
+let artworkRevision;
 function loadLocalArtworks() {
-  return new Promise((resolve) => {
-    if (!('indexedDB' in window)) return resolve();
-    const request = indexedDB.open('daria-portfolio', 2);
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains('artworks')) db.createObjectStore('artworks', { keyPath: 'id', autoIncrement: true });
-      if (!db.objectStoreNames.contains('media')) db.createObjectStore('media', { keyPath: 'key' });
-    };
-    request.onerror = () => resolve();
-    request.onsuccess = () => {
-      const rows = request.result.transaction('artworks').objectStore('artworks').getAll();
-      rows.onerror = () => resolve();
-      rows.onsuccess = () => {
-        rows.result.map(row => row.pending ? row.live : row).filter(row => row && row.published !== false).forEach((row) => {
+  if (!('indexedDB' in window)) return;
+  const revision = localStorage.getItem(artworkRevisionKey);
+  if (revision === artworkRevision) return;
+  artworkRevision = revision;
+  const request = indexedDB.open('daria-portfolio', 2);
+  request.onupgradeneeded = () => {
+    const db = request.result;
+    if (!db.objectStoreNames.contains('artworks')) db.createObjectStore('artworks', { keyPath: 'id', autoIncrement: true });
+    if (!db.objectStoreNames.contains('media')) db.createObjectStore('media', { keyPath: 'key' });
+  };
+  const allowRetry = () => { if (artworkRevision === revision) artworkRevision = undefined; };
+  request.onerror = allowRetry;
+  request.onsuccess = () => {
+    const db = request.result;
+    const rows = db.transaction('artworks').objectStore('artworks').getAll();
+    db.close();
+    rows.onerror = allowRetry;
+    rows.onsuccess = () => {
+      if (artworkRevision !== revision) return;
+      const oldWorks = Object.values(works);
+      Object.keys(works).forEach(key => delete works[key]);
+      replacedArtworkPages.clear();
+      rows.result.map(row => row.pending ? row.live : row).filter(row => row && row.published !== false).forEach((row) => {
+        if (row.removed) {
           if (row.sourcePage) replacedArtworkPages.add(row.sourcePage);
-          if (row.removed) return;
-          const images = (row.images || []).map((blob) => URL.createObjectURL(blob));
-          if (!images.length) return;
-          works[`local-${row.id}`] = {
-            title: row.title || 'Без названия',
-            kicker: 'Авторская работа',
-            year: row.year || '2026',
-            materials: row.materials || 'Материалы не указаны',
-            description: row.description || '',
-            status: row.status,
-            size: row.size,
-            price: row.price,
-            createdAt: row.createdAt || row.id,
-            crop: row.crop || null,
-            cover: row.cover ? URL.createObjectURL(row.cover) : images[0],
-            images
-          };
-        });
-        renderProject();
-        resolve();
-      };
+          return;
+        }
+        const photos = Array.isArray(row.images) ? row.images.filter(isArtworkPhoto) : [];
+        const cover = isArtworkPhoto(row.cover) ? row.cover : photos[0];
+        if (!cover) return;
+        if (!photos.length) photos.push(cover);
+        const images = photos.map(blob => URL.createObjectURL(blob));
+        if (row.sourcePage) replacedArtworkPages.add(row.sourcePage);
+        works[`local-${row.id}`] = {
+          title: row.title || 'Без названия',
+          kicker: 'Авторская работа',
+          year: row.year || '2026',
+          materials: row.materials || 'Материалы не указаны',
+          description: row.description || '',
+          status: row.status,
+          size: row.size,
+          price: row.price,
+          createdAt: row.createdAt || row.id,
+          crop: row.crop || null,
+          cover: photos.includes(cover) ? images[photos.indexOf(cover)] : URL.createObjectURL(cover),
+          images
+        };
+      });
+      renderProject();
+      for (const work of oldWorks) {
+        const release = () => {
+          for (const url of new Set([work.cover, ...work.images])) {
+            warmImages.delete(url);
+            URL.revokeObjectURL(url);
+          }
+        };
+        if (dialog.open && activeWork === work) dialog.addEventListener('close', release, { once: true });
+        else release();
+      }
     };
-  });
+  };
+}
+
+function isArtworkPhoto(blob) {
+  return blob instanceof Blob && blob.size > 0;
 }
 
 const dialog = document.querySelector('#work-dialog');
@@ -236,6 +267,13 @@ artworkMore.addEventListener('click', () => { visibleArtworks += 2; renderProjec
 artworkLess.addEventListener('click', () => { visibleArtworks -= 2; renderProject(); });
 renderProject();
 loadLocalArtworks();
+window.addEventListener('storage', event => {
+  if (event.key === artworkRevisionKey) loadLocalArtworks();
+});
+window.addEventListener('pageshow', loadLocalArtworks);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) loadLocalArtworks();
+});
 
 const artworkPages = new Map();
 const warmImages = new Map();

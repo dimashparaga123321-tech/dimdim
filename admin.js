@@ -16,6 +16,14 @@ let artworkPhotos = [];
 let photoUrls = [];
 let editingArtworkId = null;
 let editingArtworkRecord = null;
+let libraryPhotoUrls = [];
+
+function artworkImages(row) {
+  const isPhoto = blob => blob instanceof Blob && blob.size > 0;
+  const photos = Array.isArray(row.images) ? row.images.filter(isPhoto) : [];
+  if (!photos.length && isPhoto(row.cover)) photos.push(row.cover);
+  return photos;
+}
 
 async function sha256(value) {
   const data = new TextEncoder().encode(value);
@@ -126,11 +134,17 @@ async function renderLibrary() {
   const list = document.querySelector('#work-list');
   document.querySelector('#work-count').textContent = `${rows.length} ${rows.length === 1 ? 'работа' : 'работ'}`;
   document.querySelector('#empty-library').hidden = rows.length > 0;
+  libraryPhotoUrls.forEach(url => URL.revokeObjectURL(url));
+  libraryPhotoUrls = [];
   list.replaceChildren(...rows.map((row) => {
     const article = document.createElement('article');
     article.className = 'admin-work';
     const image = document.createElement('img');
-    image.src = URL.createObjectURL(row.cover || row.images[0]);
+    const photos = artworkImages(row);
+    if (photos.length) {
+      image.src = URL.createObjectURL(photos[0]);
+      libraryPhotoUrls.push(image.src);
+    }
     image.alt = row.title;
     const copy = document.createElement('div');
     copy.className = 'admin-work-copy';
@@ -138,7 +152,7 @@ async function renderLibrary() {
     const title = document.createElement('h3');
     title.textContent = row.title;
     const meta = document.createElement('p');
-    meta.textContent = [row.year, row.status, row.pending || row.published === false ? 'Черновик' : 'Видна в этом браузере'].filter(Boolean).join(' · ');
+    meta.textContent = [row.year, row.status, !photos.length ? 'Добавьте фото' : row.pending || row.published === false ? 'Черновик' : 'Видна в этом браузере'].filter(Boolean).join(' · ');
     const actions = document.createElement('div');
     actions.className = 'admin-work-actions';
     const edit = document.createElement('button');
@@ -177,17 +191,18 @@ async function renderLibrary() {
     const download = document.createElement('button');
     download.type = 'button';
     download.textContent = 'Скачать для публикации';
+    download.disabled = !photos.length;
     download.onclick = async () => {
       download.disabled = true;
       try {
-        const photos = await Promise.all(row.images.map(blob => new Promise((resolve, reject) => {
+        const encodedPhotos = await Promise.all(photos.map(blob => new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result);
           reader.onerror = () => reject(reader.error);
           reader.readAsDataURL(blob);
         })));
         const { title, size, year, status, price, materials, description, sourcePage } = row;
-        const file = new Blob([JSON.stringify({ title, size, year, status, price, materials, description, sourcePage, photos }, null, 2)], { type: 'application/json' });
+        const file = new Blob([JSON.stringify({ title, size, year, status, price, materials, description, sourcePage, photos: encodedPhotos }, null, 2)], { type: 'application/json' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(file);
         link.download = 'darya-artwork.json';
@@ -221,7 +236,8 @@ function openArtworkEditor(row = null) {
   setDescriptionVisible(Boolean(artworkForm.elements.description.value.trim()));
   artworkForm.elements.size.value = row?.size || '';
   artworkForm.elements.price.value = row?.price || '';
-  artworkPhotos = (row?.images || []).map(blob => ({ blob, stored: true }));
+  artworkPhotos = row ? artworkImages(row).map(blob => ({ blob, stored: true })) : [];
+  document.querySelector('#save-message').textContent = '';
   renderArtworkPhotos();
   editor.showModal();
 }
@@ -408,26 +424,37 @@ document.querySelector('#publish-local').onclick = () => publishDialog.showModal
 publishButton.onclick = async () => {
   publishButton.disabled = true;
   try {
-    const rows = await getAllWorks();
+    const published = { available: 0, sold: 0 };
+    const missingPhotos = [];
     await new Promise((resolve, reject) => {
       const tx = database.transaction('artworks', 'readwrite');
       tx.oncomplete = resolve;
       tx.onabort = () => reject(tx.error);
       const store = tx.objectStore('artworks');
-      for (const row of rows) {
-        if (row.removed && !row.sourcePage) store.delete(row.id);
-        else if (row.removed) store.put({ id: row.id, sourcePage: row.sourcePage, removed: true });
-        else if (row.pending || row.published === false) {
-          const { pending, live, removed, ...record } = row;
-          store.put({ ...record, published: true });
+      const request = store.getAll();
+      request.onsuccess = () => {
+        for (const row of request.result) {
+          if (row.removed && !row.sourcePage) store.delete(row.id);
+          else if (row.removed) store.put({ id: row.id, sourcePage: row.sourcePage, removed: true });
+          else if (row.pending || row.published === false) {
+            if (!artworkImages(row).length) {
+              missingPhotos.push(row.title || 'Без названия');
+              continue;
+            }
+            const { pending, live, removed, ...record } = row;
+            store.put({ ...record, published: true });
+            published[row.status === 'Продана' ? 'sold' : 'available']++;
+          }
         }
-      }
+      };
     });
     localStorage.setItem('daria-site-text-v2', JSON.stringify(textDraft));
     localStorage.removeItem('daria-site-text-draft-v2');
     localStorage.setItem('daria-hidden-artworks', JSON.stringify([...hiddenDraft]));
+    localStorage.setItem('daria-artwork-revision', crypto.randomUUID());
     publishDialog.close();
-    markDraftChanged('Готово. Откройте нужный раздел в предпросмотре или на сайте в этом же браузере.');
+    const result = `Применено в этом браузере. Портфолио — ${published.available}, проданные — ${published.sold}.`;
+    markDraftChanged(missingPhotos.length ? `${result} Для этих черновиков нужно добавить фото: ${missingPhotos.join(', ')}.` : result);
     await renderLibrary();
     refreshSitePreview();
   } catch {
