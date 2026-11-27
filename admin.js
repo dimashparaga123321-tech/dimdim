@@ -106,7 +106,6 @@ async function getAllWorks() {
 }
 const addWork = (work) => storeRequest('artworks', 'readwrite', 'add', work);
 const updateWork = (work) => storeRequest('artworks', 'readwrite', 'put', work);
-const transferArtworks = document.querySelector('#transfer-artworks');
 
 function markDraftChanged(message = 'Сохранено в этом браузере.') {
   const status = document.querySelector('#draft-status');
@@ -156,9 +155,6 @@ async function renderLibrary() {
   const endings = { one: 'работа', few: 'работы', many: 'работ' };
   document.querySelector('#work-count').textContent = `${rows.length} ${endings[new Intl.PluralRules('ru').select(rows.length)]}`;
   document.querySelector('#empty-library').hidden = rows.length > 0;
-  document.querySelector('#transfer-options').hidden = !rows.some(row => typeof row.id === 'number' && artworkImages(row).length);
-  transferArtworks.disabled = !sharedState;
-  document.querySelector('#transfer-status').textContent = sharedState ? '' : 'Перенос станет доступен после подключения общего каталога.';
   libraryPhotoUrls.forEach(url => URL.revokeObjectURL(url));
   libraryPhotoUrls = [];
   list.replaceChildren(...rows.map((row) => {
@@ -224,7 +220,7 @@ async function renderLibrary() {
     if (needsPublish) {
       const publish = document.createElement('button');
       publish.type = 'button';
-      publish.textContent = row.pending || row.published === false ? 'Опубликовать' : 'Переопубликовать';
+      publish.textContent = 'Опубликовать';
       publish.onclick = () => openPublish(row.id, row.title);
       actions.prepend(publish);
     }
@@ -446,14 +442,13 @@ const publishAll = document.querySelector('#publish-local');
 const textDraft = JSON.parse(localStorage.getItem('daria-site-text-draft-v2') || localStorage.getItem('daria-site-text-v2') || '{}');
 function openPublish(id = null, title = '') {
   publishSelection = id;
-  document.querySelector('#publish-title').textContent = id === 'device' ? 'Перенести работы с этого устройства?' : title ? `Опубликовать «${title.replace(/^«|»$/g, '')}»?` : 'Опубликовать изменения?';
+  document.querySelector('#publish-title').textContent = title ? `Опубликовать «${title.replace(/^«|»$/g, '')}»?` : 'Опубликовать изменения?';
   document.querySelector('#publish-hint').textContent = sharedCatalog
-    ? 'После подтверждения изменения появятся на сайте для всех посетителей.'
+    ? 'После подтверждения изменения и работы, сохранённые только на этом устройстве, появятся на сайте для всех.'
     : 'Общее хранилище ещё не подключено. Изменения будут видны только в этом браузере.';
   publishDialog.showModal();
 }
 publishAll.onclick = () => openPublish();
-transferArtworks.onclick = () => { if (sharedState) openPublish('device'); };
 
 async function initializeEditor() {
   refreshSitePreview();
@@ -475,9 +470,7 @@ async function initializeEditor() {
 
 async function publishSharedChanges(selection) {
   if (!sharedState) throw new Error('Catalog is not ready');
-  const rows = (await getDrafts()).filter(row => selection === 'device'
-    ? typeof row.id === 'number' && !row.removed
-    : selection === null || row.id === selection);
+  const rows = (await getDrafts()).filter(row => selection === null || row.id === selection || (typeof row.id === 'number' && !row.removed));
   const content = structuredClone(sharedState.content);
   const hidden = selection === null ? new Set(hiddenDraft) : new Set(content.hidden);
   let device = localStorage.getItem('daria-catalog-migration-device');
@@ -527,7 +520,7 @@ async function publishSharedChanges(selection) {
   localStorage.setItem('daria-artwork-revision', crypto.randomUUID());
   return missingPhotos.length
     ? `Нужны фото: ${missingPhotos.join(', ')}.${committed.length || selection === null ? ' Остальные изменения опубликованы.' : ''}`
-    : selection === 'device' ? `Работы опубликованы для всех (${committed.length}).` : 'Изменения опубликованы для всех.';
+    : 'Изменения опубликованы для всех.';
 }
 
 publishButton.onclick = async () => {
