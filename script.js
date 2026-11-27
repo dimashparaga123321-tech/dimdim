@@ -152,6 +152,19 @@ const dialogMaterials = document.querySelector('#dialog-materials');
 const thumbs = document.querySelector('#dialog-thumbs');
 let activeWork = null;
 let activeImage = 0;
+let artworkSlideshow;
+
+function stopArtworkSlideshow() {
+  clearInterval(artworkSlideshow);
+}
+
+function selectArtworkPhoto(index, manual = true) {
+  if (!dialog.open || !activeWork || activeWork.images.length < 2) return;
+  if (manual) stopArtworkSlideshow();
+  const count = activeWork.images.length;
+  activeImage = (index + count) % count;
+  renderGalleryImage();
+}
 
 function renderGalleryImage() {
   if (!activeWork) return;
@@ -203,15 +216,20 @@ function showWork(work) {
     image.src = source;
     image.alt = '';
     button.append(image);
-    button.addEventListener('click', () => {
-      activeImage = index;
-      renderGalleryImage();
-    });
+    button.addEventListener('click', () => selectArtworkPhoto(index));
     return button;
   }));
   renderGalleryImage();
   dialog.showModal();
   dialog.scrollTop = 0;
+  stopArtworkSlideshow();
+  if (work.images.length > 1 && !reducedMotion.matches) {
+    artworkSlideshow = setInterval(() => {
+      if (!document.hidden && !document.querySelector('.contact-choice[open]') && !reducedMotion.matches) {
+        selectArtworkPhoto(activeImage + 1, false);
+      }
+    }, 4000);
+  }
 }
 
 artworkMore.addEventListener('click', () => { visibleArtworks += 2; renderProject(); });
@@ -293,12 +311,13 @@ setInterval(async () => {
 
 document.querySelector('.dialog-close')?.addEventListener('click', () => dialog.close());
 document.querySelector('.gallery-arrow.prev')?.addEventListener('click', () => {
-  activeImage = (activeImage - 1 + activeWork.images.length) % activeWork.images.length;
-  renderGalleryImage();
+  selectArtworkPhoto(activeImage - 1);
 });
 document.querySelector('.gallery-arrow.next')?.addEventListener('click', () => {
-  activeImage = (activeImage + 1) % activeWork.images.length;
-  renderGalleryImage();
+  selectArtworkPhoto(activeImage + 1);
+});
+dialog.addEventListener('close', () => {
+  if (!dialog.open) stopArtworkSlideshow();
 });
 dialog?.addEventListener('click', (event) => {
   if (event.target === dialog) dialog.close();
