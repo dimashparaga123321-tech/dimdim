@@ -12,14 +12,17 @@ const navigation = document.querySelector('.site-nav');
 
 // Read only explicitly named overrides. Old position-based drafts could target unrelated elements.
 const siteButtonLabel = localStorage.getItem('daria-contact-label');
-try {
-  const overrides = JSON.parse(localStorage.getItem('daria-site-text-v2') || '{}');
-  document.querySelectorAll('[data-edit-text]').forEach(element => {
+const editableLabels = new Map([...document.querySelectorAll('[data-edit-text]')].map(element => [element, element.textContent]));
+function applyCatalogTexts(overrides) {
+  for (const [element, original] of editableLabels) {
     const value = overrides[element.dataset.editText];
-    if (typeof value === 'string') element.textContent = value;
-  });
-} catch {}
-if (siteButtonLabel) document.querySelector('.circle-link').textContent = siteButtonLabel;
+    element.textContent = typeof value === 'string' ? value : original;
+  }
+}
+if (!sharedCatalog) {
+  try { applyCatalogTexts(JSON.parse(localStorage.getItem('daria-site-text-v2') || '{}')); } catch {}
+  if (siteButtonLabel) document.querySelector('.circle-link').textContent = siteButtonLabel;
+}
 menuToggle?.addEventListener('click', () => {
   const open = navigation.classList.toggle('is-open');
   menuToggle.setAttribute('aria-expanded', String(open));
@@ -76,7 +79,7 @@ function renderProject() {
   const available = entries.filter(([key, work]) => key.startsWith('local-') && work.status !== 'Продана');
   const cards = [...document.querySelector('#featured-work').content.children].map(card => card.cloneNode(true));
   cards.push(...available.map(([key, work]) => createProjectCard(key, work)));
-  const hidden = new Set(JSON.parse(localStorage.getItem('daria-hidden-artworks') || '[]'));
+  const hidden = new Set(sharedCatalog ? sharedHidden : JSON.parse(localStorage.getItem('daria-hidden-artworks') || '[]'));
   replacedArtworkPages.forEach(page => hidden.add(page));
   const getValue = card => {
     const price = card.querySelector('small').textContent;
@@ -105,6 +108,36 @@ function renderProject() {
 }
 
 const replacedArtworkPages = new Set();
+let sharedHidden = [];
+let sharedRevision;
+let readingSharedCatalog = false;
+
+async function loadSharedArtworks() {
+  if (readingSharedCatalog) return;
+  readingSharedCatalog = true;
+  try {
+    const { revision, content } = await sharedCatalog.read();
+    if (revision === sharedRevision) return;
+    for (const key of Object.keys(works)) delete works[key];
+    replacedArtworkPages.clear();
+    sharedHidden = content.hidden;
+    for (const [id, row] of Object.entries(content.works)) {
+      const images = row.photos.map(path => sharedCatalog.photoURL(path)).filter(Boolean);
+      if (!images.length) continue;
+      if (row.sourcePage) replacedArtworkPages.add(row.sourcePage);
+      works[`local-${id}`] = { ...row, images, cover: images[0], kicker: 'Авторская работа' };
+    }
+    applyCatalogTexts(content.texts);
+    renderProject();
+    sharedRevision = revision;
+    document.dispatchEvent(new Event('daria-catalog-update'));
+  } catch (error) {
+    console.warn('Не удалось обновить каталог.', error);
+  } finally {
+    readingSharedCatalog = false;
+  }
+}
+
 let artworkRevision;
 function loadLocalArtworks() {
   if (!('indexedDB' in window)) return;
@@ -266,14 +299,16 @@ function showWork(work) {
 artworkMore.addEventListener('click', () => { visibleArtworks += 2; renderProject(); });
 artworkLess.addEventListener('click', () => { visibleArtworks -= 2; renderProject(); });
 renderProject();
-loadLocalArtworks();
+const refreshCatalog = sharedCatalog ? loadSharedArtworks : loadLocalArtworks;
+refreshCatalog();
 window.addEventListener('storage', event => {
-  if (event.key === artworkRevisionKey) loadLocalArtworks();
+  if (event.key === artworkRevisionKey) refreshCatalog();
 });
-window.addEventListener('pageshow', loadLocalArtworks);
+window.addEventListener('pageshow', refreshCatalog);
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) loadLocalArtworks();
+  if (!document.hidden) refreshCatalog();
 });
+if (sharedCatalog) setInterval(() => { if (!document.hidden) refreshCatalog(); }, 45000);
 
 const artworkPages = new Map();
 const warmImages = new Map();

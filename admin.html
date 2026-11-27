@@ -23,7 +23,7 @@
       <form id="login-form" class="login-card">
         <p>Администраторский режим</p>
         <h1 id="login-title">Админка Дарьи</h1>
-        <label>Логин<input name="login" autocomplete="username" required /></label>
+        <label><span id="login-label">Логин</span><input name="login" autocomplete="username" required /></label>
         <label>Пароль<input name="password" type="password" autocomplete="current-password" required /></label>
         <label class="remember-login"><input name="remember" type="checkbox" checked /> Запомнить вход на этом устройстве</label>
         <button type="submit">Войти</button>
@@ -36,22 +36,23 @@
       <div class="admin-tools">
         <button id="preview-mode" type="button" aria-pressed="false">Смотреть как посетитель</button>
         <a href="./#portfolio" target="_blank" rel="noopener">Открыть портфолио</a>
-        <a href="./#sold" target="_blank" rel="noopener">Открыть проданные картины</a>
+        <button id="open-sold-editor" type="button">Проданные картины</button>
         <label>Раздел для редактирования
           <select id="edit-section"><option value="">Выберите раздел</option><option value="about">Обо мне</option><option value="portfolio">Портфолио</option><option value="sold">Проданные картины</option><option value="pricing">Стоимость картины</option><option value="order">Как заказать картину</option><option value="contacts">Контакты</option></select>
         </label>
         <button id="edit-section-text" type="button">Изменить текст</button>
         <button id="new-work" type="button">Добавить картину</button>
-        <button id="publish-local" class="publish-local" type="button">Применить в этом браузере</button>
-        <p>После подтверждения откройте нужный раздел по ссылкам выше. В портфолио после первых восьми работ нажмите «Развернуть».</p>
+        <button id="publish-local" class="publish-local" type="button" hidden>Опубликовать изменения</button>
         <h2>Изменения</h2>
         <ul id="changes-list"></ul>
-        <p>Сейчас изменения сохраняются в этом браузере. Для переноса всех добавленных картин вместе с фотографиями используйте кнопку ниже.</p>
         <output id="draft-status" role="status"></output>
       </div>
       <div class="library-head"><h2>Добавленные картины</h2><span id="work-count"></span></div>
-      <div class="admin-work-actions"><button id="transfer-artworks" type="button" hidden>Передать картины для публикации</button></div>
-      <output id="transfer-status" role="status"></output>
+      <details id="transfer-options" hidden>
+        <summary>Перенос работ с этого устройства</summary>
+        <div class="admin-work-actions"><button id="transfer-artworks" type="button">Передать картины для публикации</button></div>
+        <output id="transfer-status" role="status"></output>
+      </details>
       <div id="work-list" class="work-list"></div>
       <p id="empty-library">Здесь появятся добавленные картины.</p>
       <section id="built-in-works"><h2>Картины на сайте</h2><div id="built-in-list" class="work-list"></div></section>
@@ -77,7 +78,7 @@
           <label id="artwork-description-field" hidden>Описание<textarea name="description" rows="7" maxlength="1200" placeholder="История картины, идея и вдохновение"></textarea></label>
           <label>Размер<input name="size" maxlength="60" placeholder="80 × 100 см" /></label>
           <label>Стоимость, ₽<input name="price" inputmode="numeric" placeholder="Необязательно" /></label>
-          <button class="save-work" type="submit">Сохранить черновик</button>
+          <button class="save-work" type="submit">Опубликовать</button>
           <output id="save-message" role="status"></output>
         </div>
       </div>
@@ -87,8 +88,8 @@
   <script src="artwork-pages.js?v=20261127-4"></script>
   <dialog id="publish-confirm" class="publish-confirm">
     <form method="dialog">
-      <h2>Применить изменения?</h2>
-      <p>Подтверждённые правки будут видны только в этом браузере. Другие посетители их пока не увидят.</p>
+      <h2 id="publish-title">Опубликовать изменения?</h2>
+      <p id="publish-hint"></p>
       <button type="submit">Отмена</button>
       <button id="confirm-publish" class="publish-local" type="button">Подтвердить</button>
     </form>
@@ -101,6 +102,8 @@
       <button id="apply-text" value="save" class="publish-local">Сохранить черновик</button>
     </form>
   </dialog>
-  <script src="admin.js?v=20261127-13"></script>
+  <script src="catalog-config.js?v=1"></script>
+  <script src="catalog-api.js?v=1"></script>
+  <script src="admin.js?v=20261127-14"></script>
 </body>
 </html>

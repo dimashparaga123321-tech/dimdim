@@ -17,6 +17,8 @@ let photoUrls = [];
 let editingArtworkId = null;
 let editingArtworkRecord = null;
 let libraryPhotoUrls = [];
+let sharedState;
+let publishSelection = null;
 
 function artworkImages(row) {
   const isPhoto = blob => blob instanceof Blob && blob.size > 0;
@@ -36,7 +38,7 @@ function setAuthenticated(authenticated) {
   loginView.hidden = authenticated;
   dashboard.hidden = !authenticated;
   logout.hidden = !authenticated;
-  if (authenticated) openDatabase().then(renderLibrary).then(refreshSitePreview).catch(() => markDraftChanged('Хранилище браузера недоступно.'));
+  if (authenticated) initializeEditor().catch(() => markDraftChanged('Не удалось открыть каталог. Перезагрузите страницу.'));
   else document.querySelector('#admin-site-preview').removeAttribute('src');
 }
 
@@ -44,17 +46,29 @@ document.querySelector('#login-form').addEventListener('submit', async (event) =
   event.preventDefault();
   const form = event.currentTarget;
   const message = document.querySelector('#login-message');
-  const valid = form.elements.login.value.trim().toLowerCase() === LOGIN
-    && await sha256(form.elements.password.value) === PASSWORD_HASH;
-  if (!valid) return void (message.textContent = 'Неверный логин или пароль.');
-  sessionStorage.setItem(SESSION_KEY, '1');
-  if (form.elements.remember.checked) localStorage.setItem(SESSION_KEY, '1');
-  form.reset();
-  message.textContent = '';
-  setAuthenticated(true);
+  const submit = event.submitter;
+  if (submit) submit.disabled = true;
+  try {
+    if (sharedCatalog) await sharedCatalog.login(form.elements.login.value.trim(), form.elements.password.value, form.elements.remember.checked);
+    else {
+      const valid = form.elements.login.value.trim().toLowerCase() === LOGIN
+        && await sha256(form.elements.password.value) === PASSWORD_HASH;
+      if (!valid) throw Object.assign(new Error('Invalid login'), { status: 401 });
+      sessionStorage.setItem(SESSION_KEY, '1');
+      if (form.elements.remember.checked) localStorage.setItem(SESSION_KEY, '1');
+    }
+    form.reset();
+    message.textContent = '';
+    setAuthenticated(true);
+  } catch (error) {
+    message.textContent = [400, 401, 403].includes(error.status) ? 'Проверьте данные для входа и доступ к редактору.' : 'Не удалось войти. Попробуйте ещё раз.';
+  } finally {
+    if (submit) submit.disabled = false;
+  }
 });
 
 logout.addEventListener('click', () => {
+  sharedCatalog?.logout().catch(() => {});
   sessionStorage.removeItem(SESSION_KEY);
   localStorage.removeItem(SESSION_KEY);
   setAuthenticated(false);
@@ -83,7 +97,13 @@ function storeRequest(store, mode, action, value) {
   });
 }
 
-const getAllWorks = () => storeRequest('artworks', 'readonly', 'getAll');
+const getDrafts = () => storeRequest('artworks', 'readonly', 'getAll');
+async function getAllWorks() {
+  const local = await getDrafts();
+  const records = new Map(Object.entries(sharedState?.content.works || {}).map(([id, row]) => [id, { ...row, id, published: true }]));
+  for (const row of local) records.set(row.id, row);
+  return [...records.values()];
+}
 const addWork = (work) => storeRequest('artworks', 'readwrite', 'add', work);
 const updateWork = (work) => storeRequest('artworks', 'readwrite', 'put', work);
 const transferArtworks = document.querySelector('#transfer-artworks');
@@ -93,7 +113,7 @@ transferArtworks.onclick = async () => {
   transferArtworks.disabled = true;
   status.textContent = 'Готовим файл с картинами…';
   try {
-    const rows = (await getAllWorks()).filter(row => !row.removed && artworkImages(row).length);
+    const rows = (await getDrafts()).filter(row => !row.removed && artworkImages(row).length);
     const artworks = await Promise.all(rows.map(async row => {
       const photos = await Promise.all(artworkImages(row).map(blob => new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -169,12 +189,12 @@ async function renderLibrary() {
   renderBuiltInWorks();
   const records = await getAllWorks();
   renderChanges(records);
-  const rows = records.filter(row => !row.removed).reverse();
+  const rows = records.filter(row => !row.removed).sort((a, b) => (b.createdAt || b.updatedAt || Number(b.id) || 0) - (a.createdAt || a.updatedAt || Number(a.id) || 0));
   const list = document.querySelector('#work-list');
   const endings = { one: 'работа', few: 'работы', many: 'работ' };
   document.querySelector('#work-count').textContent = `${rows.length} ${endings[new Intl.PluralRules('ru').select(rows.length)]}`;
   document.querySelector('#empty-library').hidden = rows.length > 0;
-  transferArtworks.hidden = !rows.some(row => artworkImages(row).length);
+  document.querySelector('#transfer-options').hidden = Boolean(sharedCatalog) || !rows.some(row => artworkImages(row).length);
   libraryPhotoUrls.forEach(url => URL.revokeObjectURL(url));
   libraryPhotoUrls = [];
   list.replaceChildren(...rows.map((row) => {
@@ -185,7 +205,7 @@ async function renderLibrary() {
     if (photos.length) {
       image.src = URL.createObjectURL(photos[0]);
       libraryPhotoUrls.push(image.src);
-    }
+    } else if (sharedCatalog && row.photos?.length) image.src = sharedCatalog.photoURL(row.photos[0]);
     image.alt = row.title;
     const copy = document.createElement('div');
     copy.className = 'admin-work-copy';
@@ -193,21 +213,28 @@ async function renderLibrary() {
     const title = document.createElement('h3');
     title.textContent = row.title;
     const meta = document.createElement('p');
-    meta.textContent = [row.year, row.status, !photos.length ? 'Добавьте фото' : row.pending || row.published === false ? 'Черновик' : 'Видна в этом браузере'].filter(Boolean).join(' · ');
+    const needsPublish = Boolean(sharedCatalog && typeof row.id === 'number') || row.pending || row.published === false;
+    const publication = needsPublish ? 'К публикации' : sharedCatalog ? 'Опубликована' : 'Видна в этом браузере';
+    meta.textContent = [row.year, statusLabel(row.status), photos.length || row.photos?.length ? publication : 'Добавьте фото'].filter(Boolean).join(' · ');
     const actions = document.createElement('div');
     actions.className = 'admin-work-actions';
     const edit = document.createElement('button');
     edit.type = 'button';
     edit.className = 'edit-work';
     edit.textContent = 'Изменить';
-    edit.addEventListener('click', () => openArtworkEditor(row));
+    edit.onclick = async () => {
+      edit.disabled = true;
+      try { await openArtworkEditor(row); }
+      catch { markDraftChanged('Не удалось загрузить фотографии. Попробуйте ещё раз.'); }
+      finally { edit.disabled = false; }
+    };
     const markSold = document.createElement('button');
     markSold.type = 'button';
     markSold.textContent = row.status === 'Продана' ? 'Вернуть в наличие' : 'Отметить проданной';
     markSold.onclick = async () => {
       try {
         await updateWork({ ...row, status: row.status === 'Продана' ? 'В наличии' : 'Продана',
-          pending: true, live: row.pending ? row.live : (row.published !== false ? row : null) });
+          pending: true, updatedAt: Date.now(), live: row.pending ? row.live : (row.published !== false ? row : null) });
         await renderLibrary();
         markDraftChanged('Статус сохранён в черновике.');
       } catch {
@@ -221,7 +248,7 @@ async function renderLibrary() {
     remove.addEventListener('click', async () => {
       if (!confirm(`Удалить «${row.title}»?`)) return;
       try {
-        await updateWork({ ...row, removed: true, pending: true, live: row.pending ? row.live : (row.published !== false ? row : null) });
+        await updateWork({ ...row, removed: true, pending: true, updatedAt: Date.now(), live: row.pending ? row.live : (row.published !== false ? row : null) });
         markDraftChanged('Удаление сохранено в черновике.');
         await renderLibrary();
       } catch {
@@ -230,25 +257,44 @@ async function renderLibrary() {
     });
     text.append(title, meta);
     actions.append(edit, markSold, remove);
+    if (needsPublish) {
+      const publish = document.createElement('button');
+      publish.type = 'button';
+      publish.textContent = row.pending || row.published === false ? 'Опубликовать' : 'Переопубликовать';
+      publish.onclick = () => openPublish(row.id, row.title);
+      actions.prepend(publish);
+    }
     copy.append(text, actions);
     article.append(image, copy);
     return article;
   }));
 }
 
-function openArtworkEditor(row = null) {
+function statusLabel(status) {
+  return status === 'Продана' ? 'Продана' : status === 'В наличии' ? 'В наличии' : 'В портфолио';
+}
+
+async function openArtworkEditor(row = null) {
+  let photos = row ? artworkImages(row) : [];
+  if (!photos.length && row?.photos?.length) {
+    photos = await Promise.all(row.photos.map(async path => {
+      const response = await fetch(sharedCatalog.photoURL(path));
+      if (!response.ok) throw new Error('Photo unavailable');
+      return response.blob();
+    }));
+  }
   editingArtworkId = row?.id || null;
   editingArtworkRecord = row;
   artworkForm.reset();
   artworkForm.elements.year.value = row?.year || '2026';
   artworkForm.elements.title.value = row?.title || '';
-  artworkForm.elements.status.value = row?.status || 'В портфолио';
+  artworkForm.elements.status.value = statusLabel(row?.status);
   artworkForm.elements.materials.value = row?.materials || '';
   artworkForm.elements.description.value = row?.description || '';
   setDescriptionVisible(Boolean(artworkForm.elements.description.value.trim()));
   artworkForm.elements.size.value = row?.size || '';
   artworkForm.elements.price.value = row?.price || '';
-  artworkPhotos = row ? artworkImages(row).map(blob => ({ blob, stored: true })) : [];
+  artworkPhotos = photos.map(blob => ({ blob, stored: true }));
   document.querySelector('#save-message').textContent = '';
   renderArtworkPhotos();
   editor.showModal();
@@ -354,11 +400,10 @@ artworkForm.addEventListener('submit', async (event) => {
       live: editingArtworkRecord?.pending ? editingArtworkRecord.live : (editingArtworkRecord?.published !== false ? editingArtworkRecord : null),
       updatedAt: Date.now()
     };
-    if (editingArtworkId) await updateWork({ ...work, id: editingArtworkId });
-    else await addWork(work);
+    const id = editingArtworkId ? await updateWork({ ...work, id: editingArtworkId }) : await addWork(work);
     editor.close();
     message.textContent = '';
-    markDraftChanged(`${work.title} — черновик для раздела «${work.status === 'Продана' ? 'Проданные картины' : 'Портфолио'}». Нажмите «Применить в этом браузере» → «Подтвердить».`);
+    openPublish(id, work.title);
     await renderLibrary();
   } catch (error) {
     message.textContent = error?.name === 'QuotaExceededError' ? 'В браузере недостаточно места для этих файлов.' : 'Не удалось открыть фото. Попробуйте выбрать файл JPEG или PNG.';
@@ -381,7 +426,7 @@ async function openBuiltInArtwork(file, records) {
   const metadata = page.querySelector('.artwork-page-details > p').textContent.split(',');
   const response = await fetch(page.querySelector('img').getAttribute('src'));
   if (!response.ok) throw new Error('Photo unavailable');
-  openArtworkEditor({
+  return openArtworkEditor({
     sourcePage: file, published: false,
     title: page.querySelector('h1').textContent.replace(/^Авторская картина /, '').replace(/[«»]/g, ''),
     size: metadata[0].trim(), year: metadata[1]?.trim() || '2026',
@@ -406,7 +451,7 @@ function renderBuiltInWorks() {
     button.textContent = hidden.has(file) ? 'Вернуть' : 'Убрать';
     button.onclick = async () => {
       if (hidden.has(file)) hidden.delete(file);
-      else if (confirm(`Убрать ${title} из портфолио в этом браузере?`)) hidden.add(file);
+      else if (confirm(`Убрать ${title} из портфолио?`)) hidden.add(file);
       renderBuiltInWorks();
       renderChanges(await getAllWorks());
     };
@@ -431,11 +476,106 @@ function renderBuiltInWorks() {
 
 const publishDialog = document.querySelector('#publish-confirm');
 const publishButton = document.querySelector('#confirm-publish');
+const cancelPublish = publishDialog.querySelector('button[type="submit"]');
+publishDialog.addEventListener('cancel', event => { if (publishButton.disabled) event.preventDefault(); });
+const publishAll = document.querySelector('#publish-local');
 const textDraft = JSON.parse(localStorage.getItem('daria-site-text-draft-v2') || localStorage.getItem('daria-site-text-v2') || '{}');
-document.querySelector('#publish-local').onclick = () => publishDialog.showModal();
+function openPublish(id = null, title = '') {
+  publishSelection = id;
+  document.querySelector('#publish-title').textContent = title ? `Опубликовать «${title.replace(/^«|»$/g, '')}»?` : 'Опубликовать изменения?';
+  document.querySelector('#publish-hint').textContent = sharedCatalog
+    ? 'После подтверждения изменения появятся на сайте для всех посетителей.'
+    : 'Общее хранилище ещё не подключено. Изменения будут видны только в этом браузере.';
+  publishDialog.showModal();
+}
+publishAll.onclick = () => openPublish();
+
+async function initializeEditor() {
+  refreshSitePreview();
+  await openDatabase();
+  if (sharedCatalog) {
+    sharedState = await sharedCatalog.read();
+    const { texts, hidden } = sharedState.content;
+    const drafts = JSON.parse(localStorage.getItem('daria-site-text-draft-v2') || '{}');
+    const localTexts = sharedState.revision === 0 ? textDraft : {};
+    const nextTexts = { ...texts, ...localTexts, ...drafts };
+    for (const key of Object.keys(textDraft)) delete textDraft[key];
+    Object.assign(textDraft, nextTexts);
+    if (sharedState.revision > 0) hiddenDraft.clear();
+    for (const file of hidden) hiddenDraft.add(file);
+    refreshSitePreview();
+  }
+  await renderLibrary();
+}
+
+async function publishSharedChanges(selection) {
+  if (!sharedState) throw new Error('Catalog is not ready');
+  const rows = (await getDrafts()).filter(row => selection === null || row.id === selection);
+  const content = structuredClone(sharedState.content);
+  const hidden = selection === null ? new Set(hiddenDraft) : new Set(content.hidden);
+  let device = localStorage.getItem('daria-catalog-migration-device');
+  if (!device) {
+    device = crypto.randomUUID();
+    localStorage.setItem('daria-catalog-migration-device', device);
+  }
+  const committed = [];
+  const missingPhotos = [];
+  for (const row of rows) {
+    const id = row.sourcePage ? `page-${row.sourcePage}` : typeof row.id === 'number' ? `${device}-${row.id}` : row.id;
+    if (row.removed) {
+      delete content.works[id];
+      if (row.sourcePage) hidden.add(row.sourcePage);
+    } else {
+      const images = artworkImages(row);
+      const photos = [];
+      if (images.length) {
+        for (const photo of images) photos.push(await sharedCatalog.upload(photo.size > maxPhotoBytes ? await previewBlob(photo) : photo));
+      } else photos.push(...(row.photos || []));
+      if (!photos.length) {
+        missingPhotos.push(row.title || 'Без названия');
+        continue;
+      }
+      const { title, year, materials, description, size, price, status, sourcePage, crop } = row;
+      content.works[id] = { title, year, materials, description, size, price, status: statusLabel(status), sourcePage, crop,
+        createdAt: content.works[id]?.createdAt || row.createdAt || row.updatedAt || Date.now(), photos };
+    }
+    committed.push(row);
+  }
+  content.hidden = [...hidden];
+  if (selection === null) content.texts = { ...textDraft };
+  if (committed.length || selection === null) sharedState = await sharedCatalog.save(sharedState.revision, content);
+  for (const row of committed) {
+    await new Promise((resolve, reject) => {
+      const tx = database.transaction('artworks', 'readwrite');
+      const store = tx.objectStore('artworks');
+      const request = store.get(row.id);
+      request.onsuccess = () => {
+        if (request.result && request.result.updatedAt === row.updatedAt) store.delete(row.id);
+      };
+      tx.oncomplete = resolve;
+      tx.onabort = () => reject(tx.error);
+    });
+  }
+  if (selection === null) localStorage.removeItem('daria-site-text-draft-v2');
+  localStorage.setItem('daria-artwork-revision', crypto.randomUUID());
+  return missingPhotos.length
+    ? `Нужны фото: ${missingPhotos.join(', ')}.${committed.length || selection === null ? ' Остальные изменения опубликованы.' : ''}`
+    : 'Изменения опубликованы для всех.';
+}
+
 publishButton.onclick = async () => {
+  const selection = publishSelection;
   publishButton.disabled = true;
+  cancelPublish.disabled = true;
   try {
+    if (sharedCatalog) {
+      const result = await publishSharedChanges(selection);
+      publishDialog.close();
+      markDraftChanged(result);
+      await renderLibrary();
+      refreshSitePreview();
+      return;
+    }
     const published = { available: 0, sold: 0 };
     const missingPhotos = [];
     await new Promise((resolve, reject) => {
@@ -446,6 +586,7 @@ publishButton.onclick = async () => {
       const request = store.getAll();
       request.onsuccess = () => {
         for (const row of request.result) {
+          if (selection !== null && row.id !== selection) continue;
           if (row.removed && !row.sourcePage) store.delete(row.id);
           else if (row.removed) store.put({ id: row.id, sourcePage: row.sourcePage, removed: true });
           else if (row.pending || row.published === false) {
@@ -460,20 +601,24 @@ publishButton.onclick = async () => {
         }
       };
     });
-    localStorage.setItem('daria-site-text-v2', JSON.stringify(textDraft));
-    localStorage.removeItem('daria-site-text-draft-v2');
-    localStorage.setItem('daria-hidden-artworks', JSON.stringify([...hiddenDraft]));
+    if (selection === null) {
+      localStorage.setItem('daria-site-text-v2', JSON.stringify(textDraft));
+      localStorage.removeItem('daria-site-text-draft-v2');
+      localStorage.setItem('daria-hidden-artworks', JSON.stringify([...hiddenDraft]));
+    }
     localStorage.setItem('daria-artwork-revision', crypto.randomUUID());
     publishDialog.close();
     const result = `Применено в этом браузере. Портфолио — ${published.available}, проданные — ${published.sold}.`;
     markDraftChanged(missingPhotos.length ? `${result} Для этих черновиков нужно добавить фото: ${missingPhotos.join(', ')}.` : result);
     await renderLibrary();
     refreshSitePreview();
-  } catch {
+  } catch (error) {
     publishDialog.close();
-    markDraftChanged('Не удалось применить изменения. Попробуйте снова.');
+    markDraftChanged(error.status === 409 ? 'Каталог изменился на другом устройстве. Черновик сохранён. Перезагрузите редактор перед повторной публикацией.'
+      : [401, 403].includes(error.status) ? 'Войдите заново, чтобы опубликовать. Черновик сохранён.' : 'Не удалось применить изменения. Черновик сохранён, попробуйте снова.');
   } finally {
     publishButton.disabled = false;
+    cancelPublish.disabled = false;
   }
 };
 
@@ -488,13 +633,14 @@ previewMode.onclick = () => {
 };
 const sectionPicker = document.querySelector('#edit-section');
 const textEditor = document.querySelector('#text-editor');
-const publishedTexts = () => JSON.parse(localStorage.getItem('daria-site-text-v2') || '{}');
+const publishedTexts = () => sharedState?.content.texts || JSON.parse(localStorage.getItem('daria-site-text-v2') || '{}');
 
 function renderChanges(records) {
   const previous = publishedTexts();
-  const changes = records.filter(row => row.pending || row.published === false)
+  const workChanges = records.filter(row => row.pending || row.published === false || (sharedCatalog && typeof row.id === 'number'));
+  const changes = workChanges
     .map(row => `${row.removed ? 'Удаление' : 'Картина'} · ${row.title} · ${row.status === 'Продана' ? 'Проданные картины' : 'Портфолио'}`);
-  const previouslyHidden = new Set(JSON.parse(localStorage.getItem('daria-hidden-artworks') || '[]'));
+  const previouslyHidden = new Set(sharedState?.content.hidden || JSON.parse(localStorage.getItem('daria-hidden-artworks') || '[]'));
   for (const file of new Set([...previouslyHidden, ...hiddenDraft])) {
     if (previouslyHidden.has(file) === hiddenDraft.has(file)) continue;
     const title = new DOMParser().parseFromString(artworkMarkup[file] || '', 'text/html').querySelector('h1')?.textContent || file;
@@ -507,6 +653,7 @@ function renderChanges(records) {
     if (!changes.includes(text)) changes.push(text);
   }
   const list = document.querySelector('#changes-list');
+  publishAll.hidden = changes.length <= 1 && !workChanges.some(row => row.removed) && changes.length === workChanges.length;
   list.replaceChildren(...(changes.length ? changes : ['Нет изменений к отправке']).map(value => {
     const item = document.createElement('li');
     item.textContent = value;
@@ -555,9 +702,22 @@ document.querySelector('#text-form').addEventListener('submit', event => {
 });
 
 let previewResize;
+let pendingPreviewSection;
 function refreshSitePreview() {
   document.querySelector('#admin-site-preview').src = './';
 }
+
+function goToEditorSection(id) {
+  const target = frame.contentDocument?.getElementById(id);
+  if (!target) { pendingPreviewSection = id; return; }
+  pendingPreviewSection = null;
+  window.scrollBy({ top: frame.getBoundingClientRect().top + target.getBoundingClientRect().top,
+    behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+}
+document.querySelector('#open-sold-editor').onclick = () => {
+  if (previewMode.getAttribute('aria-pressed') === 'true') previewMode.click();
+  goToEditorSection('sold');
+};
 
 document.querySelector('#admin-site-preview').addEventListener('load', event => {
   const doc = event.target.contentDocument;
@@ -565,10 +725,12 @@ document.querySelector('#admin-site-preview').addEventListener('load', event => 
   const style = doc.createElement('style');
   style.textContent = '.hero { min-height:680px } .site-header { position:relative } .admin-inline-tools { grid-column:1/-1; width:100%; margin:0 0 14px }';
   doc.head.append(style);
-  doc.querySelectorAll('[data-edit-text]').forEach(element => {
+  const applyDraftText = () => doc.querySelectorAll('[data-edit-text]').forEach(element => {
     const value = textDraft[element.dataset.editText];
     if (typeof value === 'string') element.textContent = value;
   });
+  applyDraftText();
+  doc.addEventListener('daria-catalog-update', applyDraftText);
   previewResize?.disconnect();
   const resize = () => {
     if (!doc.querySelector('dialog[open]')) frame.style.height = `${doc.body.offsetHeight}px`;
@@ -603,8 +765,7 @@ document.querySelector('#admin-site-preview').addEventListener('load', event => 
       const target = doc.getElementById(link.hash.slice(1));
       if (!target) return;
       click.preventDefault();
-      window.scrollBy({ top: frame.getBoundingClientRect().top + target.getBoundingClientRect().top,
-        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      goToEditorSection(target.id);
     });
   }
   doc?.addEventListener('click', async click => {
@@ -617,12 +778,17 @@ document.querySelector('#admin-site-preview').addEventListener('load', event => 
       const file = card.getAttribute('href');
       const key = card.dataset.work;
       const existing = rows.find(row => !row.removed && (file ? row.sourcePage === file : key === `local-${row.id}`));
-      if (existing) return openArtworkEditor(existing);
-      if (file) await openBuiltInArtwork(file, rows);
+      if (existing) await openArtworkEditor(existing);
+      else if (file) await openBuiltInArtwork(file, rows);
     } catch {
       markDraftChanged('Не удалось открыть картину для редактирования.');
     }
   }, { capture: true });
+  if (pendingPreviewSection) goToEditorSection(pendingPreviewSection);
 });
 
-setAuthenticated(sessionStorage.getItem(SESSION_KEY) === '1' || localStorage.getItem(SESSION_KEY) === '1');
+if (sharedCatalog) {
+  document.querySelector('#login-label').textContent = 'Электронная почта';
+  document.querySelector('#login-form').elements.login.type = 'email';
+  sharedCatalog.restore().then(setAuthenticated).catch(() => setAuthenticated(false));
+} else setAuthenticated(sessionStorage.getItem(SESSION_KEY) === '1' || localStorage.getItem(SESSION_KEY) === '1');
