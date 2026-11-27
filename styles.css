@@ -346,3 +346,5 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
 .order-contact-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px 20px; }
 .order-contact-row p { flex:1 1 240px; }
 .catalog-tools[hidden] { display:none; }
+.brand-mark { display: inline-flex; align-items: center; }
+.brand-mark img { display: block; flex: none; }
