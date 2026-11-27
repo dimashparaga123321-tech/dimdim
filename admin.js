@@ -11,6 +11,7 @@ const artworkPreview = document.querySelector('#crop-preview');
 const artworkPreviewImage = artworkPreview.querySelector('img');
 let database;
 const maxArtworkPhotos = 8;
+const maxPhotoBytes = 280 * 1024;
 let artworkPhotos = [];
 let photoUrls = [];
 let editingArtworkId = null;
@@ -92,12 +93,26 @@ async function previewBlob(file) {
     const photo = new Image();
     photo.src = url;
     await photo.decode();
-    const scale = Math.min(1, 1600 / Math.max(photo.naturalWidth, photo.naturalHeight));
+    let scale = Math.min(1, 1600 / Math.max(photo.naturalWidth, photo.naturalHeight));
     const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.round(photo.naturalWidth * scale));
-    canvas.height = Math.max(1, Math.round(photo.naturalHeight * scale));
-    canvas.getContext('2d').drawImage(photo, 0, 0, canvas.width, canvas.height);
-    return await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image conversion failed')), 'image/jpeg', .9));
+    const context = canvas.getContext('2d', { alpha: false });
+    for (let attempt = 0; attempt < 6; attempt++) {
+      canvas.width = Math.max(1, Math.round(photo.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(photo.naturalHeight * scale));
+      context.fillStyle = '#fff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(photo, 0, 0, canvas.width, canvas.height);
+      for (const quality of [.86, .78, .7]) {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', quality));
+        if (blob?.type === 'image/webp' && blob.size <= maxPhotoBytes) return blob;
+        if (!blob || blob.type !== 'image/webp') {
+          const jpeg = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+          if (jpeg?.size <= maxPhotoBytes) return jpeg;
+        }
+      }
+      scale *= .8;
+    }
+    throw new Error('Photo exceeds byte limit');
   } finally {
     URL.revokeObjectURL(url);
   }
@@ -255,7 +270,7 @@ artworkForm.addEventListener('submit', async (event) => {
   try {
     const images = [];
     for (const photo of photosToSave) {
-      images.push(photo.stored ? photo.blob : await previewBlob(photo.blob));
+      images.push(photo.stored && photo.blob.size <= maxPhotoBytes ? photo.blob : await previewBlob(photo.blob));
     }
     const cover = images[0];
     const work = {
