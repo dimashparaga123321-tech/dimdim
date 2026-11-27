@@ -190,12 +190,24 @@ function openArtworkEditor(row = null) {
   artworkForm.elements.status.value = row?.status || 'В портфолио';
   artworkForm.elements.materials.value = row?.materials || '';
   artworkForm.elements.description.value = row?.description || '';
+  setDescriptionVisible(Boolean(artworkForm.elements.description.value.trim()));
   artworkForm.elements.size.value = row?.size || '';
   artworkForm.elements.price.value = row?.price || '';
   artworkPhotos = (row?.images || []).map(blob => ({ blob, stored: true }));
   renderArtworkPhotos();
   editor.showModal();
 }
+
+const addDescription = document.querySelector('#add-description');
+function setDescriptionVisible(visible) {
+  document.querySelector('#artwork-description-field').hidden = !visible;
+  addDescription.setAttribute('aria-expanded', String(visible));
+  addDescription.hidden = visible;
+}
+addDescription.addEventListener('click', () => {
+  setDescriptionVisible(true);
+  artworkForm.elements.description.focus();
+});
 
 document.querySelector('#new-work').addEventListener('click', () => openArtworkEditor());
 document.querySelector('#close-editor').addEventListener('click', () => editor.close());

@@ -70,7 +70,8 @@
           <label>Название картины<input name="title" required maxlength="100" placeholder="Например, «Тишина сада»" /></label>
           <div class="field-row"><label>Год<input name="year" inputmode="numeric" value="2026" maxlength="4" required /></label><label>В какой раздел добавить<select name="status"><option>В портфолио</option><option>В наличии</option><option>Продана</option></select></label></div>
           <label>Материалы<input name="materials" maxlength="120" placeholder="Холст, масло" /></label>
-          <label>Описание<textarea name="description" rows="7" maxlength="1200" placeholder="История картины, идея и вдохновение"></textarea></label>
+          <button id="add-description" type="button" class="publish-local" aria-controls="artwork-description-field" aria-expanded="false">Добавить описание</button>
+          <label id="artwork-description-field" hidden>Описание<textarea name="description" rows="7" maxlength="1200" placeholder="История картины, идея и вдохновение"></textarea></label>
           <label>Размер<input name="size" maxlength="60" placeholder="80 × 100 см" /></label>
           <label>Стоимость, ₽<input name="price" inputmode="numeric" placeholder="Необязательно" /></label>
           <button class="save-work" type="submit">Сохранить черновик</button>
@@ -97,6 +98,6 @@
       <button id="apply-text" value="save" class="publish-local">Сохранить черновик</button>
     </form>
   </dialog>
-  <script src="admin.js?v=20261127-7"></script>
+  <script src="admin.js?v=20261127-9"></script>
 </body>
 </html>

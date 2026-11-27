@@ -321,6 +321,7 @@ footer { min-height: 90px; display: flex; align-items: center; justify-content: 
 .catalog-tools button:active { background: var(--ink); color: white; transform: scale(.97); }
 #portfolio-artwork .artwork-description > summary { display: none; }
 #description-more > summary { color: white; margin-block: 0 12px; }
+#description-more[hidden] { display: none; }
 #description-more > summary span { opacity: 0; transform: translateY(-4px); transition: opacity .2s, transform .2s; }
 #description-more[open] > summary span { opacity: 1; transform: translateY(0); }
 #dialog-description:empty, .dialog-copy dl > [hidden] { display: none; }
